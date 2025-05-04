@@ -1,29 +1,32 @@
-import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-// Removed unused import as 'auth' is not exported from 'firebase/app'
+import { Injectable, inject} from '@angular/core';
+import { Auth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  constructor(private afAuth: AngularFireAuth) {}
+  constructor(private auth: Auth) {}
 
   loginConGoogle() {
     const provider = new GoogleAuthProvider();
-    return this.afAuth.signInWithPopup(provider);
+    return signInWithPopup(this.auth, provider);
   }
 
-  getUserId(): Promise<string | null> {
-    return this.afAuth.currentUser.then(user => user?.uid || null);
+  loginConFacebook() {
+    const provider = new FacebookAuthProvider();
+    return signInWithPopup(this.auth, provider);
+  }
+
+  async getUserId(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    return user ? user.uid : null;
   }
 
   logout(): Promise<void> {
-    return this.afAuth.signOut();
+    return signOut(this.auth);
   }
 
-  getUserObservable() {
-    return this.afAuth.authState;
+  getUserObservable(callback: (user: User | null) => void) {
+    return onAuthStateChanged(this.auth, callback);
   }
 }

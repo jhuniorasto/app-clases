@@ -15,6 +15,3 @@ export const environment = {
         appId: "1:207648441749:web:1d2a57906d81b84a7d629c"
     }
 };
-
-// Initialize Firebase
-const app = initializeApp(environment.firebase);

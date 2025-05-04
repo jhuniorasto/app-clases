@@ -1,8 +1,38 @@
-<div class="container text-center mt-5">
-    <h2>Bienvenido a EduSmart</h2>
-    <p>Inicia sesión con tu cuenta de Google para continuar</p>
-    <button class="btn btn-primary" (click)="loginConGoogle()">
-      Iniciar sesión con Google
+<div class="login-container">
+  <div class="login-box">
+    <div class="logo"></div>
+    <h2>Bienvenido(a)</h2>
+    <form>
+      <label>Email</label>
+      <input type="email" placeholder="Ingresa un email" />
+
+      <label>Password <a href="#">Olvidaste tu contraseña?</a></label>
+      <input type="password" placeholder="Ingresa una contraseña" />
+
+      <button type="submit" class="btn signin-btn">Iniciar Sesión</button>
+    </form>
+    
+    <div class="divider">O</div>
+
+    <button class="btn social google-btn" (click)="loginConGoogle()">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="icon" />
+      Continuar con Google
     </button>
+
+    <button class="btn social github-btn" (click)="loginConFacebook()">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="GitHub" class="icon" />
+      Continuar con Facebook
+    </button>
+
+
+    <div class="signup-link">
+      ¿No tienes una cuenta? <a href="#">Únete</a>
+    </div>
   </div>
-  
+
+  <div class="hero-box">
+    <div class="typing-container">
+      <span #typedText class="typed-text"></span><span class="cursor">|</span>
+    </div>
+  </div>
+</div>
