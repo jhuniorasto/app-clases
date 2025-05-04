@@ -1,0 +1,39 @@
+<div class="login-container">
+    <div class="login-box">
+      <div class="logo"></div>
+      <h2>¿Aún no tienes una cuenta? Regístrate</h2>
+      <form>
+        <label>Email</label>
+        <input [(ngModel)]="email" name="email" type="email" placeholder="Ingresa un email (example@gmail.com)" />
+  
+        <label>Password</label>
+        <input [(ngModel)]="password" name="password" type="password" placeholder="Ingresa una contraseña (mín 8 caracteres)" />
+        
+        <button type="submit" class="btn signin-btn" (click)="onSignUpWithEmailAndPassword()">Registrarse</button>
+      </form>
+      
+      <div class="divider">O</div>
+  
+      <button class="btn social google-btn" (click)="onSignUpWithGoogle()">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="icon" />
+        Continuar con Google
+      </button>
+  
+      <button class="btn social github-btn" (click)="onSignUpWithFacebook()">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="GitHub" class="icon" />
+        Continuar con Facebook
+      </button>
+  
+  
+      <div class="signup-link">
+        ¿Ya tienes una cuenta? <a (click)="onRedirectToSignIn()" >Inicia Sesión</a>
+      </div>
+    </div>
+  
+    <div class="hero-box">
+      <div class="typing-container">
+        <span #typedText class="typed-text"></span><span class="cursor">|</span>
+      </div>
+    </div>
+  </div>
+  

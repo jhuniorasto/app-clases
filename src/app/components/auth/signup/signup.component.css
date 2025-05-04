@@ -1,0 +1,224 @@
+:root {
+    --dark-bg: #0e0e0e;
+    --box-bg: #1e1e1e;
+    --primary: #6366f1a;;
+    --input-bg: #2a2a2
+    --input-border: #3d3d3d;
+    --btn-bg: #333;
+    --text-color: #fff;
+  }
+  
+  .login-container {
+    display: flex;
+    height: 100vh;
+    background-color: #1e1e1e;
+  }
+  
+  .login-box {
+    padding: 12%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: var(--box-bg);
+  }
+  
+  .logo {
+    font-size: 2.2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  h2 {
+    color: #fff;
+    font-weight: bold;
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+  
+  .btn.social {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+  
+  
+  .icon {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .google-btn {
+    background-color: #2b2b2b;
+    color: white;
+    border: none;
+    border: 1px solid #444;
+  }
+  
+  .google-btn:hover {
+    border: 1px solid #513bca;
+    background-color: #513bca;
+  }
+  
+  .github-btn {
+    background-color: #2b2b2b;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #444;
+  }
+  .github-btn:hover {
+    border: 1px solid #513bca;
+    background-color: #513bca;
+  }
+  
+  .divider {
+    text-align: center;
+    margin: 2rem 0;
+    color: #888;
+    font-size: 0.9rem;
+    position: relative;
+  }
+  
+  .divider::before,
+  .divider::after {
+    content: '';
+    height: 1px;
+    width: 40%;
+    background: #444;
+    position: absolute;
+    top: 50%;
+  }
+  
+  .divider::before {
+    left: 0;
+  }
+  
+  .divider::after {
+    right: 0;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  form label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  form input {
+    background-color: var(--input-bg);
+    border: 0.5px solid #ffffff85 ;
+    padding: 0.7rem;
+    border-radius: 6px;
+    outline: none;
+    color: white;
+  }
+  
+  form input::placeholder {
+    font-size: 1.1rem;
+    color: #ccc;
+  }
+  
+  form input:focus {
+    border: 1px solid ;
+  }
+  
+  
+  
+  form a {
+    font-size: .9rem;
+    color: #ccc;
+    text-decoration: none;
+  }
+  
+  form a:hover {
+    text-decoration: underline;
+  }
+  
+  .btn.signin-btn {
+    background-color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    color: black;
+    font-weight: bold;
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn.signin-btn:hover {
+    background-color: #ececec;
+  }
+  
+  .signup-link {
+    text-align: center;
+    font-size:1.2rem;
+    color: #ccc;
+  }
+  
+  .signup-link a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  
+  .signup-link a:hover {
+    text-decoration: underline;
+  }
+  
+  .hero-box {
+    width: 50%;
+    background: radial-gradient(
+      circle at bottom,
+      rgba(241, 63, 146, 0.849) 0%,
+      rgba(203, 195, 227, 0.4) 40%,
+      rgba(137, 166, 246, 0.2) 60%,
+      rgba(75, 101, 224, 0.1) 80%,
+      rgba(27, 33, 77, 1) 100%
+    );
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+  }
+  
+  
+  .typing-container {
+    background: white;
+    padding: 1rem 2rem;
+    border-radius: 999px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: black;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  
+  .cursor {
+    color: #8a2be2;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-left: 4px;
+    animation: blink 1s infinite;
+  }
+  
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+  
