@@ -4,8 +4,8 @@ import { HomeComponent } from './components/home/home.component'; // importa tu 
 import { SignupComponent } from './components/auth/signup/signup.component'; // importa tu componente Signup
 
 export const routes: Routes = [
-  { path: '', component: LoginComponent },
-  { path: 'home', component: HomeComponent },
+  { path: '', component: HomeComponent },
+  { path: 'signin', component: LoginComponent },
   { path: 'signup', component: SignupComponent }, // ruta para el componente de registro
   { path: '**', redirectTo: '' }
 ];
