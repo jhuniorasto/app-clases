@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-home',
   imports: [CommonModule, FormsModule],
@@ -36,6 +37,12 @@ export class HomeComponent {
       this.router.navigate(['/login']);
     });
   }
+  
+  onRedirectToAdmin(): void {
+    this.router.navigate(['/admin']);
+  }
+
+
 
   ngOnInit() {
     // Simulación de carga de datos

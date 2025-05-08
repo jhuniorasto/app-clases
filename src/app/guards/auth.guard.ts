@@ -3,7 +3,9 @@ import { CanActivate, Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-
+//CONTROLA EL ACCESO A LAS RUTAS DE LA APLICACIÓN
+// Este guardia se asegura de que el usuario esté autenticado antes de permitirle acceder a ciertas rutas.
+// Si el usuario no está autenticado, se le redirige a la página de inicio de sesión.
 @Injectable({
   providedIn: 'root'
 })
@@ -17,7 +19,7 @@ export class AuthGuard implements CanActivate {
         if (user) {
           return true;
         } else {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/signin']); // Redirige a la página de inicio de sesión si no está autenticado
           return false;
         }
       })
