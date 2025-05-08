@@ -1,36 +1,36 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { NgFor, NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterModule, NgIf, NgFor],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
-  courses = [
-    {
-      id: 'curso1',
-      title: 'Introducción a Angular',
-      description: 'Aprende los fundamentos de Angular y desarrolla aplicaciones web modernas.',
-      category: 'Frontend',
-      imageUrl: 'https://via.placeholder.com/400x200?text=Angular+Course'
-    },
-    {
-      id: 'curso2',
-      title: 'Firebase para Web',
-      description: 'Conecta tus apps con Firebase y aprende Firestore, Auth y Storage.',
-      category: 'Backend',
-      imageUrl: 'https://via.placeholder.com/400x200?text=Firebase+Course'
-    },
-    // Puedes agregar más cursos simulados aquí...
+  cursos = [
+    { titulo: 'Angular desde cero', descripcion: 'Aprende a construir aplicaciones SPA modernas.' },
+    { titulo: 'Introducción a Python', descripcion: 'Domina los fundamentos de la programación.' },
+    { titulo: 'Diseño UI/UX', descripcion: 'Crea interfaces atractivas y funcionales.' }
   ];
 
+  comentarios: string[] = [];
+  nuevoComentario: string = '';
+
+  onRedirectToSignIn(): void {
+    this.router.navigate(['/signin']);
+  }
+
+  agregarComentario() {
+    if (this.nuevoComentario.trim()) {
+      this.comentarios.push(this.nuevoComentario.trim());
+      this.nuevoComentario = '';
+    }
+  }
   logout() :void {
     this.authService.logout().then(() => {
       this.router.navigate(['/login']);

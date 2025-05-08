@@ -1,31 +1,545 @@
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Bienvenido a la Plataforma de Cursos</h2>
-  
-    <div class="d-flex justify-content-between mb-3">
-      <div>
-        <h5>Cursos disponibles</h5>
-      </div>
-      <div>
-        <button class="btn btn-outline-primary" (click)="logout()">Cerrar sesión</button>
-      </div>
-    </div>
-  
-    <div class="row" *ngIf="courses?.length; else noCourses">
-      <div class="col-md-4 mb-4" *ngFor="let course of courses">
-        <div class="card h-100 shadow-sm">
-          <img [src]="course.imageUrl" class="card-img-top" alt="Imagen del curso">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">{{ course.title }}</h5>
-            <p class="card-text text-muted">{{ course.description }}</p>
-            <span class="badge bg-info text-dark mb-2">{{ course.category }}</span>
-            <a  class="mt-auto btn btn-primary">Ver Curso</a>
-          </div>
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg" type="image/x-icon">
+  <meta name="description" content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales. Permite a docentes publicar clases y estudiantes acceder al contenido con seguimiento y autenticación.">
+  <title>Aplicación Angular y Firebase para Gestión de Cursos Virtuales</title>
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css?rnd=1746314637149">
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css?rnd=1746314637149">
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap-grid.min.css?rnd=1746314637149">
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap-reboot.min.css?rnd=1746314637149">
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css?rnd=1746314637149">
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css?rnd=1746314637149">
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css?rnd=1746314637149">
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css?rnd=1746314637150">
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/recaptcha.css?rnd=1746314637150">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap&display=swap"></noscript>
+  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css?rnd=1746314637150" type="text/css">
+</head>
+<body>
+    <!-- Navbar estático en la parte inferior - Menú de navegación -->
+  <section data-bs-version="5.1" class="menu cid-uKbbFziYxE" once="menu" id="menu-5-uKbbFziYxE">
+	<nav class="navbar navbar-dropdown navbar-fixed-top navbar-expand-lg">
+		<div class="container">
+			<div class="navbar-brand">
+				<span class="navbar-logo">
+					<a href="#">
+						<img src="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg" alt="" style="height: 4.3rem;">
+					</a>
+				</span>
+				<span class="navbar-caption-wrap"><a class="navbar-caption text-black display-4" href="#">EduSmart</a></span>
+			</div>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbarSupportedContent" data-bs-target="#navbarSupportedContent" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+				<div class="hamburger">
+					<span></span>
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav nav-dropdown" data-app-modern-menu="true">
+					<li class="nav-item">
+						<a class="nav-link link text-black display-4" href="#">Cursos</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link link text-black display-4" href="#" aria-expanded="false">Profesores</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link link text-black display-4" href="#">Comunidad</a>
+					</li>
+				</ul>
+				<div class="navbar-buttons mbr-section-btn"><a class="btn btn-primary display-4" (click)="onRedirectToSignIn()">Acceder</a></div>
+			</div>
+		</div>
+	</nav>
+</section>
+
+<!-- Sección principal con fondo de gif-->
+<section class="header18 cid-uKbbFzjJ4W mbr-fullscreen position-relative gif-local-bg" id="hero-15-uKbbFzjJ4W">
+  <!-- Overlay oscuro para que el texto sea legible -->
+  <div class="mbr-overlay"></div>
+  <!-- Contenido principal -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="content-wrap col-12 col-md-12 text-white text-center">
+        <h1 class="mbr-section-title mbr-fonts-style mb-4 display-1">
+          <strong>Academia Online</strong>
+        </h1>
+        <p class="mbr-fonts-style mbr-text mb-4 display-7">Cursos virtuales a tu alcance</p>
+        <div class="mbr-section-btn">
+          <a class="btn btn-white-outline display-7" href="#">Comienza Ahora</a>
         </div>
       </div>
     </div>
-  
-    <ng-template #noCourses>
-      <div class="alert alert-info text-center">No hay cursos disponibles por el momento.</div>
-    </ng-template>
   </div>
-  
+</section>
+
+<!-- Sección de métricas -->
+<section  class="cid-uKbbFzjk6O">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="item-wrapper">
+                    <div class="title ">
+                        <span class="num mbr-fonts-style display-1">
+                            <strong>250</strong></span>
+                    </div>
+                    <h4 class="card-title mbr-fonts-style display-5">
+                        <strong>Cursos Activos</strong>
+                    </h4>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="item-wrapper">
+                    <div class="title ">
+                        <span class="num mbr-fonts-style display-1">
+                            <strong>1500</strong></span>
+                    </div>
+                    <h4 class="card-title mbr-fonts-style display-5">
+                        <strong>Alumnos Inscritos</strong>
+                    </h4>
+                </div>
+            </div>
+            <div class="col-lg-4 ">
+                <div class="item-wrapper">
+                    <div class="title ">
+                        <span class="num mbr-fonts-style display-1">
+                            <strong>50</strong></span>
+                    </div>
+                    <h4 class="card-title mbr-fonts-style display-5">
+                        <strong>Profesores Expertos</strong>
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección de fondo con imagen -->
+<section  class="cid-uKbbFzk6RG mbr-fullscreen" >
+    <div class="container">
+        <div class="row"></div>
+    </div>
+</section>
+
+<!-- Sección de noticias -->
+<section class="cid-uKbbFzlrcb">
+  <div class="container-fluid">
+    <div class="row justify-content-center mb-5">
+          <h4 class=" align-center display-2">
+            <strong>Noticias EduSmart</strong>
+          </h4>
+    </div>
+    <div class="row">
+      <div class="col-lg-3">
+          <div class="mb-3">
+            <img src="https://r.mobirisesite.com/1458871/assets/images/photo-1508014924734-d75124b0f402.jpeg" alt="" title="">
+          </div>
+          <div class="item-content">
+            <h5 class="display-5">
+              <strong>Colaboración USAL</strong>
+            </h5>
+            <p class="display-7">Mayo 3, 2025</p>
+            <p class="display-7">Nueva colaboración con la Universidad de Salamanca para ofrecer cursos de vanguardia en tecnología.</p>
+            <div class="mbr-section-btn">
+              <a href="" class="btn btn-primary display-7 mb-5">Ver</a>
+            </div>
+          </div>
+      </div>
+      <div class="col-lg-3">
+          <div class="mb-3">
+            <img src="https://r.mobirisesite.com/1458871/assets/images/photo-1560785496-3c9d27877182.jpeg" alt="" title="" data-slide-to="1" data-bs-slide-to="1">
+          </div>
+          <div class="item-content">
+            <h5 class="display-5">
+              <strong>Nueva Versión</strong>
+            </h5>
+            <p class="display-7">Abril 28, 2025</p>
+            <p class="display-7">Lanzamiento de la nueva versión de la plataforma con mejoras en la interfaz y nuevas funcionalidades.</p>
+            <div class="mbr-section-btn">
+              <a href="" class="btn btn-primary display-7 mb-5">Ver</a>
+            </div>
+          </div>
+      </div>
+      <div class="col-lg-3">
+          <div class="mb-3">
+            <img src="https://r.mobirisesite.com/1458871/assets/images/photo-1494059980473-813e73ee784b.jpeg" alt="" title="" data-slide-to="2" data-bs-slide-to="2">
+          </div>
+          <div class="item-content">
+            <h5 class="display-5">
+              <strong>IA en Educación</strong>
+            </h5>
+            <p class="display-7">Abril 20, 2025</p>
+            <p class="display-7">Seminario gratuito sobre 'Inteligencia Artificial en la Educación' impartido por expertos del sector.</p>
+            <div class="mbr-section-btn">
+              <a href="" class="btn btn-primary display-7 mb-5">Ver</a>
+            </div>
+          </div>
+      </div>
+      <div class="col-lg-3">
+          <div class="item-img mb-3">
+            <img src="https://r.mobirisesite.com/1458871/assets/images/photo-1503676260728-1c00da094a0b.jpeg" alt="" title="" data-slide-to="2" data-bs-slide-to="2">
+          </div>
+          <div class="item-content">
+            <h5 class="display-5">
+              <strong>Nuevos Cursos</strong>
+            </h5>
+            <p class="display-7">Abril 15, 2025</p>
+            <p class="display-7">Ampliamos nuestro catálogo de cursos con nuevas temáticas en desarrollo web y diseño UX/UI.</p>
+            <div class="mbr-section-btn">
+              <a href="" class="btn btn-primary display-7">Ver</a>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección de Texto desplazante-->
+<section class="marquee-section">
+    <div class="marquee-container">
+      <div class="marquee-track">
+        <span class="marquee-text">
+            * 🎓 Cursos Online * ⏰ Acceso 24/7 * 📈 Seguimiento * 💬 Comentarios * 🔐 Autenticación * 🔥 Firebase *
+            * 🎓 Cursos Online * ⏰ Acceso 24/7 * 📈 Seguimiento * 💬 Comentarios * 🔐 Autenticación * 🔥 Firebase *
+        </span>
+      </div>
+    </div>
+</section>
+
+<!-- Sección de Opiniones de EduSmart -->
+<section class="cid-uKbbFzml6l" >
+    <div class="container">
+        <div class="row  justify-content-center">
+            <h3 class="mbr-section-title align-center mb-4 display-2">
+                <strong>Opiniones</strong>
+            </h3>
+        </div>
+        <div class="row">
+            <div class=" col-lg-4 mb-5">
+                <div class="card-box align-center">
+                    <div class="mb-3">
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                    </div>
+                        <h5 class="card-title mb-3 display-7">La plataforma es muy intuitiva y fácil de usar. ¡La recomiendo!</h5>
+                        <p class="card-text display-7">Sofía Rodríguez</p>
+                </div>
+            </div>
+            <div class=" col-lg-4 mb-5">
+                <div class="card-box align-center">
+                    <div class="mb-3">
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                    </div>
+                        <h5 class="card-title mb-3 display-7">Los cursos son de alta calidad y los profesores son excelentes.</h5>
+                        <p class="card-text display-7">Javier Pérez</p>
+                </div>
+            </div>
+            <div class=" col-lg-4 mb-5">
+                <div class="card-box align-center">
+                    <div class="mb-3">
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                    </div>
+                        <h5 class="card-title mb-3 display-7">Me encanta la flexibilidad de poder estudiar a mi propio ritmo.</h5>
+                        <p class="card-text display-7">Isabel García</p>
+                </div>
+            </div>
+            <div class=" col-lg-4 mb-5">
+                <div class="card-box align-center">
+                    <div class="mb-3">
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                    </div>
+                        <h5 class="card-title mb-3 display-7">El seguimiento del progreso es muy útil para mantenerme motivado.</h5>
+                        <p class="card-text display-7">Carlos López</p>
+                </div>
+            </div>
+            <div class=" col-lg-4 mb-5">
+                <div class="card-box align-center">
+                    <div class="mb-3">
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                    </div>
+                        <h5 class="card-title mb-3 display-7">La autenticación es segura y me da confianza para usar la plataforma.</h5>
+                        <p class="card-text display-7">Ana Martínez</p>
+                </div>
+            </div>
+            <div class=" col-lg-4 mb-5">
+                <div class="card-box align-center">
+                    <div class="mb-3">
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                        <span class="mbr-iconfont mobi-mbri-star"></span>
+                    </div>
+                        <h5 class="card-title mb-3 display-7">Los comentarios y la interacción con otros estudiantes son muy enriquecedores.</h5>
+                        <p class="card-text display-7">Manuel Sánchez</p>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-0 mt-md-5">
+        </div>
+    </div>
+</section>
+
+<!-- Sección de preguntas frecuentes -->
+<section class="cid-uKbbFzmqzw">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="row justify-content-center mb-5">
+                        <div class="col-12">
+                            <h4 class="mbr-section-title mb-0 display-2">
+                                <strong>¿Preguntas?</strong>
+                            </h4>
+                        </div>
+                </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <a class="panel-title collapsed" data-bs-toggle="collapse" href="#collapse1_7" >
+                                    <h6 class="panel-title-edit display-5">¿Cómo funciona la plataforma?</h6>
+                                    <span class="mbr-iconfont mobi-mbri-arrow-down"></span>
+                                </a>
+                            </div>
+                            <div id="collapse1_7" class="collapse" >
+                                    <p class="panel-text display-7">Nuestra plataforma ofrece una interfaz intuitiva y fácil de usar, diseñada para que tanto docentes como estudiantes puedan interactuar sin complicaciones. Además, contamos con un equipo de soporte técnico disponible para resolver cualquier duda o problema que pueda surgir.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <a class="panel-title collapsed" data-bs-toggle="collapse" href="#collapse2_7" >
+                                    <h6 class="panel-title-edit display-5">¿Qué tipo de contenido puedo encontrar?</h6>
+                                    <span class="mbr-iconfont mobi-mbri-arrow-down"></span>
+                                </a>
+                            </div>
+                            <div id="collapse2_7" class="collapse">
+                                    <p class="panel-text display-7">Los docentes pueden subir clases en diversos formatos, incluyendo video, presentaciones y documentos. Los estudiantes pueden acceder a este contenido desde cualquier dispositivo y en cualquier momento, facilitando un aprendizaje flexible y adaptado a sus necesidades.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <a class="panel-title collapsed" data-bs-toggle="collapse" href="#collapse3_7" >
+                                    <h6 class="panel-title-edit display-5">¿Puedo seguir mi progreso?</h6>
+                                    <span class="mbr-iconfont mobi-mbri-arrow-down"></span>
+                                </a>
+                            </div>
+                            <div id="collapse3_7" class="collapse">
+                                    <p class="panel-text display-7">Sí, nuestra plataforma permite a los estudiantes realizar un seguimiento de su progreso a través de cuestionarios y evaluaciones. Los docentes pueden utilizar esta información para adaptar su enseñanza y ofrecer un apoyo personalizado.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <a class="panel-title collapsed" data-bs-toggle="collapse" href="#collapse4_7" >
+                                    <h6 class="panel-title-edit display-5">¿Cuáles son los precios?</h6>
+                                    <span class="mbr-iconfont mobi-mbri-arrow-down"></span>
+                                </a>
+                            </div>
+                            <div id="collapse4_7" class="collapse">
+                                    <p class="panel-text display-7">Ofrecemos diferentes planes de suscripción adaptados a las necesidades de cada usuario. Puedes consultar nuestros planes y precios en la sección de 'Precios' de nuestra página web.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <a class="panel-title collapsed" data-bs-toggle="collapse" href="#collapse5_7" >
+                                    <h6 class="panel-title-edit display-5">¿Es segura mi información?</h6>
+                                    <span class="mbr-iconfont mobi-mbri-arrow-down"></span>
+                                </a>
+                            </div>
+                            <div id="collapse5_7" class="collapse">
+                                    <p class="panel-text display-7">La seguridad de tus datos es nuestra máxima prioridad. Utilizamos las últimas tecnologías de encriptación y seguridad para proteger tu información personal y garantizar la confidencialidad de tus comunicaciones.</p>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+</section>
+
+<!-- Sección de acceso premium -->
+<section class="cid-uKbbFzmQQY" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 ">
+                <h4 class="card-text mbr-fonts-style display-10">Acceso Premium Gratis</h4>
+            </div>
+            <div class="col-lg-3">
+                <div class="mbr-section-btn"><a class="btn btn-primary display-7" href="#">¡Comienza Ahora!</a></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section data-bs-version="5.1" class="gallery07 cid-uKbbFznSBg" id="gallery-16-uKbbFznSBg">
+  <div class="container-fluid gallery-wrapper">
+    <div class="row justify-content-center">
+      <div class="col-12 content-head">
+        <div class="mbr-section-head mb-5">
+          <h4 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
+            <strong>Galería EduSmart</strong>
+          </h4>
+        </div>
+      </div>
+    </div>
+    <div class="grid-container">
+      <div class="grid-container-3 moving-left" style="transform: translate3d(-200px, 0px, 0px);">
+        <div class="grid-item">
+          <img src="https://r.mobirisesite.com/1458871/assets/images/photo-1501504905252-473c47e087f8.jpeg" alt="">
+        </div>
+        <div class="grid-item">
+          <img src="https://r.mobirisesite.com/1458871/assets/images/photo-1497633762265-9d179a990aa6.jpeg" alt="">
+        </div>
+        <div class="grid-item">
+          <img src="https://r.mobirisesite.com/1458871/assets/images/photo-1599008633840-052c7f756385.jpeg" alt="">
+        </div>
+        <div class="grid-item">
+          <img src="https://r.mobirisesite.com/1458871/assets/images/photo-1432888498266-38ffec3eaf0a.png" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección de fondo con gif -->
+<section class="gif-home" >
+  <div class="container-fluid">
+    <div class="row"></div>
+  </div>
+</section>
+
+<!-- Sección de redes sociales -->
+<section class="cid-uKbbFznFQS" >
+    <div class="container">
+            <div class="col-12">
+                <h3 class="mbr-section-title align-center display-2">
+                    <strong>¡Síguenos En Redes!</strong>
+                </h3>
+                <div class="social-list align-center">
+                    <a class="iconfont-wrapper bg-facebook m-2 " target="_blank" href="#">
+                        <span class="socicon-facebook"></span>
+                    </a>
+                    <a class="iconfont-wrapper bg-twitter m-2" href="#" target="_blank">
+                        <span class="socicon-twitter"></span>
+                    </a>
+                    <a class="iconfont-wrapper bg-instagram m-2" href="#" target="_blank">
+                        <span class="socicon-instagram"></span>
+                    </a>
+                    <a class="iconfont-wrapper bg-tiktok m-2" href="#" target="_blank">
+                        <span class="socicon-tiktok"></span>
+                    </a>
+                </div>
+            </div>
+    </div>
+</section>
+
+<section class="form5 cid-uKbbFzoaef" >
+    <div class="container">
+        <div class="row justify-content-center">
+                <div class="mb-5">
+                    <h3 class="align-center display-2">
+                        <strong>¡Contáctanos Ahora!</strong>
+                    </h3>
+                </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8 mx-auto mbr-form" data-form-type="formoid">
+                <form action="https://mobirise.eu/" method="POST" class="mbr-form form-with-styler" data-form-title="Form Name"><input type="hidden" name="email" data-form-email="true" value="GmgDYs7ew97N84/A3+UI1J7z59w+SUU0qLVH4xFLjMbc1LzmYLzFS9mMgFV93sa6K33ckgjoRGPT2cjkWw7H/ZYVqVyU2nyrJa9jcUOAle9MQeWLZRhCu1IfyPR+1nRq">
+                    <div class="row">
+                        <div hidden="hidden" data-form-alert="" class="alert alert-success col-12">Thanks for filling out the form!</div>
+                        <div hidden="hidden" data-form-alert-danger="" class="alert alert-danger col-12">
+                            Oops...! some problem!
+                        </div>
+                    </div>
+                    <div class="dragArea row">
+                        <div class="col-md col-sm-12 form-group mb-3" data-for="name">
+                            <input type="text" name="name" placeholder="Nombre" data-form-field="name" class="form-control" value="" id="name-contact-form-2-uKbbFzoaef">
+                        </div>
+                        <div class="col-md col-sm-12 form-group mb-3" data-for="email">
+                            <input type="email" name="email" placeholder="Correo" data-form-field="email" class="form-control" value="" id="email-contact-form-2-uKbbFzoaef">
+                        </div>
+                        <div class="col-12 form-group mb-3" data-for="textarea">
+                            <textarea name="textarea" placeholder="Mensaje" data-form-field="textarea" class="form-control" id="textarea-contact-form-2-uKbbFzoaef"></textarea>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 align-center mbr-section-btn">
+                            <button type="submit" class="btn btn-primary display-7">¡Envía tu Mensaje!</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cid-uKbbFzodxs">
+    <div class="container">
+        <div class="row">
+            <div class="row-links">
+                <ul class="header-menu">
+                <li class="display-5">
+                    <a href="#" class="text-white">Inicio</a>
+                  </li><li class="display-5">
+                    <a href="#" class="text-white">Cursos</a>
+                  </li><li class="display-5">
+                    <a href="#" class="text-white">Blog</a>
+                  </li><li class="display-5">
+                    <a href="#" class="text-white">Contacto</a>
+                  </li></ul>
+              </div>
+            <div class="mt-4">
+                <div class="social-row">
+                    <div class="soc-item">
+                        <a href="#" target="_blank">
+                            <span class="mbr-iconfont socicon-facebook"></span>
+                        </a>
+                    </div>
+                    <div class="soc-item">
+                        <a href="#" target="_blank">
+                            <span class="mbr-iconfont socicon-twitter "></span>
+                        </a>
+                    </div>
+                    <div class="soc-item">
+                        <a href="#" target="_blank">
+                            <span class="mbr-iconfont socicon-instagram "></span>
+                        </a>
+                    </div>
+                    <div class="soc-item">
+                        <a href="#" target="_blank">
+                            <span class="mbr-iconfont socicon-linkedin"></span>
+                        </a>
+                    </div>
+                    <div class="soc-item">
+                        <a href="#" target="_blank">
+                            <span class="mbr-iconfont socicon-twitch"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5">
+                <p class="copyright display-7">© 2025 - EduSmart - Innovación Educativa. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
