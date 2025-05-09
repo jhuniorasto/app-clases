@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +38,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   // Método para iniciar sesión con Email y Contraseña
   onLoginWithEmailAndPassword(): void {
-    
     if (!this.onValidateFields()) return; // Validar campos
     if (!this.onValidateEmail()) return; // Validar email
     if (!this.onValidatePassword()) return; // Validar contraseña
@@ -47,7 +47,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.authService
       .loginConEmailPassword(this.email, this.password)
       .then(() => {
-        this.onRedirectToHome();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Usuario verificado!',
+          text: `Bienvenido`,
+          confirmButtonText: 'Ir a Home',
+        }).then(() => {
+          // Recién aquí se redirige al Home después de hacer clic en "Ir a Home"
+          this.onRedirectToHome();
+        });
       })
       .catch((error) => {
         console.error(
@@ -56,9 +64,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
         );
 
         if (error.code === 'auth/invalid-credential') {
-          alert(
-            'Credenciales inválidas. Por favor, verifica tu correo electrónico y contraseña.'
-          );
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al registrar',
+            text: 'Credenciales inválidas. Por favor, verifica tu correo electrónico o contraseña.',
+          });
         }
       });
   }

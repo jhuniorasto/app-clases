@@ -1,152 +1,148 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-  <link rel="shortcut icon" href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg" type="image/x-icon">
-  <meta name="description" content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales.">
-  <title>EduSmart - Gestión de Cursos Virtuales</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg"
+      type="image/x-icon"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
 
-  <!-- Estilos Mobirise y Bootstrap -->
-  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css">
-  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css">
-  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css">
-  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css">
-  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css">
-  <link rel="stylesheet" href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css">
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
 
-  <!-- Fuente -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"></noscript>
-</head>
+    <!-- Fuente -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+    /></noscript>
+  </head>
 
+  <body>
+    <!-- Sección de gestion de profesores -->
+    <section class="container my-5 espaciado-superior">
+      <h2 class="mbr-section-title display-2 mt-5">
+        <strong>Gestión de Profesores</strong>
+      </h2>
 
-<body>
-
-<!-- Navbar -->
-<section class="menu cid-uKbbFziYxE" once="menu" id="menu-5-uKbbFziYxE">
-  <nav class="navbar navbar-dropdown navbar-fixed-top navbar-expand-lg">
-    <div class="container">
-      <div class="navbar-brand">
-        <span class="navbar-logo">
-          <a href="#"><img src="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg" alt="" style="height: 4.3rem;"></a>
-        </span>
-        <span class="navbar-caption-wrap">
-          <a class="navbar-caption text-black display-4" href="#">EduSmart</a>
-        </span>
+      <div class="d-flex justify-content-end mb-4">
+        <button class="btn btn-success btn-lg" (click)="agregarProfesor()">
+          Agregar Profesor
+        </button>
       </div>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-        <div class="hamburger">
-          <span></span><span></span><span></span><span></span>
-        </div>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav nav-dropdown ms-auto">
-          <li class="nav-item"><a class="nav-link text-black display-4" href="#">Cursos</a></li>
-          <li class="nav-item"><a class="nav-link text-black display-4" href="#" (click)="onRedirectToAdmin()">Profesores</a></li>
-          <li class="nav-item"><a class="nav-link text-black display-4" href="#">Comunidad</a></li>
-        </ul>
-        <div class="navbar-buttons mbr-section-btn">
-          <a class="btn btn-primary display-4" href="#" (click)="onRedirectToSignIn()">Acceder</a>
-        </div>
-      </div>
-    </div>
-  </nav>
-</section>
 
-<!-- Sección de gestion de profesores -->
-<section class="container my-5 espaciado-superior">
-  <h2 class="mbr-section-title display-2 mt-5"><strong>Gestión de Profesores</strong></h2>
-
-
-    <div class="d-flex justify-content-end mb-4">
-      <button class="btn btn-success btn-lg" (click)="agregarProfesor()">Agregar Profesor</button>
-    </div>
-  
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      <div class="col" *ngFor="let profesor of profesores">
-        <div class="card h-100 shadow border-0">
-          <div class="text-center mt-4">
-            <img [src]="profesor.imagenUrl || 'https://via.placeholder.com/150'" class="rounded-circle" alt="Foto del profesor" style="width: 120px; height: 120px; object-fit: cover;">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" *ngFor="let profesor of profesores">
+          <div class="card h-100 shadow border-0">
+            <div class="text-center mt-4">
+              <img
+                [src]="profesor.imagenUrl || 'https://via.placeholder.com/150'"
+                class="rounded-circle"
+                alt="Foto del profesor"
+                style="width: 120px; height: 120px; object-fit: cover"
+              />
+            </div>
+            <div class="card-body text-center">
+              <h5 class="card-title mb-3">{{ profesor.nombre }}</h5>
+              <p class="card-text">
+                <strong>Edad:</strong> {{ profesor.edad }}<br />
+                <strong>Curso:</strong> {{ profesor.curso }}
+              </p>
+            </div>
+            <div
+              class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3"
+            >
+              <button
+                class="btn btn-outline-primary btn-sm px-3"
+                (click)="modificarProfesor(profesor)"
+              >
+                Modificar
+              </button>
+              <button
+                class="btn btn-outline-danger btn-sm px-3"
+                (click)="eliminarProfesor(profesor.id)"
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
-          <div class="card-body text-center">
-            <h5 class="card-title mb-3">{{ profesor.nombre }}</h5>
-            <p class="card-text">
-              <strong>Edad:</strong> {{ profesor.edad }}<br>
-              <strong>Curso:</strong> {{ profesor.curso }}
-            </p>
-          </div>
-          <div class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3">
-            <button class="btn btn-outline-primary btn-sm px-3" (click)="modificarProfesor(profesor)">Modificar</button>
-            <button class="btn btn-outline-danger btn-sm px-3" (click)="eliminarProfesor(profesor.id)">Eliminar</button>
-          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal personalizado -->
+    <div class="modal-overlay" *ngIf="mostrarModal">
+      <div class="modal-content">
+        <h4 class="modal-title">Agregar Profesor</h4>
+
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="profesorForm.nombre"
+          placeholder="Nombre del profesor"
+        />
+        <input
+          class="form-control mb-2"
+          type="number"
+          [(ngModel)]="profesorForm.edad"
+          placeholder="Edad"
+        />
+        <input
+          class="form-control mb-3"
+          [(ngModel)]="profesorForm.curso"
+          placeholder="Curso que imparte"
+        />
+
+        <div class="modal-buttons">
+          <button class="btn guardar" (click)="confirmarAgregarProfesor()">
+            Guardar
+          </button>
+          <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
         </div>
       </div>
     </div>
-  </section>
-
-
-<!-- Modal personalizado -->
-<div class="modal-overlay" *ngIf="mostrarModal">
-  <div class="modal-content">
-    <h4 class="modal-title">Agregar Profesor</h4>
-    
-    <input class="form-control mb-2" [(ngModel)]="profesorForm.nombre" placeholder="Nombre del profesor">
-    <input class="form-control mb-2" type="number" [(ngModel)]="profesorForm.edad" placeholder="Edad">
-    <input class="form-control mb-3" [(ngModel)]="profesorForm.curso" placeholder="Curso que imparte">
-
-    <div class="modal-buttons">
-      <button class="btn guardar" (click)="confirmarAgregarProfesor()">Guardar</button>
-      <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- Sección de redes sociales -->
-<section class="cid-uKbbFznFQS">
-  <div class="container text-center">
-    <div class="col-12">
-      <h3 class="mbr-section-title display-2"><strong>¡Síguenos En Redes!</strong></h3>
-      <div class="social-list mt-3">
-        <a class="iconfont-wrapper bg-facebook" href="#"><span class="socicon-facebook"></span></a>
-        <a class="iconfont-wrapper bg-twitter" href="#"><span class="socicon-twitter"></span></a>
-        <a class="iconfont-wrapper bg-instagram" href="#"><span class="socicon-instagram"></span></a>
-        <a class="iconfont-wrapper bg-tiktok" href="#"><span class="socicon-tiktok"></span></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Footer -->
-<section class="cid-uKbbFzodxs" style="background-color: black;">
-  <div class="container text-center">
-    <div class="row">
-      <div class="row-links">
-        <ul class="header-menu justify-content-center">
-          <li class="display-5"><a href="#" class="text-white">Inicio</a></li>
-          <li class="display-5"><a href="#" class="text-white">Cursos</a></li>
-          <li class="display-5"><a href="#" class="text-white">Blog</a></li>
-          <li class="display-5"><a href="#" class="text-white">Contacto</a></li>
-        </ul>
-      </div>
-      <div class="social-row mt-4">
-        <div class="soc-item"><a href="#"><span class="mbr-iconfont socicon-facebook"></span></a></div>
-        <div class="soc-item"><a href="#"><span class="mbr-iconfont socicon-twitter"></span></a></div>
-        <div class="soc-item"><a href="#"><span class="mbr-iconfont socicon-instagram"></span></a></div>
-        <div class="soc-item"><a href="#"><span class="mbr-iconfont socicon-linkedin"></span></a></div>
-        <div class="soc-item"><a href="#"><span class="mbr-iconfont socicon-twitch"></span></a></div>
-      </div>
-      <div class="mt-5">
-        <p class="text-white display-7">© 2025 - EduSmart - Innovación Educativa. Todos los derechos reservados.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-</body>
+  </body>
 </html>

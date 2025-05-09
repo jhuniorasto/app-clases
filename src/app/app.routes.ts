@@ -1,13 +1,28 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/auth/signin/login.component'; //importa el componente de inicio de sesión  
-import { HomeComponent } from './components/home/home.component'; 
-import { SignupComponent } from './components/auth/signup/signup.component'; //importa el componente de registro
-import { AdminComponent } from './components/admin/admin.component'; 
+import { LoginComponent } from './components/auth/signin/login.component';
+import { SignupComponent } from './components/auth/signup/signup.component';
+import { LayoutComponent } from './components/layout/layout.component'; // Componente de layout general
+import { HomeComponent } from './components/home/home.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { CursosComponent } from './components/cursos/cursos.component';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },  //http://localhost:4200/ mostrará el componente HomeComponent
-  { path: 'signin', component: LoginComponent }, ////http://localhost:4200/signin mostrará el componente LoginComponent
-  { path: 'signup', component: SignupComponent }, // ruta para el componente de registro
-  { path: 'admin',component: AdminComponent },
-  { path: '**', redirectTo: '' } //cualquier ruta desconocida (**) redirige a la home ('')
+  // Rutas públicas
+  { path: 'signin', component: LoginComponent },
+  { path: 'signup', component: SignupComponent },
+
+  // Rutas con layout general
+  {
+    path: '',
+    component: LayoutComponent,
+    children: [
+      { path: '', component: HomeComponent },
+      { path: 'admin', component: AdminComponent },
+      { path: 'cursos', component: CursosComponent },
+      // Aquí puedes agregar más rutas internas
+    ],
+  },
+
+  // Ruta comodín para redireccionar en caso de no encontrar la ruta
+  { path: '**', redirectTo: '' },
 ];

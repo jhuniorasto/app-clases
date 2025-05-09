@@ -4,26 +4,49 @@
     <h2>Bienvenido(a)</h2>
     <form>
       <label>Email</label>
-      <input [(ngModel)]="email" name="email" type="email" placeholder="Ingresa tu email" />
+      <input
+        [(ngModel)]="email"
+        name="email"
+        type="email"
+        placeholder="Ingresa tu email"
+      />
 
       <label>Password<a href="#">Olvidaste tu contraseña?</a></label>
-      <input [(ngModel)]="password" name="password" type="password" placeholder="Ingresa tu contraseña" />
-      
-      <button type="submit" class="btn signin-btn" (click)="onLoginWithEmailAndPassword()">Iniciar Sesión</button>
+      <input
+        [(ngModel)]="password"
+        name="password"
+        type="password"
+        placeholder="Ingresa tu contraseña"
+      />
+
+      <button
+        type="submit"
+        class="btn signin-btn"
+        (click)="onLoginWithEmailAndPassword()"
+      >
+        Iniciar Sesión
+      </button>
     </form>
-    
+
     <div class="divider">O</div>
 
     <button class="btn social google-btn" (click)="onLoginWithGoogle()">
-      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="icon" />
+      <img
+        src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+        alt="Google"
+        class="icon"
+      />
       Continuar con Google
     </button>
 
     <button class="btn social github-btn" (click)="onLoginWithFacebook()">
-      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="GitHub" class="icon" />
+      <img
+        src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg"
+        alt="GitHub"
+        class="icon"
+      />
       Continuar con Facebook
     </button>
-
 
     <div class="signup-link">
       ¿No tienes una cuenta? <a (click)="onRedirectToSignUp()">Únete</a>

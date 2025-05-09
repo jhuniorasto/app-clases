@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg"
+      type="image/x-icon"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
+
+    <!-- Fuente -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+    /></noscript>
+  </head>
+
+  <body>
+    <section class="container my-5 espaciado-superior">
+      <h2 class="mbr-section-title display-2 mt-5">
+        <strong>Gestión de Cursos</strong>
+      </h2>
+
+      <div class="d-flex justify-content-end mb-4">
+        <button class="btn btn-success btn-lg" (click)="abrirModal()">
+          Agregar Curso
+        </button>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-3">
+        <div class="col" *ngFor="let curso of cursos">
+          <div class="card h-100 shadow border-0">
+            <div class="text-center mt-4">
+              <img
+                [src]="curso.imagenUrl || imagenPorDefecto"
+                class="rounded"
+                alt="Imagen del curso"
+                style="width: 100%; height: 180px; object-fit: cover"
+              />
+            </div>
+            <div class="card-body text-center">
+              <h5 class="card-title mb-2">{{ curso.titulo }}</h5>
+              <p class="card-text">
+                <strong>Categoría:</strong> {{ curso.categoria }}<br />
+                <strong>Descripción:</strong> {{ curso.descripcion }}<br />
+                <strong>Creado por:</strong> {{ curso.creadoPorUid }}<br />
+                <strong>Fecha:</strong>
+                {{ curso.fechaCreacion }}
+              </p>
+            </div>
+            <div
+              class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3"
+            >
+              <button
+                class="btn btn-outline-primary btn-sm px-3"
+                (click)="seleccionarCurso(curso)"
+              >
+                Modificar
+              </button>
+              <button
+                class="btn btn-outline-danger btn-sm px-3"
+                (click)="eliminarCurso(curso.id)"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal para agregar/modificar curso -->
+    <div class="modal-overlay" *ngIf="mostrarModal">
+      <div class="modal-content">
+        <h4 class="modal-title">
+          {{ cursoSeleccionado ? "Modificar Curso" : "Agregar Curso" }}
+        </h4>
+
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="nuevoCurso.titulo"
+          placeholder="Título del curso"
+        />
+        <textarea
+          class="form-control mb-2"
+          [(ngModel)]="nuevoCurso.descripcion"
+          placeholder="Descripción del curso"
+        ></textarea>
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="nuevoCurso.categoria"
+          placeholder="Categoría"
+        />
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="nuevoCurso.imagenUrl"
+          placeholder="URL de la imagen"
+        />
+        <input
+          class="form-control mb-3"
+          [(ngModel)]="nuevoCurso.creadoPorUid"
+          placeholder="UID del creador"
+        />
+
+        <div class="modal-buttons">
+          <button class="btn guardar" (click)="confirmarAgregarCurso()">
+            Guardar
+          </button>
+          <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

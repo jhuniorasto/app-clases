@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-signup',
@@ -18,6 +19,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './signup.component.css',
 })
 export class SignupComponent {
+  public nombre: string = '';
   public email: string = '';
   public password: string = '';
 
@@ -36,20 +38,38 @@ export class SignupComponent {
   }
 
   // Método para iniciar sesión con Email y Contraseña
-  onSignUpWithEmailAndPassword(): void {
-
+  async onSignUpWithEmailAndPassword(): Promise<void> {
     if (!this.onValidateFields()) return; // Validar campos
     if (!this.onValidateEmail()) return; // Validar email
     if (!this.onValidatePassword()) return; // Validar contraseña
-
-    this.authService
-      .signUpEmailAndPassword(this.email, this.password)
-      .then(() => {
+    try {
+      const userCredential = await this.authService.signUpEmailAndPassword(
+        this.email,
+        this.password,
+        this.nombre
+      );
+      // Registro exitoso
+      Swal.fire({
+        icon: 'success',
+        title: '¡Usuario registrado!',
+        text: `Bienvenido, ${this.nombre}`,
+        confirmButtonText: 'Ir a Home',
+      }).then(() => {
+        // Recién aquí se redirige al Home después de hacer clic en "Ir a Home"
         this.onRedirectToHome();
-      })
-      .catch((error) => {
-        console.error('Error al registrarse con Email y Password', error);
       });
+    } catch (error: any) {
+      let message = '';
+      if (error.code === 'auth/email-already-in-use') {
+        message = 'Este correo ya está registrado. Intenta con otro.';
+      }
+      // Alert de Error de registro
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al registrar',
+        text: message,
+      });
+    }
   }
 
   // Método para iniciar sesión con Google
@@ -78,7 +98,7 @@ export class SignupComponent {
 
   // Método para validar campos Email y Password
   onValidateFields(): boolean {
-    if (!this.email || !this.password) {
+    if (!this.nombre || !this.email || !this.password) {
       alert('Por favor, completa todos los campos.');
       return false;
     }

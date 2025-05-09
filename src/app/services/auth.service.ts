@@ -1,65 +1,124 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
-  Auth, //Funcionalidad de autenticación de Firebase
-  GoogleAuthProvider, // Clase para autenticarse con Google
-  createUserWithEmailAndPassword, //Función para registrar un nuevo usuario
-  FacebookAuthProvider, //  Clase para autenticarse con Facebook
-  signInWithEmailAndPassword, //Función para login con email y contraseña
-  signInWithPopup,//	Función para login con Google/Facebook usando una ventana emergente
-  signOut, //Función para cerrar sesión
+  Auth,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
   onAuthStateChanged,
   User,
-} from '@angular/fire/auth'; // Auth es una clase que forma parte de la librería @angular/fire/auth, y representa toda la funcionalidad de autenticación que ofrece Firebase, 
-import { error } from 'console';
+} from '@angular/fire/auth';
+
+import {
+  Firestore,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from '@angular/fire/firestore';
 
 @Injectable({
-  providedIn: 'root', //Se declara como inyectable en toda la app 
+  providedIn: 'root',
 })
-
 export class AuthService {
-  constructor(private auth: Auth) {} // Se inyecta el servicio de autenticación de Firebase
+  constructor(private auth: Auth, private firestore: Firestore) {}
 
-  // inicia sesión en Firebase usando un correo y una contraseña.
-  loginConEmailPassword(email: string, password: string) {
-    return signInWithEmailAndPassword(this.auth, email, password); // Devuelve una promesa que se resuelve cuando el inicio de sesión es exitoso  
+  // Verifica si un correo ya está registrado en Firestore
+  async correoYaExiste(email: string): Promise<boolean> {
+    const usuariosRef = collection(this.firestore, 'usuarios');
+    const q = query(usuariosRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
   }
 
-  //Registrar a un nuevo usuario con correo y contraseña.
-  signUpEmailAndPassword(email: string, password: string) {
-    return new Promise((resolve, reject) => {
-      createUserWithEmailAndPassword(this.auth, email, password).then(
-        userCredential => 
-          // Se resuelve la promesa con el objeto de credenciales del usuario
-          resolve(userCredential),
-        error =>
-          // Si hay un error, se rechaza la promesa y se devuelve el error.
-          reject(error)
+  // Registro con correo, contraseña y nombre (rol fijo: docente)
+  async signUpEmailAndPassword(
+    email: string,
+    password: string,
+    nombre: string
+  ) {
+    try {
+      const existe = await this.correoYaExiste(email);
+      if (existe) {
+        throw new Error('El correo ya está registrado en la base de datos.');
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password
       );
-    });
+      const user = userCredential.user;
+
+      const userRef = doc(this.firestore, `usuarios/${user.uid}`);
+      await setDoc(
+        userRef,
+        {
+          uid: user.uid,
+          email: user.email,
+          nombre: nombre,
+          rol: 'docente',
+          fechaRegistro: new Date(),
+        },
+        { merge: true }
+      );
+
+      return userCredential;
+    } catch (error: any) {
+      console.error('Error al registrar usuario:', error);
+      throw error;
+    }
   }
- 
-  // Abre una ventana emergente para iniciar sesión con Google.
+
+  // Login con correo y contraseña
+  loginConEmailPassword(email: string, password: string) {
+    return signInWithEmailAndPassword(this.auth, email, password);
+  }
+
+  // Login con Google (sin guardar datos por ahora)
   loginConGoogle() {
-    const provider = new GoogleAuthProvider(); //Usa el proveedor GoogleAuthProvider de Firebase.
+    const provider = new GoogleAuthProvider();
     return signInWithPopup(this.auth, provider);
   }
 
-  loginConFacebook() {
+  async loginConFacebook() {
     const provider = new FacebookAuthProvider();
-    return signInWithPopup(this.auth, provider);
+    return await signInWithPopup(this.auth, provider);
   }
 
-  
-  async getUserId(): Promise<string | null> {
-    const user = this.auth.currentUser; //Obtiene el usuario actual de Firebase.
-    return user ? user.uid : null; //Devuelve el ID del usuario o null si no hay un usuario autenticado.
-  }
-
+  // Cierra sesión
   logout(): Promise<void> {
-    return signOut(this.auth); // Cierra la sesión del usuario actual en Firebase.
+    return signOut(this.auth);
   }
 
+  // Obtener observable del usuario actual
   getUserObservable(callback: (user: User | null) => void) {
-    return onAuthStateChanged(this.auth, callback); //	Escuchar cambios en la sesión del usuario
+    return onAuthStateChanged(this.auth, callback);
+  }
+
+  // Obtener el UID del usuario autenticado
+  async getUserId(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    return user ? user.uid : null;
+  }
+
+  // Obtener datos del usuario desde Firestore
+  async getUserData(): Promise<any> {
+    const uid = await this.getUserId();
+    if (!uid) return null;
+
+    const userDoc = doc(this.firestore, `usuarios/${uid}`);
+    const userSnap = await getDoc(userDoc);
+
+    if (userSnap.exists()) {
+      return userSnap.data();
+    } else {
+      return null;
+    }
   }
 }
