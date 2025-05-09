@@ -75,7 +75,7 @@ export class AdminComponent {
   
     // Agregar el profesor a Firebase de forma asíncrona (sin bloquear la UI)
     const profesoresRef = collection(this.firestore, 'profesores');
-    const docRef = await addDoc(profesoresRef, nuevoProfesor);
+    const docRef = await addDoc(profesoresRef, nuevoProfesor);//metodo await para esperar la respuesta de firebase
   
     // Después de que Firebase responda, actualizar el ID del profesor con el ID real
     const index = this.profesores.findIndex(p => p.id === 'nuevo-id');
