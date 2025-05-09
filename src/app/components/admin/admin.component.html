@@ -20,37 +20,8 @@
   <!-- Fuente -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"></noscript>
-
-  <!-- Ajuste para espacio bajo el navbar -->
-  <style>
-    body {
-      padding-top: 80px; /* Altura del navbar fijo */
-    }
-    .social-list {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .iconfont-wrapper {
-      font-size: 24px;
-      color: white;
-      padding: 10px;
-      border-radius: 50%;
-      background-color: #333;
-    }
-    .header-menu {
-      list-style: none;
-      padding-left: 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    .header-menu li {
-      margin: 5px 0;
-    }
-  </style>
 </head>
+
 
 <body>
 
@@ -84,6 +55,55 @@
     </div>
   </nav>
 </section>
+
+<!-- Sección de gestion de profesores -->
+<section class="container my-5">
+    <h2 class="text-center mb-5 display-4">Gestión de Profesores</h2>
+  
+    <div class="d-flex justify-content-end mb-4">
+      <button class="btn btn-success btn-lg" (click)="agregarProfesor()">Agregar Profesor</button>
+    </div>
+  
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <div class="col" *ngFor="let profesor of profesores">
+        <div class="card h-100 shadow border-0">
+          <div class="text-center mt-4">
+            <img [src]="profesor.imagenUrl || 'https://via.placeholder.com/150'" class="rounded-circle" alt="Foto del profesor" style="width: 120px; height: 120px; object-fit: cover;">
+          </div>
+          <div class="card-body text-center">
+            <h5 class="card-title mb-3">{{ profesor.nombre }}</h5>
+            <p class="card-text">
+              <strong>Edad:</strong> {{ profesor.edad }}<br>
+              <strong>Curso:</strong> {{ profesor.curso }}
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3">
+            <button class="btn btn-outline-primary btn-sm px-3" (click)="modificarProfesor(profesor)">Modificar</button>
+            <button class="btn btn-outline-danger btn-sm px-3" (click)="eliminarProfesor(profesor.id)">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+<!-- Modal personalizado -->
+<div class="modal-overlay" *ngIf="mostrarModal">
+  <div class="modal-content">
+    <h4 class="modal-title">Agregar Profesor</h4>
+    
+    <input class="form-control mb-2" [(ngModel)]="profesorForm.nombre" placeholder="Nombre del profesor">
+    <input class="form-control mb-2" type="number" [(ngModel)]="profesorForm.edad" placeholder="Edad">
+    <input class="form-control mb-3" [(ngModel)]="profesorForm.curso" placeholder="Curso que imparte">
+
+    <div class="modal-buttons">
+      <button class="btn guardar" (click)="confirmarAgregarProfesor()">Guardar</button>
+      <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+
 
 <!-- Sección de redes sociales -->
 <section class="cid-uKbbFznFQS">
@@ -125,6 +145,7 @@
     </div>
   </div>
 </section>
+
 
 </body>
 </html>

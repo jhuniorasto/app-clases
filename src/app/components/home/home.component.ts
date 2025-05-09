@@ -26,6 +26,10 @@ export class HomeComponent {
     this.router.navigate(['/signin']);
   }
 
+  onRedirectToAdmin(): void {
+    this.router.navigate(['/admin']);
+  }
+
   agregarComentario() {
     if (this.nuevoComentario.trim()) {
       this.comentarios.push(this.nuevoComentario.trim());
@@ -38,9 +42,6 @@ export class HomeComponent {
     });
   }
   
-  onRedirectToAdmin(): void {
-    this.router.navigate(['/admin']);
-  }
 
 
 
