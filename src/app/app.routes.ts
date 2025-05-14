@@ -5,11 +5,13 @@ import { LayoutComponent } from './components/layout/layout.component'; // Compo
 import { HomeComponent } from './components/home/home.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { CursosComponent } from './components/cursos/cursos.component';
+import { MyperfilComponent} from './components/myperfil/myperfil.component'; // Componente de perfil
 
 export const routes: Routes = [
   // Rutas públicas
   { path: 'signin', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
+
 
   // Rutas con layout general
   {
@@ -19,6 +21,7 @@ export const routes: Routes = [
       { path: '', component: HomeComponent },
       { path: 'admin', component: AdminComponent },
       { path: 'cursos', component: CursosComponent },
+      { path: 'perfil', component: MyperfilComponent}, // Ruta para el perfil
       // Aquí puedes agregar más rutas internas
     ],
   },

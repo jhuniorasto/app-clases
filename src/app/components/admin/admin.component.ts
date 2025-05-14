@@ -123,4 +123,12 @@ export class AdminComponent {
     const profRef = doc(this.firestore, 'profesores', id);
     await deleteDoc(profRef);
   }
+
+    onRedirectToSignIn(): void {
+    this.router.navigate(['/signin']);
+  }
+
+  onRedirectToAdmin(): void {
+    this.router.navigate(['/admin']);
+  }
 }

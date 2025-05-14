@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import {
   Auth,
   GoogleAuthProvider,
@@ -26,8 +27,14 @@ import {
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private auth: Auth, private firestore: Firestore) {}
+private usuarioActual = new BehaviorSubject<User | null>(null);
+  public usuario$ = this.usuarioActual.asObservable(); // ⬅️ Usaremos esta en el componente
 
+  constructor(private auth: Auth, private firestore: Firestore) {
+    onAuthStateChanged(this.auth, (user) => {
+      this.usuarioActual.next(user);
+    });
+  }
   // Verifica si un correo ya está registrado en Firestore
   async correoYaExiste(email: string): Promise<boolean> {
     const usuariosRef = collection(this.firestore, 'usuarios');
