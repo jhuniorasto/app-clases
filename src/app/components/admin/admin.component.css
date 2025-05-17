@@ -1,6 +1,5 @@
-body {
+  body {
     padding-top: 80px; /* Altura del navbar fijo */
-    background-color: white;
   }
   
   .social-list {
@@ -10,9 +9,7 @@ body {
     gap: 10px;
   }
 
-  .espaciado-superior {
-    margin-top: 8rem;
-  }
+
   
 
   .iconfont-wrapper {

@@ -50,10 +50,7 @@
           </li>
 
           <!-- Mostrar "Mi perfil" solo si hay usuario autenticado -->
-          <li
-            class="nav-item"
-            *ngIf="usuario$ | async as usuario"
-          >
+          <li class="nav-item" *ngIf="usuario$ | async as usuario">
             <a
               class="nav-link link text-black display-4"
               (click)="onRedirectToPerfil()"
@@ -63,21 +60,15 @@
         </ul>
 
         <!-- Mostrar "Acceder" si NO hay usuario -->
-        <div
-          class="navbar-buttons mbr-section-btn"
-          *ngIf="!(usuario$ | async)"
-        >
+        <div class="navbar-buttons mbr-section-btn" *ngIf="!(usuario$ | async)">
           <a class="btn btn-primary display-4" (click)="onRedirectToSignIn()"
             >Acceder</a
           >
         </div>
 
         <!-- Mostrar "Cerrar sesión" si HAY usuario -->
-        <div
-          class="navbar-buttons mbr-section-btn"
-          *ngIf="usuario$ | async"
-        >
-          <a class="btn btn-danger display-4" (click)="onLogout()"
+        <div class="navbar-buttons mbr-section-btn" *ngIf="usuario$ | async">
+          <a class="btn btn-primary display-4" (click)="onLogout()"
             >Cerrar sesión</a
           >
         </div>

@@ -4,10 +4,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Curso } from './../../models/curso.model';
 import { CursoService } from './../../services/curso.service';
+import { ClaseService } from './../../services/clase.service';
+import { ProgresoClaseService } from './../../services/progreso-clase.service';
+import { AuthService } from './../../services/auth.service';
+import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-cursos',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   standalone: true,
   templateUrl: './cursos.component.html',
   styleUrls: ['./cursos.component.css'],
@@ -30,7 +34,12 @@ export class CursosComponent {
     fechaCreacion: new Date(),
   };
 
-  constructor(private cursoService: CursoService) {}
+  constructor(
+    private cursoService: CursoService,
+    private claseService: ClaseService,
+    private progresoClaseService: ProgresoClaseService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.cargarCursos();
@@ -55,10 +64,19 @@ export class CursosComponent {
     this.cerrarModal();
   }
 
-  cargarCursos(): void {
+  async cargarCursos(): Promise<void> {
     this.cursoService.obtenerCursos().subscribe((cursos) => {
       this.cursos = cursos;
     });
+    const estudianteUid = await this.authService.getUserId();
+    if (estudianteUid) {
+      for (const curso of this.cursos) {
+        curso.progresoEstudiante = await this.calcularProgresoCurso(
+          curso.id,
+          estudianteUid
+        );
+      }
+    }
   }
 
   seleccionarCurso(curso: Curso): void {
@@ -195,5 +213,40 @@ export class CursosComponent {
         });
       }
     }
+  }
+
+  async calcularProgresoCurso(
+    cursoId: string,
+    estudianteUid: string
+  ): Promise<number> {
+    // Obtener todas las clases del curso
+    const clases = await this.claseService
+      .obtenerClasesPorCurso(cursoId)
+      .toPromise();
+
+    const totalClases = clases ? clases.length : 0;
+
+    if (totalClases === 0) return 0;
+
+    // Obtener todos los progresos del estudiante para esas clases
+    const progresos =
+      await this.progresoClaseService.obtenerProgresosPorEstudiante(
+        estudianteUid
+      );
+
+    // Filtrar progresos relacionados a este curso, completados
+    const clasesCompletadasYaprobadas = progresos.filter(
+      (p) => p.cursoId === cursoId && p.completado
+    ).length;
+
+    return (clasesCompletadasYaprobadas / totalClases) * 100;
+  }
+
+  // Este método puede recibir un porcentaje y convertirlo en el valor apropiado para el SVG
+  progreso(porcentaje: number): string {
+    const radio = 16; // valor que tienes en el HTML
+    const circunferencia = 2 * Math.PI * radio;
+    const progreso = (porcentaje / 100) * circunferencia;
+    return `${progreso} ${circunferencia}`;
   }
 }

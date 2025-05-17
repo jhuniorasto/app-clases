@@ -1,8 +1,15 @@
 body {
-    padding-top: 100px; 
-    background-color: white;
-  }
-  .card {
+  padding-top: 100px;
+}
+.card {
   max-width: 500px;
   margin: 0 auto;
+}
+.profile-card {
+  max-width: 500px;
+  margin: 0 auto;
+}
+.profile-icon {
+  font-size: 3rem;
+  color: #0d6efd;
 }

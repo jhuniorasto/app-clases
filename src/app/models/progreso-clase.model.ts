@@ -3,9 +3,9 @@ export class ProgresoClase {
     public id: string,
     public claseId: string,
     public estudianteUid: string,
-    public porcentaje: number,
     public completado: boolean,
     public fechaUltimoAvance: Date,
+    public cursoId?: string, // OPCIONAL (para facilitar búsquedas por curso)
     public fechaCompletado?: Date
   ) {}
 
@@ -14,9 +14,9 @@ export class ProgresoClase {
       id,
       data.claseId,
       data.estudianteUid,
-      data.porcentaje,
       data.completado,
       data.fechaUltimoAvance,
+      data.cursoId,
       data.fechaCompletado ? new Date(data.fechaCompletado) : undefined
     );
   }

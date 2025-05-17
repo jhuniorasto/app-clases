@@ -1,0 +1,20 @@
+.container{
+    margin-top: 8rem;
+}
+
+.container-temario{
+    padding: 5%;
+}
+.btn-inscribirse{
+    background-color: #a45ee5;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+.accordion-button {
+  font-size: 1.2rem;
+}
+.accordion-body {
+  background-color: #f9f9f9;
+}
+

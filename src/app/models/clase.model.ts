@@ -5,7 +5,7 @@ export class Clase {
     public cursoId: string,
     public titulo: string,
     public descripcion: string,
-    public tipoContenido: 'texto' | 'video' | 'enlace' | 'pdf',
+    public material: 'texto' | 'video' | 'enlace' | 'pdf',
     public contenidoUrl: string,
     public fechaPublicacion: Date
   ) {}
@@ -16,7 +16,7 @@ export class Clase {
       data.cursoId,
       data.titulo,
       data.descripcion,
-      data.tipoContenido,
+      data.material,
       data.contenidoUrl,
       new Date(data.fechaPublicacion)
     );

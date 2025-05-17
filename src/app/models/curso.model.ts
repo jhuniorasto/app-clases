@@ -8,6 +8,8 @@ export class Curso {
     public categoria: string,
     public imagenUrl: string,
     public creadoPorUid: string,
+    public progresoEstudiante: number = 0, // Porcentaje de avance del curso
+    public duracion: number, // Duración en horas
     public fechaCreacion: Date
   ) {}
 
@@ -19,6 +21,8 @@ export class Curso {
       data.categoria,
       data.imagenUrl,
       data.creadoPorUid,
+      data.progresoEstudiante,
+      data.duracion,
       new Date(data.fechaCreacion)
     );
   }

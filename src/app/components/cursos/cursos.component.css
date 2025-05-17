@@ -1,6 +1,6 @@
 body {
     padding-top: 80px; /* Altura del navbar fijo */
-    background-color: white;
+    padding-bottom: 5%;
   }
   
   .social-list {
@@ -10,19 +10,7 @@ body {
     gap: 10px;
   }
 
-  .espaciado-superior {
-    margin-top: 8rem;
-  }
-  
 
-  .iconfont-wrapper {
-    font-size: 24px;
-    color: white;
-    padding: 10px;
-    border-radius: 50%;
-    background-color: #333;
-  }
-  
   .header-menu {
     list-style: none;
     padding-left: 0;
@@ -30,28 +18,77 @@ body {
     flex-wrap: wrap;
     gap: 15px;
   }
-  
   .header-menu li {
     margin: 5px 0;
   }
-  
-  .card {
+
+  .curso-card {
     border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
   }
   
-  .card:hover {
+  .curso-card:hover {
     transform: translateY(-5px);
   }
-  
-  .card-img-top {
-    height: 220px;
+
+  .curso-imagen img {
+    width: 100%;
+    height: 150px;
     object-fit: cover;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    border-top: 12px;
   }
-  
+
+  .curso-titulo {
+    font-family: 'Poppins';
+    font-weight: 600;
+    font-size: 2rem;
+  }
+
+  .curso-docente {
+    margin-top: 10px;
+    font-size: 1.5rem;
+  }
+
+  .curso-progreso {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  svg {
+    transform: rotate(-90deg);
+  }
+
+  circle.bg {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 4;
+  }
+
+  circle.progress {
+    fill: none;
+    stroke: #8e44ad;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 100, 100;
+    transition: stroke-dasharray 0.3s ease;
+  }
+
+  text.porcentaje {
+    fill: #000;
+    font-size: 10px;
+    transform: rotate(90deg);
+  }
+
+
   /* Modal overlay de fondo */
   .modal-overlay {
     position: fixed;
