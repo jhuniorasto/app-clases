@@ -4,9 +4,9 @@ export class Usuario {
     public uid: string,
     public nombre: string,
     public email: string,
-    public rol: 'estudiante' | 'profesor',
+    public rol?: 'estudiante' | 'docente',
     public fotoUrl?: string,
-    public fechaRegistro?: Date  // ✅ Ya convertido a Date
+    public fechaRegistro?: Date // ✅ Ya convertido a Date
   ) {}
 
   static fromFirestore(data: any, uid: string): Usuario {
@@ -16,7 +16,7 @@ export class Usuario {
       data.email,
       data.rol,
       data.fotoUrl,
-      data.fechaRegistro?.toDate?.() || null  // ✅ Conversión segura de Timestamp a Date
+      data.fechaRegistro?.toDate?.() || null // ✅ Conversión segura de Timestamp a Date
     );
   }
 }

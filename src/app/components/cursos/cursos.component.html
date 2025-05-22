@@ -76,10 +76,7 @@
 
       <div class="row row-cols-1 row-cols-md-2 g-4">
         <div class="col" *ngFor="let curso of cursos">
-          <a
-            class="curso-card p-3 d-block"
-            [routerLink]="['/detalle-curso', curso.id]"
-          >
+          <div class="curso-card p-3 d-block">
             <div class="curso-imagen">
               <img [src]="curso.imagenUrl || imagenPorDefecto" alt="Curso" />
             </div>
@@ -91,19 +88,32 @@
                 Docente: {{ curso.creadoPorUid }}
               </p>
             </div>
-            <div class="curso-progreso">
-              <svg width="36" height="36" viewBox="0 0 36 36">
-                <circle class="bg" cx="18" cy="18" r="16"></circle>
-                <circle
-                  class="progress"
-                  [attr.stroke-dasharray]="progreso(curso.progresoEstudiante)"
-                  cx="18"
-                  cy="18"
-                  r="16"
-                ></circle>
-              </svg>
+            <div class="curso-ver">
+              <button
+                class="btn btn-primary btn-sm"
+                [routerLink]="['/detalle-curso', curso.id]"
+              >
+                Ver curso
+              </button>
             </div>
-          </a>
+            <!-- Iconos de editar y eliminar solo para admin/profesor -->
+            <div class="curso-acciones text-end" *ngIf="!isEstudiante">
+              <button
+                class="btn btn-link p-0 me-2"
+                title="Editar"
+                (click)="seleccionarCurso(curso)"
+              >
+                <i class="bi bi-pencil-square fs-5 text-primary"></i>
+              </button>
+              <button
+                class="btn btn-link p-0"
+                (click)="eliminarCurso(curso.id)"
+                title="Eliminar"
+              >
+                <i class="bi bi-trash fs-5 text-danger"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

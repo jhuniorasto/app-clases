@@ -37,6 +37,7 @@
           <li class="nav-item">
             <a
               class="nav-link link text-black display-4"
+              *ngIf="!isEstudiante && (usuario$ | async)"
               (click)="onRedirectToCursos()"
               >Cursos</a
             >
@@ -44,8 +45,23 @@
           <li class="nav-item">
             <a
               class="nav-link link text-black display-4"
+              *ngIf="!isEstudiante && (usuario$ | async)"
               (click)="onRedirectToProfesores()"
               >Profesores</a
+            >
+          </li>
+          <li class="nav-item" *ngIf="isEstudiante && (usuario$ | async)">
+            <a
+              class="nav-link link text-black display-4"
+              (click)="onRedirectToMisCursos()"
+              >Mis Cursos</a
+            >
+          </li>
+          <li class="nav-item" *ngIf="isEstudiante && (usuario$ | async)">
+            <a
+              class="nav-link link text-black display-4"
+              (click)="onRedirectToMisDocentes()"
+              >Docentes</a
             >
           </li>
 

@@ -35,9 +35,11 @@ export class UsuarioService {
   async crearUsuario(usuario: Usuario): Promise<void> {
     const userRef = doc(this.firestore, `usuarios/${usuario.uid}`);
     await setDoc(userRef, {
+      uid: usuario.uid,
       nombre: usuario.nombre,
       email: usuario.email,
       rol: usuario.rol,
+      fechaRegistro: usuario.fechaRegistro,
       fotoUrl: usuario.fotoUrl || null,
     });
   }
@@ -66,7 +68,7 @@ export class UsuarioService {
 
   // 🧑‍🏫 6. Obtener todos los profesores (para asignar cursos o responder comentarios)
   async obtenerProfesores(): Promise<Usuario[]> {
-    const q = query(this.usuariosCollection, where('rol', '==', 'profesor'));
+    const q = query(this.usuariosCollection, where('rol', '==', 'docente'));
     const snapshot = await getDocs(q);
     return snapshot.docs.map((docSnap) =>
       Usuario.fromFirestore(docSnap.data(), docSnap.id)
@@ -80,5 +82,12 @@ export class UsuarioService {
     if (snapshot.empty) return null;
     const docSnap = snapshot.docs[0];
     return Usuario.fromFirestore(docSnap.data(), docSnap.id);
+  }
+
+  async obtenerRolUsuario(uid: string): Promise<string | null> {
+    const userRef = doc(this.firestore, `usuarios/${uid}`);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) return null;
+    return snap.data()?.['rol'] || null;
   }
 }

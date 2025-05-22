@@ -82,7 +82,19 @@
             {{ curso?.fechaCreacion | date : "dd/MM/yyyy" }}
           </p>
 
-          <button class="btn btn-inscribirse">Inscribirme al Curso</button>
+          <button
+            class="btn btn-inscribirse"
+            [disabled]="isInscrito"
+            (click)="inscribirseCurso()"
+            *ngIf="isEstudiante"
+          >
+            {{
+              isInscrito
+                ? "Inscrito desde " +
+                  (inscripcion?.fechaInscripcion | date : "dd/MM/yyyy")
+                : "Inscribirme al Curso"
+            }}
+          </button>
         </div>
         <div class="col-md-4 text-center mt-4 mt-md-0">
           <img
@@ -101,6 +113,7 @@
         <!-- Acciones primero en móvil -->
         <div
           class="col-md-6 col-sm-12 order-1 order-md-2 text-md-end mt-3 mt-md-0"
+          *ngIf="!isEstudiante"
         >
           <h2 class="display-2"><strong>Acciones</strong></h2>
           <button

@@ -27,14 +27,18 @@ export class InscripcionService {
   async inscribirEstudiante(
     cursoId: string,
     estudianteUid: string
-  ): Promise<void> {
-    const id = `${cursoId}_${estudianteUid}`; // ID personalizado
+  ): Promise<Inscripcion> {
+    const id = `${cursoId}_${estudianteUid}`;
     const ref = doc(this.firestore, `inscripciones/${id}`);
     await setDoc(ref, {
       cursoId,
       estudianteUid,
       fechaInscripcion: new Date().toISOString(),
     });
+    // Espera a que se guarde y luego obtén el documento
+    const snap = await getDoc(ref);
+    if (!snap.exists()) throw new Error('No se pudo obtener la inscripción');
+    return Inscripcion.fromFirestore(snap.data(), snap.id);
   }
 
   // 🔍 2. Verificar si un estudiante ya está inscrito en un curso

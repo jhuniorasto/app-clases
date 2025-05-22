@@ -10,11 +10,10 @@ import { Usuario } from '../../models/usuario.model';
   selector: 'app-myperfil',
   imports: [CommonModule, FormsModule],
   templateUrl: './myperfil.component.html',
-  styleUrl: './myperfil.component.css'
+  styleUrl: './myperfil.component.css',
 })
-export class MyperfilComponent implements OnInit{
-
-usuario: Usuario | null = null;
+export class MyperfilComponent implements OnInit {
+  usuario: Usuario | null = null;
   cargando: boolean = true;
 
   constructor(

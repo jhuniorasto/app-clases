@@ -3,20 +3,30 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
+  standalone: true,
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrl: './home.component.css',
 })
 export class HomeComponent {
-
   constructor(private authService: AuthService, private router: Router) {}
   cursos = [
-    { titulo: 'Angular desde cero', descripcion: 'Aprende a construir aplicaciones SPA modernas.' },
-    { titulo: 'Introducción a Python', descripcion: 'Domina los fundamentos de la programación.' },
-    { titulo: 'Diseño UI/UX', descripcion: 'Crea interfaces atractivas y funcionales.' }
+    {
+      titulo: 'Angular desde cero',
+      descripcion: 'Aprende a construir aplicaciones SPA modernas.',
+    },
+    {
+      titulo: 'Introducción a Python',
+      descripcion: 'Domina los fundamentos de la programación.',
+    },
+    {
+      titulo: 'Diseño UI/UX',
+      descripcion: 'Crea interfaces atractivas y funcionales.',
+    },
   ];
 
   comentarios: string[] = [];
@@ -36,14 +46,11 @@ export class HomeComponent {
       this.nuevoComentario = '';
     }
   }
-  logout() :void {
+  logout(): void {
     this.authService.logout().then(() => {
       this.router.navigate(['/login']);
     });
   }
-  
-
-
 
   ngOnInit() {
     // Simulación de carga de datos

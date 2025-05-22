@@ -1,152 +1,137 @@
 body {
-    padding-top: 80px; /* Altura del navbar fijo */
-    padding-bottom: 5%;
-  }
-  
-  .social-list {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
+  padding-top: 80px; /* Altura del navbar fijo */
+  padding-bottom: 5%;
+}
 
+.social-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
-  .header-menu {
-    list-style: none;
-    padding-left: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  .header-menu li {
-    margin: 5px 0;
-  }
+.header-menu {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.header-menu li {
+  margin: 5px 0;
+}
+.curso-ver {
+  position: absolute;
+  bottom: 15px;
+  right: 100px;
+}
 
-  .curso-card {
-    border-radius: 15px;
-    background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
-    position: relative;
-    overflow: hidden;
-    border: 1px solid #f0f0f0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
-    cursor: pointer;
-    color: inherit;
-    text-decoration: none;
-  }
-  
-  .curso-card:hover {
-    transform: translateY(-5px);
-  }
+.curso-card {
+  border-radius: 15px;
+  background: radial-gradient(
+    circle,
+    rgba(238, 174, 202, 1) 0%,
+    rgba(148, 187, 233, 1) 100%
+  );
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
 
-  .curso-imagen img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-top: 12px;
-  }
+.curso-card:hover {
+  transform: translateY(-5px);
+}
 
-  .curso-titulo {
-    font-family: 'Poppins';
-    font-weight: 600;
-    font-size: 2rem;
-  }
+.curso-imagen img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-top: 12px;
+}
 
-  .curso-docente {
-    margin-top: 10px;
-    font-size: 1.5rem;
-  }
+.curso-titulo {
+  font-family: "Poppins";
+  font-weight: 600;
+  font-size: 2rem;
+}
 
-  .curso-progreso {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-  }
+.curso-docente {
+  margin-top: 10px;
+  font-size: 1.5rem;
+}
 
-  svg {
-    transform: rotate(-90deg);
-  }
+.curso-progreso {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
 
-  circle.bg {
-    fill: none;
-    stroke: #eee;
-    stroke-width: 4;
-  }
+.curso-acciones {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
 
-  circle.progress {
-    fill: none;
-    stroke: #8e44ad;
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-dasharray: 100, 100;
-    transition: stroke-dasharray 0.3s ease;
-  }
+/* Modal overlay de fondo */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(30, 30, 30, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
 
-  text.porcentaje {
-    fill: #000;
-    font-size: 10px;
-    transform: rotate(90deg);
-  }
+/* Contenido del modal */
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 500px;
+  overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
 
+.modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #4b0082;
+}
 
-  /* Modal overlay de fondo */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(30, 30, 30, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-  }
-  
-  /* Contenido del modal */
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 400px;
-    max-height: 500px;
-    overflow-y: auto;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    text-align: center;
-  }
-  
-  .modal-title {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    font-weight: bold;
-    color: #4b0082;
-  }
-  
-  .modal-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-  
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
 
-  
-  .btn.guardar {
-    background-color: #a45ee5;
-    color: white;
-  }
-  
-  .btn.cancelar {
-    background-color: #f8d7da;
-    color: #721c24;
-  }
-  
-  /* Formulario del modal */
-  .modal form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    text-align: center;
-  }
-  
+.btn.guardar {
+  background-color: #a45ee5;
+  color: white;
+}
+
+.btn.cancelar {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Formulario del modal */
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: center;
+}

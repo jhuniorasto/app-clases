@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg"
+      type="image/x-icon"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
+
+    <!-- Fuente -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+    /></noscript>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2 class="mbr-section-title display-2 mt-5">
+        <strong>Mis Cursos</strong>
+      </h2>
+
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="col" *ngFor="let curso of cursos">
+          <a
+            class="curso-card p-3 d-block"
+            [routerLink]="['/detalle-curso', curso.id]"
+          >
+            <div class="curso-imagen">
+              <img [src]="curso.imagenUrl || imagenPorDefecto" alt="Curso" />
+            </div>
+            <div class="curso-info mt-3">
+              <h6 class="curso-titulo mb-1">
+                {{ curso.titulo }} - {{ curso.descripcion }}
+              </h6>
+              <p class="curso-docente text-muted">
+                Docente: {{ curso.creadoPorUid }}
+              </p>
+            </div>
+            <div class="curso-progreso">
+              <svg width="36" height="36" viewBox="0 0 36 36">
+                <circle class="bg" cx="18" cy="18" r="16"></circle>
+                <circle
+                  class="progress"
+                  [attr.stroke-dasharray]="progreso(curso.progresoEstudiante)"
+                  cx="18"
+                  cy="18"
+                  r="16"
+                ></circle>
+              </svg>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para agregar/modificar curso -->
+    <div class="modal-overlay" *ngIf="mostrarModal">
+      <div class="modal-content">
+        <h4 class="modal-title">
+          {{ cursoSeleccionado ? "Modificar Curso" : "Agregar Curso" }}
+        </h4>
+
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="nuevoCurso.titulo"
+          placeholder="Título del curso"
+        />
+        <textarea
+          class="form-control mb-2"
+          [(ngModel)]="nuevoCurso.descripcion"
+          placeholder="Descripción del curso"
+        ></textarea>
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="nuevoCurso.categoria"
+          placeholder="Categoría"
+        />
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="nuevoCurso.imagenUrl"
+          placeholder="URL de la imagen"
+        />
+        <input
+          class="form-control mb-3"
+          [(ngModel)]="nuevoCurso.creadoPorUid"
+          placeholder="UID del creador"
+        />
+
+        <div class="modal-buttons">
+          <button class="btn guardar" (click)="confirmarAgregarCurso()">
+            Guardar
+          </button>
+          <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

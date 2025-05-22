@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg"
+      type="image/x-icon"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
+
+    <!-- Fuente -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+    /></noscript>
+  </head>
+
+  <body>
+    <!-- Sección de gestion de profesores -->
+    <div class="container">
+      <h2 class="mbr-section-title display-2 mt-5">
+        <strong>Docentes</strong>
+      </h2>
+
+      <div class="d-flex justify-content-end mb-4">
+        <button class="btn btn-primary" (click)="agregarProfesor()">
+          Buscar Docente
+        </button>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" *ngFor="let profesor of profesores">
+          <div class="card h-100 shadow border-0">
+            <div class="text-center mt-4">
+              <img
+                [src]="profesor.fotoUrl || imagenPorDefecto"
+                class="rounded-circle"
+                alt="Foto del profesor"
+                style="width: 120px; height: 120px; object-fit: cover"
+              />
+            </div>
+            <div class="card-body text-center">
+              <h5 class="card-title mb-3">{{ profesor.nombre }}</h5>
+              <p class="card-text">
+                <strong>Email:</strong> {{ profesor.email }}<br />
+                <strong>Rol:</strong> {{ profesor.rol }}
+              </p>
+            </div>
+            <div
+              class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3"
+            >
+              <button
+                class="btn btn-outline-primary btn-sm px-3"
+                (click)="modificarProfesor(profesor)"
+              >
+                Cursos que imparte
+              </button>
+              <button
+                class="btn btn-outline-danger btn-sm px-3"
+                (click)="verCV()"
+              >
+                Ver CV
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal personalizado -->
+    <div class="modal-overlay" *ngIf="mostrarModal">
+      <div class="modal-content">
+        <h4 class="modal-title">Agregar Profesor</h4>
+
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="profesorForm.nombre"
+          placeholder="Nombre del profesor"
+        />
+        <input
+          class="form-control mb-2"
+          type="number"
+          [(ngModel)]="profesorForm.edad"
+          placeholder="Edad"
+        />
+        <input
+          class="form-control mb-3"
+          [(ngModel)]="profesorForm.curso"
+          placeholder="Curso que imparte"
+        />
+
+        <div class="modal-buttons">
+          <button class="btn guardar" (click)="confirmarAgregarProfesor()">
+            Guardar
+          </button>
+          <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

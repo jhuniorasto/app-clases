@@ -1,28 +1,36 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { map } from 'rxjs/operators';
+import { CanLoad, CanActivate, Router, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
-//CONTROLA EL ACCESO A LAS RUTAS DE LA APLICACIÓN
-// Este guardia se asegura de que el usuario esté autenticado antes de permitirle acceder a ciertas rutas.
-// Si el usuario no está autenticado, se le redirige a la página de inicio de sesión.
+import { filter, map, switchMap, take } from 'rxjs/operators';
+import { AuthService } from '../services/auth.service';
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanLoad, CanActivate {
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(private afAuth: AngularFireAuth, private router: Router) {}
-
-  canActivate(): Observable<boolean> {
-    return this.afAuth.authState.pipe(
-      map(user => {
-        if (user) {
-          return true;
-        } else {
-          this.router.navigate(['/signin']); // Redirige a la página de inicio de sesión si no está autenticado
-          return false;
-        }
-      })
+  private checkAuth(): Observable<boolean | UrlTree> {
+    return this.authService.authInitialized$.pipe(
+      // Esperar a que Firebase haya inicializado sesión
+      filter((initialized) => initialized),
+      take(1),
+      switchMap(() =>
+        this.authService.isLoggedIn$.pipe(
+          take(1),
+          map((isLoggedIn) =>
+            isLoggedIn ? true : this.router.createUrlTree(['/signin'])
+          )
+        )
+      )
     );
+  }
+
+  canLoad(): Observable<boolean | UrlTree> {
+    return this.checkAuth();
+  }
+
+  canActivate(): Observable<boolean | UrlTree> {
+    return this.checkAuth();
   }
 }

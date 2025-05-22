@@ -4,11 +4,17 @@ import { CommonModule } from '@angular/common';
 import { CursoService } from '../../services/curso.service';
 import { Curso } from '../../models/curso.model';
 import { Clase } from '../../models/clase.model';
+import { Usuario } from '../../models/usuario.model';
+import { Inscripcion } from '../../models/inscripcion.model';
 import { ClaseService } from '../../services/clase.service';
+import { InscripcionService } from '../../services/inscripcion.service';
+import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { cp } from 'fs';
 @Component({
   selector: 'app-clases',
   imports: [CommonModule, FormsModule],
+  standalone: true,
   templateUrl: './clases.component.html',
   styleUrl: './clases.component.css',
 })
@@ -16,8 +22,11 @@ export class ClasesComponent {
   cursoId: string | null = '';
   curso: Curso | null = null;
   clases: Clase[] | null = null;
-
+  usuario: Usuario | null = null;
   mostrarFormulario: boolean = false;
+  isInscrito: boolean = false;
+  inscripcion: Inscripcion | null = null;
+  isEstudiante: boolean = false;
 
   nuevaClase: {
     titulo: string;
@@ -36,7 +45,9 @@ export class ClasesComponent {
   constructor(
     private route: ActivatedRoute,
     private cursoService: CursoService,
-    private claseService: ClaseService
+    private claseService: ClaseService,
+    private inscripcionService: InscripcionService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +56,49 @@ export class ClasesComponent {
       this.getDatosCurso(this.cursoId);
     }
     this.getClasesPorCurso(this.cursoId!);
+    this.checkearRol();
+    this.obtenerUsuarioLogueado();
+  }
+
+  async checkearRol(): Promise<void> {
+    const user = await this.authService.getUserData();
+
+    if (user) {
+      this.isEstudiante = user.rol === 'estudiante';
+    } else {
+      this.isEstudiante = false;
+    }
+  }
+
+  obtenerUsuarioLogueado(): void {
+    // Obtener usuario logueado
+    this.authService.getUserObservable((user) => {
+      console.log(user);
+
+      if (user) {
+        this.usuario = {
+          uid: user.uid,
+          email: user.email || '',
+          nombre: user.displayName || '',
+          fotoUrl: user.photoURL || '',
+        };
+        this.verificarInscripcion();
+      } else {
+        this.usuario = null;
+      }
+      console.log('Usuario logueado:', this.usuario);
+    });
+  }
+
+  verificarInscripcion(): void {
+    if (this.cursoId && this.usuario?.uid) {
+      this.inscripcionService
+        .estaInscrito(this.cursoId, this.usuario.uid)
+        .then((inscrito) => {
+          console.log('Inscrito:', inscrito);
+          this.isInscrito = inscrito;
+        });
+    }
   }
 
   async getDatosCurso(id: string): Promise<void> {
@@ -64,6 +118,25 @@ export class ClasesComponent {
         );
         console.log('Clases:', this.clases);
       });
+  }
+
+  inscribirseCurso(): void {
+    // Lógica para inscribirse en el curso
+    if (this.cursoId && this.usuario?.uid) {
+      this.inscripcionService
+        .inscribirEstudiante(this.cursoId, this.usuario.uid)
+        .then((inscripcion) => {
+          this.isInscrito = true; // Cambia el estado de inscripción
+          this.inscripcion = inscripcion; // Guarda la inscripción
+          console.log('Inscripción exitosa:', inscripcion);
+          alert('Inscripción exitosa');
+        })
+        .catch((error) => {
+          console.error('Error al inscribirse:', error);
+        });
+    } else {
+      console.error('No se puede inscribir: cursoId o usuario.uid es null');
+    }
   }
 
   editarClase(clase: Clase) {

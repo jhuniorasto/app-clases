@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
+import { Usuario } from '../models/usuario.model';
+import { UsuarioService } from './usuario.service';
 import {
   Auth,
   GoogleAuthProvider,
@@ -27,12 +29,28 @@ import {
   providedIn: 'root',
 })
 export class AuthService {
-private usuarioActual = new BehaviorSubject<User | null>(null);
+  private usuarioActual = new BehaviorSubject<User | null>(null);
   public usuario$ = this.usuarioActual.asObservable(); // ⬅️ Usaremos esta en el componente
+  isLoggedIn$: Observable<Boolean> = this.usuario$.pipe(map(Boolean)); // Estado de autenticación
+  private authInitialized = new BehaviorSubject<boolean>(false);
+  public authInitialized$ = this.authInitialized.asObservable();
+  private rolUsuario = new BehaviorSubject<string | null>(null);
+  public rol$ = this.rolUsuario.asObservable();
 
-  constructor(private auth: Auth, private firestore: Firestore) {
-    onAuthStateChanged(this.auth, (user) => {
+  constructor(
+    private auth: Auth,
+    private firestore: Firestore,
+    private usuarioService: UsuarioService
+  ) {
+    onAuthStateChanged(this.auth, async (user) => {
       this.usuarioActual.next(user);
+      if (user) {
+        const rol = await this.usuarioService.obtenerRolUsuario(user.uid);
+        this.rolUsuario.next(rol);
+      } else {
+        this.rolUsuario.next(null);
+      }
+      this.authInitialized.next(true); // ⚠️ Marcar como inicializado
     });
   }
   // Verifica si un correo ya está registrado en Firestore
@@ -62,18 +80,15 @@ private usuarioActual = new BehaviorSubject<User | null>(null);
       );
       const user = userCredential.user;
 
-      const userRef = doc(this.firestore, `usuarios/${user.uid}`);
-      await setDoc(
-        userRef,
-        {
-          uid: user.uid,
-          email: user.email,
-          nombre: nombre,
-          rol: 'docente',
-          fechaRegistro: new Date(),
-        },
-        { merge: true }
-      );
+      // Usar UsuarioService para crear el usuario en la colección
+      await this.usuarioService.crearUsuario({
+        uid: user.uid,
+        email: user.email || '',
+        nombre: nombre,
+        rol: 'docente',
+        fechaRegistro: new Date(),
+        fotoUrl: user.photoURL || '',
+      });
 
       return userCredential;
     } catch (error: any) {
@@ -88,9 +103,23 @@ private usuarioActual = new BehaviorSubject<User | null>(null);
   }
 
   // Login con Google (sin guardar datos por ahora)
-  loginConGoogle() {
+  async loginConGoogle(): Promise<void> {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(this.auth, provider);
+    const result = await signInWithPopup(this.auth, provider);
+    const user = result.user;
+    if (user) {
+      // Construye el objeto Usuario
+      const usuario: Usuario = {
+        uid: user.uid,
+        nombre: user.displayName || '',
+        email: user.email || '',
+        fechaRegistro: new Date(),
+        rol: 'estudiante', // o el rol que corresponda
+        fotoUrl: user.photoURL || '',
+      };
+      // Guarda en Firestore
+      await this.usuarioService.crearUsuario(usuario);
+    }
   }
 
   async loginConFacebook() {

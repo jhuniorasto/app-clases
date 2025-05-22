@@ -1,3 +1,4 @@
+import { Usuario } from './../../models/usuario.model';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -20,6 +21,7 @@ export class CursosComponent {
   cursos: Curso[] = [];
   cursoSeleccionado: Curso | null = null;
   mostrarModal = false;
+  isEstudiante: boolean = false;
 
   imagenPorDefecto: string =
     'https://cdn-icons-png.flaticon.com/512/4539/4539220.png';
@@ -43,6 +45,17 @@ export class CursosComponent {
 
   ngOnInit(): void {
     this.cargarCursos();
+    this.checkearRol();
+  }
+
+  async checkearRol(): Promise<void> {
+    const user = await this.authService.getUserData();
+
+    if (user) {
+      this.isEstudiante = user.rol === 'estudiante';
+    } else {
+      this.isEstudiante = false;
+    }
   }
 
   abrirModal(): void {
