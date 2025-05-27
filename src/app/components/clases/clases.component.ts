@@ -10,10 +10,12 @@ import { ClaseService } from '../../services/clase.service';
 import { InscripcionService } from '../../services/inscripcion.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { ComentariosComponent } from '../comentarios/comentarios.component';
+;
 import { cp } from 'fs';
 @Component({
   selector: 'app-clases',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ComentariosComponent],
   standalone: true,
   templateUrl: './clases.component.html',
   styleUrl: './clases.component.css',

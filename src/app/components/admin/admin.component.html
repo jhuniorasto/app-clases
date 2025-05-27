@@ -96,25 +96,16 @@
             <div
               class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3"
             >
-              <button
-                class="btn btn-outline-primary btn-sm px-3"
-                (click)="modificarProfesor(profesor)"
-              >
-                Modificar
-              </button>
-              <button
-                class="btn btn-outline-danger btn-sm px-3"
-                (click)="eliminarProfesor(profesor.id)"
-              >
-                Eliminar
-              </button>
+           <button class="btn btn-outline-primary btn-sm px-3" (click)="abrirModalEditar(profesor)">Modificar</button>
+
+              <button class="btn btn-outline-danger btn-sm px-3" (click)="eliminarProfesor(profesor.id)">Eliminar</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal personalizado -->
+    <!-- Modal agregar profesor -->
     <div class="modal-overlay" *ngIf="mostrarModal">
       <div class="modal-content">
         <h4 class="modal-title">Agregar Profesor</h4>
@@ -144,5 +135,36 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal para editar profesor -->
+<div class="modal-overlay" *ngIf="mostrarModalEditar">
+  <div class="modal-content">
+    <h4 class="modal-title">Editar Profesor</h4>
+
+    <input
+      class="form-control mb-2"
+      [(ngModel)]="profesorEditado.nombre"
+      placeholder="Nombre"
+    />
+    <input
+      class="form-control mb-2"
+      type="number"
+      [(ngModel)]="profesorEditado.edad"
+      placeholder="Edad"
+    />
+    <input
+      class="form-control mb-3"
+      [(ngModel)]="profesorEditado.curso"
+      placeholder="Curso"
+    />
+
+    <div class="modal-buttons d-flex justify-content-between">
+   <button class="btn btn-success px-4" (click)="confirmarEdicion()">Guardar cambios</button>
+<button class="btn btn-outline-secondary px-4" (click)="cerrarModalEditar()">Cancelar</button>
+
+    </div>
+  </div>
+</div>
+
   </body>
 </html>

@@ -1,11 +1,11 @@
-// Clase para representar un comentario en una clase
 export class Comentario {
   constructor(
     public id: string,
     public claseId: string,
     public usuarioUid: string,
     public contenido: string,
-    public fecha: Date
+    public fecha: Date,
+    public usuarioNombre: string 
   ) {}
 
   static fromFirestore(data: any, id: string): Comentario {
@@ -14,7 +14,8 @@ export class Comentario {
       data.claseId,
       data.usuarioUid,
       data.contenido,
-      new Date(data.fecha)
+      new Date(data.fecha),
+      data.usuarioNombre || 'Anónimo'
     );
   }
 }

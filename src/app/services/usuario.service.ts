@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import {
   Firestore,
   doc,
@@ -17,9 +18,10 @@ import { Usuario } from '../models/usuario.model';
   providedIn: 'root',
 })
 export class UsuarioService {
+  
   private usuariosCollection: CollectionReference;
 
-  constructor(private firestore: Firestore) {
+  constructor(private firestore: Firestore, private auth: Auth) {
     this.usuariosCollection = collection(this.firestore, 'usuarios');
   }
 
@@ -89,5 +91,11 @@ export class UsuarioService {
     const snap = await getDoc(userRef);
     if (!snap.exists()) return null;
     return snap.data()?.['rol'] || null;
+  }
+
+  async obtenerUsuarioActual(): Promise<Usuario | null> {
+    const user = this.auth.currentUser;
+    if (!user) return null;
+    return await this.obtenerUsuarioPorUid(user.uid); // Reutiliza tu método existente
   }
 }
