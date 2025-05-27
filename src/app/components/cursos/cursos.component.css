@@ -22,8 +22,14 @@ body {
 }
 .curso-ver {
   position: absolute;
+  bottom: 20px;
+  right: 10px;
+}
+
+.curso-acciones {
+  position: absolute;
   bottom: 15px;
-  right: 100px;
+  right: 20%;
 }
 
 .curso-card {
@@ -66,12 +72,6 @@ body {
 }
 
 .curso-progreso {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-}
-
-.curso-acciones {
   position: absolute;
   bottom: 20px;
   right: 20px;

@@ -1,3 +1,4 @@
+import { supabase } from './../../../environments/supabase.client';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -10,7 +11,7 @@ import { ClaseService } from '../../services/clase.service';
 import { InscripcionService } from '../../services/inscripcion.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { cp } from 'fs';
+import { SupabasestorageService } from '../../services/supabasestorage.service';
 @Component({
   selector: 'app-clases',
   imports: [CommonModule, FormsModule],
@@ -27,6 +28,7 @@ export class ClasesComponent {
   isInscrito: boolean = false;
   inscripcion: Inscripcion | null = null;
   isEstudiante: boolean = false;
+  archivoSeleccionado: File | null = null;
 
   nuevaClase: {
     titulo: string;
@@ -47,7 +49,8 @@ export class ClasesComponent {
     private cursoService: CursoService,
     private claseService: ClaseService,
     private inscripcionService: InscripcionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private supabaseStorageService: SupabasestorageService
   ) {}
 
   ngOnInit(): void {
@@ -144,32 +147,54 @@ export class ClasesComponent {
     console.log('Editar clase:', clase);
   }
 
-  addClase(): void {
+  onArchivoSeleccionado(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.archivoSeleccionado = file;
+      // Aquí podrías subir el archivo a Supabase o manejarlo como necesites
+    }
+  }
+
+  async addClase(): Promise<void> {
     if (!this.cursoId || !this.nuevaClase.titulo || !this.nuevaClase.archivos) {
       alert('Todos los campos son obligatorios');
       return;
     }
-    const claseData = {
-      cursoId: this.cursoId,
-      titulo: this.nuevaClase.titulo,
-      descripcion: this.nuevaClase.descripcion,
-      archivos: this.nuevaClase.archivos,
-      material: this.nuevaClase.archivos, // Para compatibilidad con el servicio/modelo antiguo
-      contenidoUrl: this.nuevaClase.contenidoUrl,
-      fechaPublicacion: new Date(),
-    };
-    this.claseService.crearClase(claseData).then((id) => {
-      console.log('Clase creada con ID:', id);
-      this.getClasesPorCurso(this.cursoId!);
-      this.nuevaClase = {
-        titulo: '',
-        descripcion: '',
-        archivos: 'texto',
-        contenidoUrl: '',
+
+    let archivoUrl = '';
+    if (this.archivoSeleccionado) {
+      archivoUrl =
+        (await this.supabaseStorageService.subirArchivo(
+          this.archivoSeleccionado
+        )) ?? this.nuevaClase.contenidoUrl;
+      if (!archivoUrl) {
+        alert('Error al subir el archivo');
+        return;
+      }
+
+      const claseData = {
+        cursoId: this.cursoId,
+        titulo: this.nuevaClase.titulo,
+        descripcion: this.nuevaClase.descripcion,
+        archivos: this.nuevaClase.archivos,
+        material: this.nuevaClase.archivos, // Para compatibilidad con el servicio/modelo antiguo
+        contenidoUrl: archivoUrl,
         fechaPublicacion: new Date(),
       };
-      this.mostrarFormulario = false;
-    });
+      this.claseService.crearClase(claseData).then((id) => {
+        console.log('Clase creada con ID:', id);
+        this.getClasesPorCurso(this.cursoId!);
+        this.nuevaClase = {
+          titulo: '',
+          descripcion: '',
+          archivos: 'texto',
+          contenidoUrl: '',
+          fechaPublicacion: new Date(),
+        };
+        this.archivoSeleccionado = null; // Limpiar archivo seleccionado
+        this.mostrarFormulario = false;
+      });
+    }
   }
 
   eliminarClase(id: string) {

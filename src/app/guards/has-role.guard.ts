@@ -26,7 +26,7 @@ export class RoleGuard implements CanActivate {
         if (rol && expectedRoles.includes(rol)) {
           return true;
         } else {
-          alert('Acceso denegado.');
+          alert('No tienes el rol necesario para acceder a esta página.');
           return this.router.createUrlTree(['/home']); // o /home
         }
       })

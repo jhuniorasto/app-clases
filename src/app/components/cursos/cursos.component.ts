@@ -9,7 +9,7 @@ import { ClaseService } from './../../services/clase.service';
 import { ProgresoClaseService } from './../../services/progreso-clase.service';
 import { AuthService } from './../../services/auth.service';
 import { RouterModule } from '@angular/router';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 @Component({
   selector: 'app-cursos',
   imports: [CommonModule, FormsModule, RouterModule],
@@ -43,8 +43,12 @@ export class CursosComponent {
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
-    this.cargarCursos();
+  async ngOnInit(): Promise<void> {
+    const uid = await this.getIdUsuario();
+    if (uid) {
+      this.getCursosDeUsuario(uid);
+    }
+    //this.cargarCursos();
     this.checkearRol();
   }
 
@@ -75,6 +79,26 @@ export class CursosComponent {
       this.agregarCurso();
     }
     this.cerrarModal();
+  }
+
+  async getCursosDeUsuario(uid: string): Promise<void> {
+    try {
+      const cursos = await this.cursoService
+        .obtenerCursosPorUsuario(uid)
+        .subscribe((cursos) => (this.cursos = cursos));
+    } catch (error) {
+      console.error('Error al obtener los cursos del usuario:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudieron cargar los cursos del usuario.',
+      });
+    }
+  }
+
+  async getIdUsuario(): Promise<string | null> {
+    const usuario = await this.authService.getUserId();
+    return usuario;
   }
 
   async cargarCursos(): Promise<void> {
@@ -127,32 +151,40 @@ export class CursosComponent {
         this.cargarCursos();
 
         // Mostrar mensaje de éxito si el curso fue agregado correctamente
-        Swal.fire({
-          icon: 'success',
-          title: '¡Curso agregado!',
-          text: `El curso ha sido agregado exitosamente.`,
-          confirmButtonText: 'Aceptar',
-        });
+        this.mostrarMensajeAdvertenciaSwal(
+          'success',
+          '¡Curso agregado!',
+          'El curso ha sido agregado exitosamente.'
+        );
       } else {
         // Mostrar mensaje de advertencia si los campos no están completos
-        Swal.fire({
-          icon: 'warning',
-          title: 'Campos incompletos',
-          text: `Por favor, completa todos los campos del curso.`,
-          confirmButtonText: 'Aceptar',
-        });
+        this.mostrarMensajeAdvertenciaSwal(
+          'warning',
+          '¡Campos incompletos!',
+          'Por favor, completa todos los campos.'
+        );
       }
     } catch (error) {
       console.error('Error al agregar curso:', error);
-
-      // Mostrar mensaje de error si ocurre algún problema al agregar el curso
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al agregar curso',
-        text: `Hubo un problema al agregar el curso. Intenta nuevamente.`,
-        confirmButtonText: 'Aceptar',
-      });
+      this.mostrarMensajeAdvertenciaSwal(
+        'error',
+        'Error al agregar curso',
+        'Hubo un problema al agregar el curso. Intenta nuevamente.'
+      );
     }
+  }
+
+  mostrarMensajeAdvertenciaSwal(
+    icon: SweetAlertIcon,
+    title: String,
+    text: String
+  ): void {
+    Swal.fire({
+      icon: icon,
+      title: title,
+      text: `${text}`,
+      confirmButtonText: 'Aceptar',
+    });
   }
 
   async modificarCurso(): Promise<void> {

@@ -172,10 +172,10 @@
             <div class="mb-3">
               <label class="form-label">URL de contenido</label>
               <input
-                type="text"
-                class="form-control"
+                type="file"
+                (change)="onArchivoSeleccionado($event)"
                 [(ngModel)]="nuevaClase.contenidoUrl"
-                name="contenidoUrl"
+                class="form-control"
                 required
               />
             </div>
@@ -217,16 +217,41 @@
                   </p>
                   <p>
                     <strong>Contenido:</strong>
+                    <!-- Si es un video -->
+                    <video
+                      *ngIf="clase.material === 'video'"
+                      [src]="clase.contenidoUrl"
+                      controls
+                      width="100%"
+                    ></video>
+                    <!-- Si es un PDF -->
                     <a
+                      *ngIf="clase.material === 'pdf'"
                       [href]="clase.contenidoUrl"
                       target="_blank"
-                      *ngIf="clase.material !== 'pdf'"
                     >
-                      Ver contenido
+                      Ver PDF
                     </a>
-                    <span *ngIf="clase.material === 'pdf'">
-                      {{ clase.contenidoUrl }}
-                    </span>
+                    <!-- Si es un enlace -->
+                    <a
+                      *ngIf="clase.material === 'enlace'"
+                      [href]="clase.contenidoUrl"
+                      target="_blank"
+                    >
+                      Ir al enlace
+                    </a>
+                    <!-- Si es un Word u otro archivo -->
+                    <a
+                      *ngIf="
+                        clase.material !== 'video' &&
+                        clase.material !== 'pdf' &&
+                        clase.material !== 'enlace'
+                      "
+                      [href]="clase.contenidoUrl"
+                      target="_blank"
+                    >
+                      Descargar archivo
+                    </a>
                   </p>
                   <div class="mt-2">
                     <button
