@@ -76,16 +76,28 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   // Método para iniciar sesión con Google
-  onLoginWithGoogle(): void {
-    this.authService
-      .loginConGoogle()
-      .then(() => {
-        this.onRedirectToHome();
-      })
-      .catch((error) => {
-        console.error('Error al iniciar sesión con Google', error);
+onLoginWithGoogle(): void {
+  this.authService.loginConGoogle()
+    .then((usuario) => {
+      if (usuario) {
+        this.router.navigate(['/home']); // ✅ solo si hay usuario válido
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo iniciar sesión con Google.',
+        });
+      }
+    })
+    .catch((error) => {
+      console.error('Error al iniciar sesión con Google', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al autenticar con Google.',
       });
-  }
+    });
+}
 
   // Método para iniciar sesión con Facebook
   onLoginWithFacebook(): void {

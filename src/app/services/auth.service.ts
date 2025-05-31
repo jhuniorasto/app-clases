@@ -102,25 +102,28 @@ export class AuthService {
     return signInWithEmailAndPassword(this.auth, email, password);
   }
 
-  // Login con Google (sin guardar datos por ahora)
-  async loginConGoogle(): Promise<void> {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(this.auth, provider);
-    const user = result.user;
-    if (user) {
-      // Construye el objeto Usuario
-      const usuario: Usuario = {
-        uid: user.uid,
-        nombre: user.displayName || '',
-        email: user.email || '',
-        fechaRegistro: new Date(),
-        rol: 'estudiante', // o el rol que corresponda
-        fotoUrl: user.photoURL || '',
-      };
-      // Guarda en Firestore
-      await this.usuarioService.crearUsuario(usuario);
-    }
+
+async loginConGoogle(): Promise<Usuario | null> {
+  const provider = new GoogleAuthProvider();
+  const result = await signInWithPopup(this.auth, provider);
+  const user = result.user;
+
+  if (user) {
+    const usuario: Usuario = {
+      uid: user.uid,
+      nombre: user.displayName || '',
+      email: user.email || '',
+      fechaRegistro: new Date(),
+      rol: 'estudiante',
+      fotoUrl: user.photoURL || '',
+    };
+
+    await this.usuarioService.crearUsuario(usuario);
+    return usuario; // ✅ devuelve el usuario
   }
+
+  return null; // ✅ si no se pudo obtener el usuario
+}
 
   async loginConFacebook() {
     const provider = new FacebookAuthProvider();
