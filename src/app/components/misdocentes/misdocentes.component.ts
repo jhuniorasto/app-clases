@@ -136,6 +136,4 @@ verTodosLosProfesores() {
   this.filtroNombre = '';
   this.profesoresFiltrados = [...this.profesores];
 }
-
-
 }

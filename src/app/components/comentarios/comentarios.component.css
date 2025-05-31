@@ -1,5 +1,8 @@
-.comentarios {
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
+.comentarios-scrollbox {
+  max-height: 250px; /* Altura máxima visible */
+  overflow-y: auto;  /* Scroll vertical solo si se desborda */
+  border: 1px solid #ddd;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 10px;
 }

@@ -1,21 +1,22 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Comentario } from '../../models/comentario.model';
 import { ComentarioService } from '../../services/comentario.service';
 import { AuthService } from '../../services/auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-comentarios',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './comentarios.component.html',
-  styleUrls: ['./comentarios.component.css'] // ✅ corrección aquí
+  styleUrls: ['./comentarios.component.css']
 })
-export class ComentariosComponent implements OnInit {
+export class ComentariosComponent implements OnInit, OnChanges {
   @Input() claseId!: string;
 
-  comentarios: Comentario[] = [];
+  comentarios$!: Observable<Comentario[]>;
   nuevoComentario: string = '';
   usuarioNombre: string = '';
   usuarioUid: string = '';
@@ -26,26 +27,24 @@ export class ComentariosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1. Cargar usuario actual
     this.authService.getUserObservable((user) => {
       if (user) {
         this.usuarioUid = user.uid;
         this.usuarioNombre = user.displayName || 'Anónimo';
-        console.log('Usuario autenticado:', this.usuarioNombre);
       }
     });
+  }
 
-    // 2. Verificar que claseId está definido antes de cargar comentarios
-    if (this.claseId) {
-      this.comentarioService
-        .obtenerComentariosPorClase(this.claseId)
-        .subscribe((comentarios) => {
-          this.comentarios = comentarios;
-          console.log(`Comentarios para clase ${this.claseId}:`, comentarios);
-        });
-    } else {
-      console.warn('claseId no definido en <app-comentarios>');
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['claseId'] && this.claseId) {
+      console.log('claseId cambiado o inicializado:', this.claseId);
+      this.cargarComentarios();
     }
+  }
+
+  private cargarComentarios(): void {
+    console.log('Cargando comentarios para claseId:', this.claseId);
+    this.comentarios$ = this.comentarioService.obtenerComentariosPorClase(this.claseId);
   }
 
   async enviarComentario() {
@@ -61,8 +60,8 @@ export class ComentariosComponent implements OnInit {
 
     try {
       await this.comentarioService.crearComentario(nuevo);
-      console.log('Comentario enviado:', nuevo);
       this.nuevoComentario = '';
+      this.cargarComentarios();
     } catch (error) {
       console.error('Error al enviar comentario:', error);
     }

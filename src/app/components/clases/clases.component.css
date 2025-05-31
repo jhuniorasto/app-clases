@@ -1,19 +1,33 @@
-.container{
-    margin-top: 8rem;
-}
 
-.container-temario{
-    padding: 5%;
-}
-.btn-inscribirse{
-    background-color: #a45ee5;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-}
-.accordion-button {
-  font-size: 1.2rem;
-}
 .accordion-body {
   background-color: #f9f9f9;
+  padding: 20px;
+}
+
+/* Contenedor de comentarios con scroll */
+.comentarios-scrollbox {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+  background-color: #fff;
+}
+
+/* Textarea */
+textarea.form-control {
+  border-radius: 10px;
+  resize: none;
+}
+
+/* Botón */
+button.btn-primary {
+  background-color: #6a1b9a;
+  border: none;
+}
+
+/* Cada comentario */
+.border-bottom {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
 }

@@ -69,12 +69,23 @@ export class UsuarioService {
   }
 
   // 🧑‍🏫 6. Obtener todos los profesores (para asignar cursos o responder comentarios)
+ 
   async obtenerProfesores(): Promise<Usuario[]> {
-    const q = query(this.usuariosCollection, where('rol', '==', 'docente'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map((docSnap) =>
-      Usuario.fromFirestore(docSnap.data(), docSnap.id)
-    );
+    const profesoresRef = collection(this.firestore, 'profesores');
+    const snapshot = await getDocs(profesoresRef);
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        uid: doc.id,
+        nombre: data['nombre'] ?? '',
+        email: '', // no existe en los documentos actuales
+        rol: 'docente', // asumido
+        fotoUrl: data['imagenUrl'] ?? '', // usa imagenUrl de Firebase
+        fechaRegistro: undefined
+      };
+    });
   }
 
   // 🔎 7. Buscar usuario por email (por si se necesita en el futuro)
