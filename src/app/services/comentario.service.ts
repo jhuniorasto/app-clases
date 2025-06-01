@@ -32,7 +32,7 @@ export class ComentarioService {
  async crearComentario(comentario: Omit<Comentario, 'id'>): Promise<string> {
   const docRef = await addDoc(this.comentariosCollection, {
     ...comentario,
-    fecha: Timestamp.fromDate(new Date()), // ✅ cambio aquí
+    fecha: Timestamp.fromDate(new Date()), 
     usuarioNombre: comentario.usuarioNombre
   });
   return docRef.id;
@@ -76,4 +76,16 @@ export class ComentarioService {
     const comentarioRef = doc(this.firestore, `comentarios/${id}`);
     await deleteDoc(comentarioRef);
   }
+
+ async agregarRespuestaAComentario(comentarioId: string, respuesta: any): Promise<void> {
+  const comentarioRef = doc(this.firestore, `comentarios/${comentarioId}`);
+  await updateDoc(comentarioRef, {
+    respuesta: {
+      ...respuesta,
+      fecha: Timestamp.fromDate(new Date())
+    }
+  });
+}
+
+
 }

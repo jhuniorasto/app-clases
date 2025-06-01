@@ -20,30 +20,39 @@ export class ComentariosComponent implements OnInit, OnChanges {
   nuevoComentario: string = '';
   usuarioNombre: string = '';
   usuarioUid: string = '';
+  isDocente: boolean = false;
+  respuestaMap: { [comentarioId: string]: string } = {};
 
   constructor(
     private comentarioService: ComentarioService,
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
-    this.authService.getUserObservable((user) => {
-      if (user) {
-        this.usuarioUid = user.uid;
-        this.usuarioNombre = user.displayName || 'Anónimo';
+ ngOnInit(): void {
+  this.authService.getUserObservable(async (user) => {
+    if (user) {
+      this.usuarioUid = user.uid;
+
+      // Cargar usuario con más detalles desde Firestore
+      const usuarioCompleto = await this.authService.getUserData(); // Usa tu método que sí obtiene el rol
+
+      if (usuarioCompleto) {
+        this.usuarioNombre = usuarioCompleto.nombre || 'Anónimo';
+        this.isDocente = usuarioCompleto.rol === 'docente';
+        console.log('[DEBUG] Rol cargado desde Firestore:', usuarioCompleto.rol);
       }
-    });
-  }
+    }
+  });
+}
+
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['claseId'] && this.claseId) {
-      console.log('claseId cambiado o inicializado:', this.claseId);
       this.cargarComentarios();
     }
   }
 
   private cargarComentarios(): void {
-    console.log('Cargando comentarios para claseId:', this.claseId);
     this.comentarios$ = this.comentarioService.obtenerComentariosPorClase(this.claseId);
   }
 
@@ -65,5 +74,30 @@ export class ComentariosComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error('Error al enviar comentario:', error);
     }
+  }
+
+  async responderComentario(comentarioId: string) {
+    const respuestaTexto = this.respuestaMap[comentarioId]?.trim();
+    if (!respuestaTexto) return;
+
+    const respuesta = {
+      contenido: respuestaTexto,
+      docenteUid: this.usuarioUid,
+      docenteNombre: this.usuarioNombre,
+      fecha: new Date()
+    };
+
+    try {
+      await this.comentarioService.agregarRespuestaAComentario(comentarioId, respuesta);
+      this.respuestaMap[comentarioId] = '';
+      this.cargarComentarios();
+    } catch (error) {
+      console.error('Error al responder comentario:', error);
+    }
+  }
+
+  cancelarRespuesta(comentarioId: string) {
+    delete this.respuestaMap[comentarioId];
+
   }
 }

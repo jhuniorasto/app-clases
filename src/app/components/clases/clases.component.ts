@@ -10,27 +10,30 @@ import { ClaseService } from '../../services/clase.service';
 import { InscripcionService } from '../../services/inscripcion.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { UsuarioService } from '../../services/usuario.service';
 import { ComentariosComponent } from '../comentarios/comentarios.component';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-clases',
-  imports: [CommonModule, FormsModule, ComentariosComponent],
   standalone: true,
+  imports: [CommonModule, FormsModule, ComentariosComponent],
   templateUrl: './clases.component.html',
   styleUrl: './clases.component.css',
 })
 export class ClasesComponent {
-
   cursoId: string | null = '';
   curso: Curso | null = null;
   clases: Clase[] | null = null;
   usuario: Usuario | null = null;
-  mostrarFormulario: boolean = false;
-  isInscrito: boolean = false;
+  mostrarFormulario = false;
+  isInscrito = false;
   inscripcion: Inscripcion | null = null;
-  isEstudiante: boolean = false;
-  editandoClase: boolean = false;
+  isEstudiante = false;
+  editandoClase = false;
+  estudiantesInscritos: { nombre: string; email: string }[] = [];
+  mostrarEstudiantes = false;
+  cargandoEstudiantes = false;
 
   nuevaClase: {
     titulo: string;
@@ -52,7 +55,8 @@ export class ClasesComponent {
     private cursoService: CursoService,
     private claseService: ClaseService,
     private inscripcionService: InscripcionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private usuarioService: UsuarioService
   ) {}
 
   ngOnInit(): void {
@@ -63,6 +67,7 @@ export class ClasesComponent {
     }
     this.checkearRol();
     this.obtenerUsuarioLogueado();
+    
   }
 
   async checkearRol(): Promise<void> {
@@ -131,7 +136,7 @@ export class ClasesComponent {
     this.nuevaClase = {
       titulo: clase.titulo,
       descripcion: clase.descripcion,
-      archivos: clase.material, // ✅ aseguramos compatibilidad con el modelo
+      archivos: clase.material,
       contenidoUrl: clase.contenidoUrl,
       fechaPublicacion: clase.fechaPublicacion,
       id: clase.id
@@ -139,7 +144,6 @@ export class ClasesComponent {
 
     this.editandoClase = true;
     this.mostrarFormulario = true;
-    console.log('Editando clase:', this.nuevaClase);
   }
 
   addClase(): void {
@@ -160,13 +164,11 @@ export class ClasesComponent {
 
     if (this.editandoClase && this.nuevaClase.id) {
       this.claseService.actualizarClase(this.nuevaClase.id, claseData).then(() => {
-        console.log('Clase actualizada');
         this.getClasesPorCurso(this.cursoId!);
         this.resetFormulario();
       });
     } else {
-      this.claseService.crearClase(claseData).then((id) => {
-        console.log('Clase creada con ID:', id);
+      this.claseService.crearClase(claseData).then(() => {
         this.getClasesPorCurso(this.cursoId!);
         this.resetFormulario();
       });
@@ -176,7 +178,6 @@ export class ClasesComponent {
   eliminarClase(id: string) {
     if (confirm('¿Estás seguro de eliminar esta clase?')) {
       this.claseService.eliminarClase(id).then(() => {
-        console.log('Clase eliminada');
         this.getClasesPorCurso(this.cursoId!);
       });
     }
@@ -192,5 +193,31 @@ export class ClasesComponent {
     };
     this.editandoClase = false;
     this.mostrarFormulario = false;
+  }
+
+  async cargarEstudiantesInscritos(): Promise<void> {
+    this.mostrarEstudiantes = !this.mostrarEstudiantes;
+
+    if (this.mostrarEstudiantes) {
+      this.cargandoEstudiantes = true;
+      this.estudiantesInscritos = [];
+
+      try {
+        const inscripciones = await this.inscripcionService.obtenerEstudiantesPorCurso(this.curso?.id || '');
+
+        for (const inscripcion of inscripciones) {
+          const user = await this.authService.getUsuarioPorUid(inscripcion.estudianteUid);
+
+          const nombre = user?.nombre || 'Sin nombre';
+          const email = user?.email || 'Sin email';
+
+          this.estudiantesInscritos.push({ nombre, email });
+        }
+      } catch (error) {
+        console.error('Error al cargar estudiantes:', error);
+      } finally {
+        this.cargandoEstudiantes = false;
+      }
+    }
   }
 }

@@ -1,8 +1,8 @@
 <div class="comentarios">
   <h5 class="mb-3">💬 Comentarios</h5>
 
-  <!-- ✅ Textarea fijo arriba -->
-  <div class="mb-3">
+  <!-- Textarea para estudiantes -->
+  <div class="mb-3" *ngIf="!isDocente">
     <textarea
       class="form-control"
       [(ngModel)]="nuevoComentario"
@@ -12,17 +12,47 @@
     <button class="btn btn-primary btn-sm mt-2" (click)="enviarComentario()">Publicar</button>
   </div>
 
-  <!-- ✅ Comentarios con scroll -->
+  <!-- Lista de comentarios -->
   <div class="comentarios-scrollbox">
     <div *ngIf="comentarios$ | async as comentarios">
       <div *ngIf="comentarios.length === 0" class="text-muted mb-3">
         Aún no hay comentarios.
       </div>
 
-      <div *ngFor="let c of comentarios" class="border-bottom pb-2 mb-2">
+      <div *ngFor="let c of comentarios" class="comentario">
+        <!-- Comentario principal -->
         <strong>{{ c.usuarioNombre }}</strong>
         <div class="small text-muted">{{ c.fecha | date:'short' }}</div>
         <p class="mb-1">{{ c.contenido }}</p>
+
+        <!-- Respuesta del docente -->
+        <div *ngIf="c.respuesta" class="respuesta">
+          <div class="d-flex justify-content-between">
+            <strong class="text-primary">{{ c.respuesta.docenteNombre }}</strong>
+            <span class="small text-muted">{{ c.respuesta.fecha | date:'short' }}</span>
+          </div>
+          <p class="mb-0">{{ c.respuesta.contenido }}</p>
+        </div>
+
+        <!-- Botón y formulario de respuesta (solo docentes) -->
+        <div *ngIf="isDocente && !c.respuesta" class="mt-2">
+          <button class="btn btn-link btn-sm text-primary ps-0" (click)="respuestaMap[c.id] = ''">Responder</button>
+
+          <div *ngIf="respuestaMap[c.id] !== undefined" class="respuesta-form mt-2">
+            <textarea
+              [(ngModel)]="respuestaMap[c.id]"
+              class="form-control"
+              rows="2"
+              placeholder="Escribe una respuesta..."
+            ></textarea>
+        <div class="mt-2 d-flex justify-content-start gap-2 flex-wrap">
+  <button class="btn btn-sm btn-primary" (click)="responderComentario(c.id)">Publicar</button>
+  <button class="btn btn-sm btn-outline-secondary" (click)="cancelarRespuesta(c.id)">Cancelar</button>
+</div>
+
+
+          </div>
+        </div>
       </div>
     </div>
   </div>
