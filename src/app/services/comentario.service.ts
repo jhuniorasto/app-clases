@@ -11,6 +11,7 @@ import {
   query,
   where,
   CollectionReference,
+  orderBy,
 } from '@angular/fire/firestore';
 import { Comentario } from '../models/comentario.model'; // Asegúrate de tener esta ruta correcta
 import { collectionData } from '@angular/fire/firestore';
@@ -31,7 +32,8 @@ export class ComentarioService {
   async crearComentario(comentario: Omit<Comentario, 'id'>): Promise<string> {
     const docRef = await addDoc(this.comentariosCollection, {
       ...comentario,
-      fecha: comentario.fecha.toISOString(), // Guardamos como string ISO
+      fecha: comentario.fecha.toISOString(), // guardamos como string ISO
+      usuarioNombre: comentario.usuarioNombre, // nuevo
     });
     return docRef.id;
   }
@@ -40,8 +42,10 @@ export class ComentarioService {
   obtenerComentariosPorClase(claseId: string): Observable<Comentario[]> {
     const q = query(
       this.comentariosCollection,
-      where('claseId', '==', claseId)
+      where('claseId', '==', claseId),
+      orderBy('fecha') // ✅ Orden ascendente por fecha
     );
+
     return collectionData(q, { idField: 'id' }).pipe(
       map((docs: any[]) =>
         docs.map((doc) => Comentario.fromFirestore(doc, doc.id))

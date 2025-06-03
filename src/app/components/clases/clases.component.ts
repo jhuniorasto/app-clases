@@ -12,9 +12,10 @@ import { InscripcionService } from '../../services/inscripcion.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { SupabasestorageService } from '../../services/supabasestorage.service';
+import { ComentariosComponent } from '../comentarios/comentarios.component';
 @Component({
   selector: 'app-clases',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ComentariosComponent],
   standalone: true,
   templateUrl: './clases.component.html',
   styleUrl: './clases.component.css',
@@ -61,6 +62,15 @@ export class ClasesComponent {
     this.getClasesPorCurso(this.cursoId!);
     this.checkearRol();
     this.obtenerUsuarioLogueado();
+  }
+
+  descargarArchivo(url: string, nombre: string) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   async checkearRol(): Promise<void> {
@@ -161,40 +171,41 @@ export class ClasesComponent {
       return;
     }
 
-    let archivoUrl = '';
+    let archivoUrl = this.nuevaClase.contenidoUrl || '';
     if (this.archivoSeleccionado) {
       archivoUrl =
         (await this.supabaseStorageService.subirArchivo(
           this.archivoSeleccionado
-        )) ?? this.nuevaClase.contenidoUrl;
+        )) || '';
       if (!archivoUrl) {
         alert('Error al subir el archivo');
         return;
       }
+    }
 
-      const claseData = {
-        cursoId: this.cursoId,
-        titulo: this.nuevaClase.titulo,
-        descripcion: this.nuevaClase.descripcion,
-        archivos: this.nuevaClase.archivos,
-        material: this.nuevaClase.archivos, // Para compatibilidad con el servicio/modelo antiguo
-        contenidoUrl: archivoUrl,
+    const claseData = {
+      cursoId: this.cursoId,
+      titulo: this.nuevaClase.titulo,
+      descripcion: this.nuevaClase.descripcion,
+      archivos: this.nuevaClase.archivos,
+      material: this.nuevaClase.archivos, // Para compatibilidad
+      contenidoUrl: archivoUrl,
+      fechaPublicacion: new Date(),
+    };
+
+    this.claseService.crearClase(claseData).then((id) => {
+      console.log('Clase creada con ID:', id);
+      this.getClasesPorCurso(this.cursoId!);
+      this.nuevaClase = {
+        titulo: '',
+        descripcion: '',
+        archivos: 'texto',
+        contenidoUrl: '',
         fechaPublicacion: new Date(),
       };
-      this.claseService.crearClase(claseData).then((id) => {
-        console.log('Clase creada con ID:', id);
-        this.getClasesPorCurso(this.cursoId!);
-        this.nuevaClase = {
-          titulo: '',
-          descripcion: '',
-          archivos: 'texto',
-          contenidoUrl: '',
-          fechaPublicacion: new Date(),
-        };
-        this.archivoSeleccionado = null; // Limpiar archivo seleccionado
-        this.mostrarFormulario = false;
-      });
-    }
+      this.archivoSeleccionado = null;
+      this.mostrarFormulario = false;
+    });
   }
 
   eliminarClase(id: string) {

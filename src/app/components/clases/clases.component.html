@@ -63,16 +63,13 @@
   </head>
 
   <body>
-    <!-- Contenido del curso -->
     <div class="container mt-6">
       <div
         class="row align-items-center bg-primary p-4 text-white rounded shadow"
       >
         <div class="col-md-7">
           <h2 class="fw-bold display-3">Curso de {{ curso?.titulo }}</h2>
-          <p class="fs-4 mb-3">
-            {{ curso?.descripcion }}
-          </p>
+          <p class="fs-4 mb-3">{{ curso?.descripcion }}</p>
           <p class="mb-3"><strong>Categoría:</strong> {{ curso?.categoria }}</p>
           <p class="mb-3">
             <strong>Creado por (UID):</strong> {{ curso?.creadoPorUid }}
@@ -107,10 +104,8 @@
       </div>
     </div>
 
-    <div class="container-temario">
-      <!-- Encabezados -->
+    <div class="container-temario mt-5">
       <div class="row d-flex align-items-center mb-4">
-        <!-- Acciones primero en móvil -->
         <div
           class="col-md-6 col-sm-12 order-1 order-md-2 text-md-end mt-3 mt-md-0"
           *ngIf="!isEstudiante"
@@ -125,15 +120,12 @@
           <button class="btn btn-primary btn-sm">Ordenar</button>
         </div>
 
-        <!-- Temario después en móvil -->
         <div class="col-md-6 col-sm-12 order-2 order-md-1">
           <h2 class="display-2"><strong>Temario</strong></h2>
         </div>
       </div>
 
-      <!-- Contenido principal en 2 columnas -->
       <div class="row">
-        <!-- Acciones (Formulario), primero en móvil -->
         <div class="col-md-6 order-1 order-md-2" *ngIf="mostrarFormulario">
           <form (ngSubmit)="addClase()" class="mb-4 card card-body shadow">
             <div class="mb-3">
@@ -174,16 +166,14 @@
               <input
                 type="file"
                 (change)="onArchivoSeleccionado($event)"
-                [(ngModel)]="nuevaClase.contenidoUrl"
-                class="form-control"
                 required
+                class="form-control"
               />
             </div>
             <button type="submit" class="btn btn-success">Agregar Clase</button>
           </form>
         </div>
 
-        <!-- Temario (accordion), después en móvil -->
         <div class="col-md-6 order-2 order-md-1">
           <div class="accordion" id="accordionClases">
             <div
@@ -232,6 +222,14 @@
                     >
                       Ver PDF
                     </a>
+                    <!-- Para descargar el PDF -->
+                    <a
+                      *ngIf="clase.material === 'pdf'"
+                      [href]="clase.contenidoUrl"
+                      download="Clase-{{ clase.titulo }}.pdf"
+                    >
+                      Descargar PDF
+                    </a>
                     <!-- Si es un enlace -->
                     <a
                       *ngIf="clase.material === 'enlace'"
@@ -242,18 +240,23 @@
                     </a>
                     <!-- Si es un Word u otro archivo -->
                     <a
-                      *ngIf="
-                        clase.material !== 'video' &&
-                        clase.material !== 'pdf' &&
-                        clase.material !== 'enlace'
+                      *ngIf="clase.material === 'pdf'"
+                      href="javascript:void(0)"
+                      (click)="
+                        descargarArchivo(
+                          clase.contenidoUrl,
+                          'Clase-' + clase.titulo + '.pdf'
+                        )
                       "
-                      [href]="clase.contenidoUrl"
-                      target="_blank"
                     >
-                      Descargar archivo
+                      Descargar PDF
                     </a>
                   </p>
-                  <div class="mt-2">
+                  <!-- 🔽 COMENTARIOS POR CLASE -->
+                  <div class="mt-4">
+                    <app-comentarios [claseId]="clase.id"></app-comentarios>
+                  </div>
+                  <div class="mt-2" *ngIf="!isEstudiante">
                     <button
                       class="btn btn-outline-primary btn-sm me-2"
                       (click)="editarClase(clase)"

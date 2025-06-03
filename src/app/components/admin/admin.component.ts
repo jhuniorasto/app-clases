@@ -11,6 +11,7 @@ import {
 } from '@angular/fire/firestore';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-admin',
@@ -20,6 +21,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class AdminComponent {
   profesores: any[] = [];
+  mostrarModalEditar = false;
+profesorEditado: any = { id: '', nombre: '', edad: null, curso: '' };
 
   imagenPorDefecto: string =
     'https://cdn-icons-png.flaticon.com/512/4539/4539220.png';
@@ -115,14 +118,41 @@ export class AdminComponent {
   }
 
   async eliminarProfesor(id: string) {
-    const confirmacion = confirm('¿Estás seguro de eliminar este profesor?');
-    if (!confirmacion) return;
+  const resultado = await Swal.fire({
+    title: '¿Estás seguro?',
+    text: 'Esta acción eliminará al profesor permanentemente.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    reverseButtons: true
+  });
 
-    this.profesores = this.profesores.filter((profesor) => profesor.id !== id);
+  if (resultado.isConfirmed) {
+    try {
+      this.profesores = this.profesores.filter((profesor) => profesor.id !== id);
+      const profRef = doc(this.firestore, 'profesores', id);
+      await deleteDoc(profRef);
 
-    const profRef = doc(this.firestore, 'profesores', id);
-    await deleteDoc(profRef);
+      await Swal.fire({
+        icon: 'success',
+        title: 'Eliminado',
+        text: 'El profesor ha sido eliminado correctamente.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error('Error al eliminar profesor:', error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al eliminar el profesor.',
+      });
+    }
   }
+}
 
     onRedirectToSignIn(): void {
     this.router.navigate(['/signin']);
@@ -131,4 +161,43 @@ export class AdminComponent {
   onRedirectToAdmin(): void {
     this.router.navigate(['/admin']);
   }
+
+  abrirModalEditar(profesor: any) {
+  this.profesorEditado = { ...profesor };
+  this.mostrarModalEditar = true;
+}
+
+cerrarModalEditar() {
+  this.mostrarModalEditar = false;
+  this.profesorEditado = { id: '', nombre: '', edad: null, curso: '' };
+}
+async confirmarEdicion() {
+  const { id, nombre, edad, curso } = this.profesorEditado;
+
+  if (!nombre || !curso || isNaN(Number(edad))) {
+    alert('Por favor completa todos los campos correctamente.');
+    return;
+  }
+
+  // Obtener la imagenUrl anterior
+  const index = this.profesores.findIndex((p) => p.id === id);
+  if (index !== -1) {
+    const profesorAnterior = this.profesores[index];
+
+    this.profesores[index] = {
+      ...profesorAnterior, // conserva imagenUrl y otros posibles campos
+      nombre,
+      edad: Number(edad),
+      curso,
+    };
+  }
+
+  // Actualizar en Firestore solo los campos modificables
+  const profRef = doc(this.firestore, 'profesores', id);
+  await updateDoc(profRef, { nombre, edad: Number(edad), curso });
+
+  this.cerrarModalEditar();
+}
+
+
 }

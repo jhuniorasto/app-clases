@@ -11,6 +11,8 @@ import { filter, map, Observable, switchMap, take } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
+
+// Verifica si el usuario tiene el rol requerido para acceder a la ruta
 export class RoleGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
 

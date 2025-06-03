@@ -63,20 +63,21 @@
   </head>
 
   <body>
-    <!-- Sección de gestion de profesores -->
+    <!-- Sección de gestión de profesores -->
     <div class="container">
       <h2 class="mbr-section-title display-2 mt-5">
         <strong>Docentes</strong>
       </h2>
 
-      <div class="d-flex justify-content-end mb-4">
-        <button class="btn btn-primary" (click)="agregarProfesor()">
-          Buscar Docente
-        </button>
-      </div>
+      <!-- Botón solo visible para estudiante -->
+      <div class="d-flex justify-content-end mb-4 gap-2">
+  <button class="btn btn-primary" (click)="buscarDocente()">Buscar Docente</button>
+  <button class="btn btn-outline-secondary" (click)="verTodosLosProfesores()">Ver todos los profesores</button>
+</div>
 
+      <!-- Lista de docentes filtrados -->
       <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col" *ngFor="let profesor of profesores">
+        <div class="col" *ngFor="let profesor of profesoresFiltrados">
           <div class="card h-100 shadow border-0">
             <div class="text-center mt-4">
               <img
@@ -96,53 +97,26 @@
             <div
               class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3"
             >
-              <button
-                class="btn btn-outline-primary btn-sm px-3"
-                (click)="modificarProfesor(profesor)"
-              >
-                Cursos que imparte
-              </button>
-              <button
-                class="btn btn-outline-danger btn-sm px-3"
-                (click)="verCV()"
-              >
-                Ver CV
-              </button>
+              <button class="btn btn-outline-primary btn-sm px-3" (click)="modificarProfesor(profesor)">Cursos que imparte </button>
+              <button class="btn btn-outline-danger btn-sm px-3"(click)="verCV()">Ver CV</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal personalizado -->
-    <div class="modal-overlay" *ngIf="mostrarModal">
-      <div class="modal-content">
-        <h4 class="modal-title">Agregar Profesor</h4>
+    <!-- Modal de búsqueda de docentes -->
+<div class="modal-overlay" *ngIf="mostrarModal">
+  <div class="modal-content">
+    <h4 class="modal-title">Buscar Docente por Nombre</h4>
 
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="profesorForm.nombre"
-          placeholder="Nombre del profesor"
-        />
-        <input
-          class="form-control mb-2"
-          type="number"
-          [(ngModel)]="profesorForm.edad"
-          placeholder="Edad"
-        />
-        <input
-          class="form-control mb-3"
-          [(ngModel)]="profesorForm.curso"
-          placeholder="Curso que imparte"
-        />
+    <input class="form-control mb-3" [(ngModel)]="filtroNombre" placeholder="Nombre del docente"/>
 
-        <div class="modal-buttons">
-          <button class="btn guardar" (click)="confirmarAgregarProfesor()">
-            Guardar
-          </button>
-          <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
-        </div>
-      </div>
+    <div class="modal-buttons d-flex justify-content-between">
+      <button class="btn btn-secondary" (click)="aplicarFiltro()">Filtrar</button>
+      <button class="btn btn-outline-danger" (click)="cerrarModal()">Cerrar</button>
     </div>
+  </div>
+</div>
   </body>
 </html>
