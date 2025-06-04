@@ -85,6 +85,16 @@ export const routes: Routes = [
         canLoad: [AuthGuard, RoleGuard],
         data: { roles: ['docente', 'estudiante'] },
       },
+      {
+        path: 'detalle-clases/:id',
+        loadComponent: () =>
+          import('./components/misclases/misclases.component').then(
+            (m) => m.MisclasesComponent
+          ),
+        canActivate: [AuthGuard, RoleGuard],
+        canLoad: [AuthGuard, RoleGuard],
+        data: { roles: ['estudiante'] },
+      },
     ],
   },
 

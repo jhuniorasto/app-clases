@@ -1,1 +1,201 @@
-<p>misclases works!</p>
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg"
+      type="image/x-icon"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
+
+    <!-- Fuente -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
+    /></noscript>
+  </head>
+
+  <body>
+    <div class="container mt-6">
+      <div
+        class="row align-items-center bg-primary p-4 text-white rounded shadow"
+      >
+        <div class="col-md-7">
+          <h2 class="fw-bold display-3">Curso de {{ curso?.titulo }}</h2>
+          <p class="fs-4 mb-3">{{ curso?.descripcion }}</p>
+          <p class="mb-3"><strong>Categoría:</strong> {{ curso?.categoria }}</p>
+          <p class="mb-3">
+            <strong>Creado por (UID):</strong> {{ curso?.creadoPorUid }}
+          </p>
+          <p class="mb-3">
+            <strong>Publicado el:</strong>
+            {{ curso?.fechaCreacion | date : "dd/MM/yyyy" }}
+          </p>
+
+          <button
+            class="btn btn-inscribirse"
+            [disabled]="isInscrito"
+            (click)="inscribirseCurso()"
+            *ngIf="isEstudiante"
+          >
+            {{
+              isInscrito
+                ? "Inscrito desde " +
+                  (inscripcion?.fechaInscripcion | date : "dd/MM/yyyy")
+                : "Inscribirme al Curso"
+            }}
+          </button>
+        </div>
+        <div class="col-md-4 text-center mt-4 mt-md-0">
+          <img
+            [src]="curso?.imagenUrl"
+            alt="Imagen del curso"
+            class="img-fluid rounded"
+            style="max-height: 250px; object-fit: cover"
+          />
+        </div>
+      </div>
+    </div>
+    <!-- Mensaje si no está inscrito -->
+    <div *ngIf="!isInscrito" class="alert alert-warning mt-4">
+      Debes inscribirte al curso para ver el temario.
+    </div>
+
+    <div class="container-temario mt-5" *ngIf="isInscrito">
+      <div class="col-md-6 col-sm-12 order-2 order-md-1">
+        <h2 class="display-2"><strong>Temario</strong></h2>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 order-2 order-md-1">
+          <div class="accordion" id="accordionClases">
+            <div
+              class="accordion-item mb-3"
+              *ngFor="let clase of clases; let i = index"
+            >
+              <h2 class="accordion-header" id="heading{{ i }}">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  [attr.data-bs-target]="'#collapse' + i"
+                  aria-expanded="false"
+                  [attr.aria-controls]="'collapse' + i"
+                >
+                  {{ clase.titulo }}
+                  <span class="badge bg-info ms-3">{{ clase.material }}</span>
+                </button>
+              </h2>
+              <div
+                [id]="'collapse' + i"
+                class="accordion-collapse collapse"
+                [attr.aria-labelledby]="'heading' + i"
+                data-bs-parent="#accordionClases"
+              >
+                <div class="accordion-body">
+                  <p><strong>Descripción:</strong> {{ clase.descripcion }}</p>
+                  <p>
+                    <strong>Publicado:</strong>
+                    {{ clase.fechaPublicacion | date }}
+                  </p>
+                  <p>
+                    <strong>Contenido:</strong>
+                    <!-- Si es un video -->
+                    <video
+                      *ngIf="clase.material === 'video'"
+                      [src]="clase.contenidoUrl"
+                      controls
+                      width="100%"
+                    ></video>
+                    <!-- Si es un PDF -->
+                    <a
+                      *ngIf="clase.material === 'pdf'"
+                      [href]="clase.contenidoUrl"
+                      target="_blank"
+                    >
+                      Ver PDF
+                    </a>
+                    <!-- Si es un enlace -->
+                    <a
+                      *ngIf="clase.material === 'enlace'"
+                      [href]="clase.contenidoUrl"
+                      target="_blank"
+                    >
+                      Ir al enlace
+                    </a>
+                    <!-- Si es un Word u otro archivo -->
+                  </p>
+                  <!-- 🔽 COMENTARIOS POR CLASE -->
+                  <div class="mt-4">
+                    <app-comentarios [claseId]="clase.id"></app-comentarios>
+                  </div>
+                  <!-- Botón para marcar clase como completada -->
+                  <div *ngIf="isEstudiante && isInscrito">
+                    <button
+                      class="btn btn-success btn-sm"
+                      [disabled]="clase.completada"
+                      (click)="marcarClaseComoCompletada(clase)"
+                    >
+                      {{
+                        clase.completada
+                          ? "Completada"
+                          : "Marcar como completada"
+                      }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

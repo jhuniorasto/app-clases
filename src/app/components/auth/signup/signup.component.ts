@@ -62,8 +62,9 @@ export class SignupComponent {
       let message = '';
       if (error.code === 'auth/email-already-in-use') {
         message = 'Este correo ya está registrado. Intenta con otro.';
+      } else {
+        message = error.message || 'Error desconocido';
       }
-      // Alert de Error de registro
       Swal.fire({
         icon: 'error',
         title: 'Error al registrar',

@@ -68,78 +68,93 @@
         <strong>Mis Cursos</strong>
       </h2>
 
-      <div class="row row-cols-1 row-cols-md-2 g-4">
-        <div class="col" *ngFor="let curso of cursos">
-          <a
-            class="curso-card p-3 d-block"
-            [routerLink]="['/detalle-curso', curso.id]"
-          >
-            <div class="curso-imagen">
-              <img [src]="curso.imagenUrl || imagenPorDefecto" alt="Curso" />
-            </div>
-            <div class="curso-info mt-3">
-              <h6 class="curso-titulo mb-1">
-                {{ curso.titulo }} - {{ curso.descripcion }}
-              </h6>
-              <p class="curso-docente text-muted">
-                Docente: {{ curso.creadoPorUid }}
-              </p>
-            </div>
-            <div class="curso-progreso">
-              <svg width="36" height="36" viewBox="0 0 36 36">
-                <circle class="bg" cx="18" cy="18" r="16"></circle>
-                <circle
-                  class="progress"
-                  [attr.stroke-dasharray]="progreso(curso.progresoEstudiante)"
-                  cx="18"
-                  cy="18"
-                  r="16"
-                ></circle>
-              </svg>
-            </div>
-          </a>
+      <!-- Botones para alternar vistas -->
+      <div class="mb-3">
+        <button class="btn btn-primary me-2" (click)="verTodosLosCursos()">
+          Ver todos los cursos
+        </button>
+        <button
+          *ngIf="tieneInscripciones"
+          class="btn btn-success"
+          (click)="verCursosInscritos()"
+        >
+          Ver cursos inscritos
+        </button>
+      </div>
+
+      <!-- Mensaje si no está inscrito a ningún curso -->
+      <div
+        *ngIf="!tieneInscripciones && !mostrarCursosInscritos"
+        class="alert alert-info"
+      >
+        Aún no estás inscrito a ningún curso.
+      </div>
+
+      <!-- Lista de cursos inscritos -->
+      <div *ngIf="mostrarCursosInscritos && tieneInscripciones">
+        <h4>Cursos inscritos</h4>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+          <div class="col" *ngFor="let curso of cursosInscritos">
+            <a
+              class="curso-card p-3 d-block"
+              [routerLink]="['/detalle-clases', curso.id]"
+            >
+              <div class="curso-imagen">
+                <img [src]="curso.imagenUrl || imagenPorDefecto" alt="Curso" />
+              </div>
+              <div class="curso-info mt-3">
+                <h6 class="curso-titulo mb-1">
+                  {{ curso.titulo }} - {{ curso.descripcion }}
+                </h6>
+                <p class="curso-docente text-muted">
+                  Publicado: {{ curso.fechaCreacion | date : "dd/MM/yyyy" }}
+                </p>
+              </div>
+              <div class="curso-progreso">
+                <svg width="36" height="36" viewBox="0 0 36 36">
+                  <circle class="bg" cx="18" cy="18" r="16"></circle>
+                  <circle
+                    class="progress"
+                    [attr.stroke-dasharray]="
+                      progreso(progresosCursos[curso.id] || 0)
+                    "
+                    [attr.stroke-dashoffset]="
+                      offset(progresosCursos[curso.id] || 0)
+                    "
+                    cx="18"
+                    cy="18"
+                    r="16"
+                  ></circle>
+                </svg>
+                <span class="ms-2">{{ progresosCursos[curso.id] || 0 }}%</span>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Modal para agregar/modificar curso -->
-    <div class="modal-overlay" *ngIf="mostrarModal">
-      <div class="modal-content">
-        <h4 class="modal-title">
-          {{ cursoSeleccionado ? "Modificar Curso" : "Agregar Curso" }}
-        </h4>
-
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="nuevoCurso.titulo"
-          placeholder="Título del curso"
-        />
-        <textarea
-          class="form-control mb-2"
-          [(ngModel)]="nuevoCurso.descripcion"
-          placeholder="Descripción del curso"
-        ></textarea>
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="nuevoCurso.categoria"
-          placeholder="Categoría"
-        />
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="nuevoCurso.imagenUrl"
-          placeholder="URL de la imagen"
-        />
-        <input
-          class="form-control mb-3"
-          [(ngModel)]="nuevoCurso.creadoPorUid"
-          placeholder="UID del creador"
-        />
-
-        <div class="modal-buttons">
-          <button class="btn guardar" (click)="confirmarAgregarCurso()">
-            Guardar
-          </button>
-          <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
+      <!-- Lista de todos los cursos (si no está mostrando los inscritos) -->
+      <div *ngIf="!mostrarCursosInscritos">
+        <h4 *ngIf="tieneInscripciones">Todos los cursos</h4>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+          <div class="col" *ngFor="let curso of cursos">
+            <a
+              class="curso-card p-3 d-block"
+              [routerLink]="['/detalle-clases', curso.id]"
+            >
+              <div class="curso-imagen">
+                <img [src]="curso.imagenUrl || imagenPorDefecto" alt="Curso" />
+              </div>
+              <div class="curso-info mt-3">
+                <h6 class="curso-titulo mb-1">
+                  {{ curso.titulo }} - {{ curso.descripcion }}
+                </h6>
+                <p class="curso-docente text-muted">
+                  Docente: {{ curso.creadoPorUid }}
+                </p>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </div>
