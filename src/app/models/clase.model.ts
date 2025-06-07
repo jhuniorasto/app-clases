@@ -10,15 +10,16 @@ export class Clase {
     public fechaPublicacion: Date
   ) {}
 
+  // Método de fábrica para crear una instancia desde Firestore
   static fromFirestore(data: any, id: string): Clase {
     return new Clase(
       id,
-      data.cursoId,
-      data.titulo,
-      data.descripcion,
-      data.material,
-      data.contenidoUrl,
-      new Date(data.fechaPublicacion)
+      data.cursoId ?? '',
+      data.titulo ?? '',
+      data.descripcion ?? '',
+      data.material ?? 'texto',
+      data.contenidoUrl ?? '',
+      data.fechaPublicacion ? new Date(data.fechaPublicacion) : new Date()
     );
   }
 }

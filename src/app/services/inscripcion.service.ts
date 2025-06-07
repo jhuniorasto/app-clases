@@ -84,4 +84,29 @@ export class InscripcionService {
     const ref = doc(this.firestore, `inscripciones/${id}`);
     await deleteDoc(ref);
   }
+
+  // 🔍 6. Obtener inscripción por curso y estudiante
+  async obtenerInscripcionPorCursoYEstudiante(
+    cursoId: string,
+    estudianteUid: string
+  ): Promise<Inscripcion | null> {
+    const q = query(
+      this.inscripcionesCollection,
+      where('cursoId', '==', cursoId),
+      where('estudianteUid', '==', estudianteUid)
+    );
+    const snapshot = await getDocs(q);
+    if (snapshot.docs.length > 0) {
+      const data = snapshot.docs[0].data();
+      // Si la fecha está como string, conviértela a Date
+      if (
+        data['fechaInscripcion'] &&
+        typeof data['fechaInscripcion'] === 'string'
+      ) {
+        data['fechaInscripcion'] = new Date(data['fechaInscripcion']);
+      }
+      return Inscripcion.fromFirestore(data, snapshot.docs[0].id);
+    }
+    return null;
+  }
 }

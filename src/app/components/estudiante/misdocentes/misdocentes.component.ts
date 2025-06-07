@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService } from '../../services/usuario.service'; // ajusta la ruta si es necesario
-import { Usuario } from '../../models/usuario.model'; // ajusta la ruta si es necesario
+import { UsuarioService } from '../../../services/usuario.service'; // ajusta la ruta si es necesario
+import { Usuario } from '../../../models/usuario.model'; // ajusta la ruta si es necesario
 import Swal from 'sweetalert2';
 
 @Component({
@@ -73,7 +73,6 @@ export class MisdocentesComponent {
     }
   }
 
-
   modificarProfesor(profesor: Usuario) {
     alert('Función deshabilitada. Edita desde el módulo de usuarios.');
   }
@@ -91,51 +90,50 @@ export class MisdocentesComponent {
   }
 
   // Aplica el filtro, cierra el modal
-aplicarFiltro() {
-  const texto = this.filtroNombre.trim().toLowerCase();
+  aplicarFiltro() {
+    const texto = this.filtroNombre.trim().toLowerCase();
 
-  if (texto === '') {
-    alert('Por favor escribe un nombre para filtrar.');
-    return;
+    if (texto === '') {
+      alert('Por favor escribe un nombre para filtrar.');
+      return;
+    }
+
+    this.profesoresFiltrados = this.profesores.filter((profesor) =>
+      profesor.nombre.toLowerCase().includes(texto)
+    );
+    this.mostrarModal = false;
   }
 
-  this.profesoresFiltrados = this.profesores.filter((profesor) =>
-    profesor.nombre.toLowerCase().includes(texto)
-  );
-  this.mostrarModal = false;
-}
-
-// Limpia el filtro y muestra todos los profesores
-limpiarFiltro() {
-  this.filtroNombre = '';
-  this.profesoresFiltrados = [...this.profesores];
-  this.mostrarModal = false;
-}
-
-// Solo cierra el modal sin cambiar la lista
-cerrarModal() {
-  this.mostrarModal = false;
-}
-
-verTodosLosProfesores() {
-  const sinFiltro = this.filtroNombre.trim() === '';
-  const yaMostrandoTodo = this.profesoresFiltrados.length === this.profesores.length;
-
-  if (sinFiltro && yaMostrandoTodo) {
-    // Mensaje elegante con SweetAlert
-    Swal.fire({
-      icon: 'info',
-      title: 'Vista completa',
-      text: 'Actualmente estás viendo todos los profesores disponibles.',
-      confirmButtonText: 'Entendido',
-    });
-    return;
+  // Limpia el filtro y muestra todos los profesores
+  limpiarFiltro() {
+    this.filtroNombre = '';
+    this.profesoresFiltrados = [...this.profesores];
+    this.mostrarModal = false;
   }
 
-  // Si había filtro, se limpia y se muestra todo
-  this.filtroNombre = '';
-  this.profesoresFiltrados = [...this.profesores];
-}
+  // Solo cierra el modal sin cambiar la lista
+  cerrarModal() {
+    this.mostrarModal = false;
+  }
 
+  verTodosLosProfesores() {
+    const sinFiltro = this.filtroNombre.trim() === '';
+    const yaMostrandoTodo =
+      this.profesoresFiltrados.length === this.profesores.length;
 
+    if (sinFiltro && yaMostrandoTodo) {
+      // Mensaje elegante con SweetAlert
+      Swal.fire({
+        icon: 'info',
+        title: 'Vista completa',
+        text: 'Actualmente estás viendo todos los profesores disponibles.',
+        confirmButtonText: 'Entendido',
+      });
+      return;
+    }
+
+    // Si había filtro, se limpia y se muestra todo
+    this.filtroNombre = '';
+    this.profesoresFiltrados = [...this.profesores];
+  }
 }

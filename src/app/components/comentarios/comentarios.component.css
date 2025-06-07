@@ -1,7 +1,66 @@
 .comentarios {
+  padding: 0.75rem;
+}
+
+/* Scroll en la caja de comentarios */
+.comentarios-scrollbox {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
   background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
-  max-width: auto;
-  max-height: auto;
+  width: 100%;
+  overflow-x: hidden; /* 🔥 IMPORTANTE: evita scroll horizontal */
+}
+
+/* Comentario */
+.comentario {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 1rem;
+}
+
+/* Respuesta del docente */
+.respuesta {
+  margin-top: 0.5rem;
+  margin-left: 1rem;
+  padding: 0.75rem;
+  background-color: #e7f1ff;
+  border-left: 4px solid #0d6efd;
+  border-radius: 0.375rem;
+}
+
+/* Formulario de respuesta */
+.respuesta-form textarea {
+  resize: vertical;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+
+/* Botón responder estilo Bootstrap */
+.btn-link {
+  font-size: 0.9rem;
+  padding-left: 0;
+}
+.respuesta-form {
+  width: 100%;
+}
+
+.respuesta-form textarea {
+  width: 100%;
+  resize: vertical;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+
+textarea.form-control {
+  height: 75px;
+  font-size: 0.95rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  resize: vertical; /* Permite agrandarlo si el usuario quiere */
+  line-height: 1.4;
 }

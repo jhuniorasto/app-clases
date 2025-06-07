@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { UsuarioService } from './usuario.service';
+
 import {
   Auth,
   GoogleAuthProvider,
@@ -30,8 +31,8 @@ import {
 })
 export class AuthService {
   private usuarioActual = new BehaviorSubject<User | null>(null);
-  public usuario$ = this.usuarioActual.asObservable(); // ⬅️ Usaremos esta en el componente
-  isLoggedIn$: Observable<Boolean> = this.usuario$.pipe(map(Boolean)); // Estado de autenticación
+  public usuario$ = this.usuarioActual.asObservable();
+  isLoggedIn$: Observable<Boolean> = this.usuario$.pipe(map(Boolean));
   private authInitialized = new BehaviorSubject<boolean>(false);
   public authInitialized$ = this.authInitialized.asObservable();
   private rolUsuario = new BehaviorSubject<string | null>(null);
@@ -50,10 +51,11 @@ export class AuthService {
       } else {
         this.rolUsuario.next(null);
       }
-      this.authInitialized.next(true); // ⚠️ Marcar como inicializado
+      this.authInitialized.next(true);
     });
   }
-  // Verifica si un correo ya está registrado en Firestore
+
+  // ✅ Verifica si un correo ya está registrado
   async correoYaExiste(email: string): Promise<boolean> {
     const usuariosRef = collection(this.firestore, 'usuarios');
     const q = query(usuariosRef, where('email', '==', email));
@@ -61,7 +63,7 @@ export class AuthService {
     return !querySnapshot.empty;
   }
 
-  // Registro con correo, contraseña y nombre (rol fijo: docente)
+  // ✅ Registro de usuario (rol fijo: docente)
   async signUpEmailAndPassword(
     email: string,
     password: string,
@@ -80,7 +82,6 @@ export class AuthService {
       );
       const user = userCredential.user;
 
-      // Usar UsuarioService para crear el usuario en la colección
       await this.usuarioService.crearUsuario({
         uid: user.uid,
         email: user.email || '',
@@ -97,53 +98,57 @@ export class AuthService {
     }
   }
 
-  // Login con correo y contraseña
+  // ✅ Login con correo y contraseña
   loginConEmailPassword(email: string, password: string) {
     return signInWithEmailAndPassword(this.auth, email, password);
   }
 
-  // Login con Google (sin guardar datos por ahora)
-  async loginConGoogle(): Promise<void> {
+  // ✅ Login con Google
+  async loginConGoogle(): Promise<Usuario | null> {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(this.auth, provider);
     const user = result.user;
+
     if (user) {
-      // Construye el objeto Usuario
       const usuario: Usuario = {
         uid: user.uid,
         nombre: user.displayName || '',
         email: user.email || '',
         fechaRegistro: new Date(),
-        rol: 'estudiante', // o el rol que corresponda
+        rol: 'estudiante',
         fotoUrl: user.photoURL || '',
       };
-      // Guarda en Firestore
+
       await this.usuarioService.crearUsuario(usuario);
+      return usuario;
     }
+
+    return null;
   }
 
+  // ✅ Login con Facebook
   async loginConFacebook() {
     const provider = new FacebookAuthProvider();
     return await signInWithPopup(this.auth, provider);
   }
 
-  // Cierra sesión
+  // ✅ Logout
   logout(): Promise<void> {
     return signOut(this.auth);
   }
 
-  // Obtener observable del usuario actual
+  // ✅ Observable del usuario actual
   getUserObservable(callback: (user: User | null) => void) {
     return onAuthStateChanged(this.auth, callback);
   }
 
-  // Obtener el UID del usuario autenticado
+  // ✅ UID del usuario actual
   async getUserId(): Promise<string | null> {
     const user = this.auth.currentUser;
     return user ? user.uid : null;
   }
 
-  // Obtener datos del usuario desde Firestore
+  // ✅ Datos del usuario desde Firestore
   async getUserData(): Promise<any> {
     const uid = await this.getUserId();
     if (!uid) return null;
@@ -154,6 +159,24 @@ export class AuthService {
     if (userSnap.exists()) {
       return userSnap.data();
     } else {
+      return null;
+    }
+  }
+
+  // ✅ 🔍 Obtener usuario por su UID
+  async getUsuarioPorUid(uid: string): Promise<Usuario | null> {
+    try {
+      const userDoc = doc(this.firestore, `usuarios/${uid}`);
+      const userSnap = await getDoc(userDoc);
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        return Usuario.fromFirestore(data, uid);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener usuario por UID:', error);
       return null;
     }
   }

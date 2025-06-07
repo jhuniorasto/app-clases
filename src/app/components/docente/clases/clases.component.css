@@ -1,0 +1,40 @@
+.accordion-body {
+  background-color: #f9f9f9;
+  padding: 20px;
+}
+
+/* Contenedor de comentarios con scroll */
+.comentarios-scrollbox {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+  background-color: #fff;
+}
+
+.container-temario {
+  padding: 5%;
+}
+
+.div-curso {
+  padding-top: 5%;
+}
+
+/* Textarea */
+textarea.form-control {
+  border-radius: 10px;
+  resize: none;
+}
+
+/* Botón */
+button.btn-primary {
+  background-color: #6a1b9a;
+  border: none;
+}
+
+/* Cada comentario */
+.border-bottom {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+}

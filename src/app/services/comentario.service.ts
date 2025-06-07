@@ -17,7 +17,7 @@ import { Comentario } from '../models/comentario.model'; // Asegúrate de tener 
 import { collectionData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
+import { Timestamp } from '@angular/fire/firestore';
 @Injectable({
   providedIn: 'root',
 })
@@ -32,8 +32,8 @@ export class ComentarioService {
   async crearComentario(comentario: Omit<Comentario, 'id'>): Promise<string> {
     const docRef = await addDoc(this.comentariosCollection, {
       ...comentario,
-      fecha: comentario.fecha.toISOString(), // guardamos como string ISO
-      usuarioNombre: comentario.usuarioNombre, // nuevo
+      fecha: Timestamp.fromDate(new Date()),
+      usuarioNombre: comentario.usuarioNombre,
     });
     return docRef.id;
   }
@@ -43,7 +43,7 @@ export class ComentarioService {
     const q = query(
       this.comentariosCollection,
       where('claseId', '==', claseId),
-      orderBy('fecha') // ✅ Orden ascendente por fecha
+      orderBy('fecha', 'desc') // Ordenar por fecha descendente
     );
 
     return collectionData(q, { idField: 'id' }).pipe(
@@ -74,5 +74,18 @@ export class ComentarioService {
   async eliminarComentario(id: string): Promise<void> {
     const comentarioRef = doc(this.firestore, `comentarios/${id}`);
     await deleteDoc(comentarioRef);
+  }
+
+  async agregarRespuestaAComentario(
+    comentarioId: string,
+    respuesta: any
+  ): Promise<void> {
+    const comentarioRef = doc(this.firestore, `comentarios/${comentarioId}`);
+    await updateDoc(comentarioRef, {
+      respuesta: {
+        ...respuesta,
+        fecha: Timestamp.fromDate(new Date()),
+      },
+    });
   }
 }

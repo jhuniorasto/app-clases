@@ -1,38 +1,49 @@
+import { supabase } from '../../../../environments/supabase.client';
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { CursoService } from '../../services/curso.service';
 import { ActivatedRoute } from '@angular/router';
-import { Curso } from '../../models/curso.model';
-import { Clase } from '../../models/clase.model';
-import { Usuario } from '../../models/usuario.model';
-import { Inscripcion } from '../../models/inscripcion.model';
-import { ClaseService } from '../../services/clase.service';
-import { InscripcionService } from '../../services/inscripcion.service';
-import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
+import { CursoService } from '../../../services/curso.service';
+import { Curso } from '../../../models/curso.model';
+import { Clase } from '../../../models/clase.model';
+import { Usuario } from '../../../models/usuario.model';
+import { Inscripcion } from '../../../models/inscripcion.model';
+import { ClaseService } from '../../../services/clase.service';
+import { InscripcionService } from '../../../services/inscripcion.service';
+import { AuthService } from '../../../services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { SupabasestorageService } from '../../services/supabasestorage.service';
-import { ComentariosComponent } from '../comentarios/comentarios.component';
-import { ProgresoClaseService } from '../../services/progreso-clase.service';
-import Swal from 'sweetalert2';
-type ClaseConCompletada = Clase & { completada?: boolean };
+import { SupabasestorageService } from '../../../services/supabasestorage.service';
+import { ComentariosComponent } from '../../comentarios/comentarios.component';
 @Component({
-  selector: 'app-misclases',
-  standalone: true,
+  selector: 'app-clases',
   imports: [CommonModule, FormsModule, ComentariosComponent],
-  templateUrl: './misclases.component.html',
-  styleUrl: './misclases.component.css',
+  standalone: true,
+  templateUrl: './clases.component.html',
+  styleUrl: './clases.component.css',
 })
-export class MisclasesComponent {
+export class ClasesComponent {
   cursoId: string | null = '';
   curso: Curso | null = null;
-  clases: ClaseConCompletada[] | null = null;
+  clases: Clase[] | null = null;
   usuario: Usuario | null = null;
   mostrarFormulario: boolean = false;
   isInscrito: boolean = false;
   inscripcion: Inscripcion | null = null;
   isEstudiante: boolean = false;
   archivoSeleccionado: File | null = null;
-  progresosCursos: { [cursoId: string]: number } = {};
+
+  nuevaClase: {
+    titulo: string;
+    descripcion: string;
+    archivos: 'texto' | 'video' | 'enlace' | 'pdf';
+    contenidoUrl: string;
+    fechaPublicacion: Date;
+  } = {
+    titulo: '',
+    descripcion: '',
+    archivos: 'texto',
+    contenidoUrl: '',
+    fechaPublicacion: new Date(),
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -40,15 +51,15 @@ export class MisclasesComponent {
     private claseService: ClaseService,
     private inscripcionService: InscripcionService,
     private authService: AuthService,
-    private supabaseStorageService: SupabasestorageService,
-    private progresoClaseService: ProgresoClaseService
+    private supabaseStorageService: SupabasestorageService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.cursoId = this.route.snapshot.paramMap.get('id');
     if (this.cursoId) {
       this.getDatosCurso(this.cursoId);
     }
+    this.getClasesPorCurso(this.cursoId!);
     this.checkearRol();
     this.obtenerUsuarioLogueado();
   }
@@ -85,9 +96,6 @@ export class MisclasesComponent {
           fotoUrl: user.photoURL || '',
         };
         this.verificarInscripcion();
-        if (this.cursoId) {
-          this.getClasesPorCurso(this.cursoId);
-        }
       } else {
         this.usuario = null;
       }
@@ -111,26 +119,17 @@ export class MisclasesComponent {
     console.log('Curso:', this.curso);
   }
 
-  async getClasesPorCurso(cursoId: string): Promise<void> {
+  getClasesPorCurso(cursoId: string): void {
     this.claseService
       .obtenerClasesPorCurso(cursoId)
-      .subscribe(async (clases: Clase[]) => {
-        if (this.usuario?.uid && this.isEstudiante) {
-          // Obtén los progresos del estudiante
-          const progresos =
-            await this.progresoClaseService.obtenerProgresosPorEstudiante(
-              this.usuario.uid
-            );
-          // Agrega la propiedad 'completada' a cada clase según el progreso
-          this.clases = clases.map((clase) => ({
-            ...clase,
-            completada: progresos.some(
-              (p: any) => p.claseId === clase.id && p.completado
-            ),
-          }));
-        } else {
-          this.clases = clases;
-        }
+      .subscribe((clases: Clase[]) => {
+        // Ordenar por fechaPublicacion ascendente (de la más antigua a la más reciente)
+        this.clases = clases.sort(
+          (a, b) =>
+            new Date(a.fechaPublicacion).getTime() -
+            new Date(b.fechaPublicacion).getTime()
+        );
+        console.log('Clases:', this.clases);
       });
   }
 
@@ -166,24 +165,54 @@ export class MisclasesComponent {
     }
   }
 
-  async marcarClaseComoCompletada(clase: any) {
-    if (!this.usuario?.uid || !clase.id) return;
+  async addClase(): Promise<void> {
+    if (!this.cursoId || !this.nuevaClase.titulo || !this.nuevaClase.archivos) {
+      alert('Todos los campos son obligatorios');
+      return;
+    }
 
-    await this.progresoClaseService.marcarComoCompletada(
-      clase.id,
-      this.usuario.uid,
-      this.cursoId || '' // Asegúrate de pasar el cursoId si es necesario
-    );
+    let archivoUrl = this.nuevaClase.contenidoUrl || '';
+    if (this.archivoSeleccionado) {
+      archivoUrl =
+        (await this.supabaseStorageService.subirArchivo(
+          this.archivoSeleccionado
+        )) || '';
+      if (!archivoUrl) {
+        alert('Error al subir el archivo');
+        return;
+      }
+    }
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Clase Completada',
-      text: `Has completado la clase: ${clase.titulo}`,
+    const claseData = {
+      cursoId: this.cursoId,
+      titulo: this.nuevaClase.titulo,
+      descripcion: this.nuevaClase.descripcion,
+      archivos: this.nuevaClase.archivos,
+      material: this.nuevaClase.archivos, // Para compatibilidad
+      contenidoUrl: archivoUrl,
+      fechaPublicacion: new Date(),
+    };
+
+    this.claseService.crearClase(claseData).then((id) => {
+      console.log('Clase creada con ID:', id);
+      this.getClasesPorCurso(this.cursoId!);
+      this.nuevaClase = {
+        titulo: '',
+        descripcion: '',
+        archivos: 'texto',
+        contenidoUrl: '',
+        fechaPublicacion: new Date(),
+      };
+      this.archivoSeleccionado = null;
+      this.mostrarFormulario = false;
     });
+  }
 
-    // Vuelve a cargar las clases para refrescar el estado desde la base de datos
-    if (this.cursoId) {
-      await this.getClasesPorCurso(this.cursoId);
+  eliminarClase(id: string) {
+    if (confirm('¿Estás seguro de eliminar esta clase?')) {
+      this.claseService.eliminarClase(id).then(() => {
+        console.log('Clase eliminada');
+      });
     }
   }
 }

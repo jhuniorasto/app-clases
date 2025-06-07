@@ -26,7 +26,7 @@ export const routes: Routes = [
       {
         path: 'admin',
         loadComponent: () =>
-          import('./components/admin/admin.component').then(
+          import('./components/docente/profesores/admin.component').then(
             (m) => m.AdminComponent
           ),
         canActivate: [AuthGuard, RoleGuard],
@@ -36,7 +36,7 @@ export const routes: Routes = [
       {
         path: 'cursos',
         loadComponent: () =>
-          import('./components/cursos/cursos.component').then(
+          import('./components/docente/cursos/cursos.component').then(
             (m) => m.CursosComponent
           ),
         canActivate: [AuthGuard, RoleGuard],
@@ -56,7 +56,7 @@ export const routes: Routes = [
       {
         path: 'miscursos',
         loadComponent: () =>
-          import('./components/miscursos/miscursos.component').then(
+          import('./components/estudiante/miscursos/miscursos.component').then(
             (m) => m.MiscursosComponent
           ),
         canActivate: [AuthGuard, RoleGuard],
@@ -67,9 +67,9 @@ export const routes: Routes = [
       {
         path: 'misdocentes',
         loadComponent: () =>
-          import('./components/misdocentes/misdocentes.component').then(
-            (m) => m.MisdocentesComponent
-          ),
+          import(
+            './components/estudiante/misdocentes/misdocentes.component'
+          ).then((m) => m.MisdocentesComponent),
         canActivate: [AuthGuard, RoleGuard],
         canLoad: [AuthGuard, RoleGuard],
 
@@ -78,7 +78,7 @@ export const routes: Routes = [
       {
         path: 'detalle-curso/:id',
         loadComponent: () =>
-          import('./components/clases/clases.component').then(
+          import('./components/docente/clases/clases.component').then(
             (m) => m.ClasesComponent
           ),
         canActivate: [AuthGuard, RoleGuard],
@@ -88,7 +88,7 @@ export const routes: Routes = [
       {
         path: 'detalle-clases/:id',
         loadComponent: () =>
-          import('./components/misclases/misclases.component').then(
+          import('./components/estudiante/misclases/misclases.component').then(
             (m) => m.MisclasesComponent
           ),
         canActivate: [AuthGuard, RoleGuard],
