@@ -166,6 +166,7 @@ export class ClasesComponent {
   }
 
   async addClase(): Promise<void> {
+    console.log('cursoId:', this.cursoId);
     if (!this.cursoId || !this.nuevaClase.titulo || !this.nuevaClase.archivos) {
       alert('Todos los campos son obligatorios');
       return;
@@ -173,10 +174,16 @@ export class ClasesComponent {
 
     let archivoUrl = this.nuevaClase.contenidoUrl || '';
     if (this.archivoSeleccionado) {
-      archivoUrl =
-        (await this.supabaseStorageService.subirArchivo(
-          this.archivoSeleccionado
-        )) || '';
+      try {
+        archivoUrl =
+          (await this.supabaseStorageService.subirArchivo(
+            this.archivoSeleccionado
+          )) || '';
+        console.log('Archivo subido, URL:', archivoUrl);
+      } catch (error) {
+        console.error('Error en subirArchivo():', error);
+      }
+
       if (!archivoUrl) {
         alert('Error al subir el archivo');
         return;

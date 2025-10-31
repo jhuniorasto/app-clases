@@ -14,20 +14,6 @@ import { RouterModule } from '@angular/router';
 })
 export class HomeComponent {
   constructor(private authService: AuthService, private router: Router) {}
-  cursos = [
-    {
-      titulo: 'Angular desde cero',
-      descripcion: 'Aprende a construir aplicaciones SPA modernas.',
-    },
-    {
-      titulo: 'Introducción a Python',
-      descripcion: 'Domina los fundamentos de la programación.',
-    },
-    {
-      titulo: 'Diseño UI/UX',
-      descripcion: 'Crea interfaces atractivas y funcionales.',
-    },
-  ];
 
   comentarios: string[] = [];
   nuevoComentario: string = '';
