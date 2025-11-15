@@ -49,7 +49,7 @@ export class MisclasesComponent {
     if (this.cursoId) {
       this.getDatosCurso(this.cursoId);
     }
-    this.checkearRol();
+    await this.checkearRol();
     await this.obtenerUsuarioLogueado();
     await this.obtenerInscripcionActual();
   }

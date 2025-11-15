@@ -5,25 +5,31 @@ import { supabase } from '../../environments/supabase.client';
   providedIn: 'root',
 })
 export class SupabasestorageService {
-  private bucket = 'clases';
+  private bucket = 'resources-appcursos';
 
   constructor() {}
 
   async subirArchivo(file: File): Promise<string | null> {
     const nombreArchivo = `${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage
+    console.log('Subiendo archivo:', nombreArchivo);
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from(this.bucket)
       .upload(nombreArchivo, file);
 
-    if (error) {
-      console.error('Error al subir archivo:', error.message);
+    console.log('Resultado uploadData:', uploadData);
+    console.log('Resultado uploadError:', uploadError);
+
+    if (uploadError) {
+      console.error('Error al subir archivo:', uploadError.message);
       return null;
     }
 
-    const { data } = supabase.storage
+    const { data: publicData } = supabase.storage
       .from(this.bucket)
       .getPublicUrl(nombreArchivo);
 
-    return data?.publicUrl || null;
+    console.log('Public data:', publicData);
+    return publicData?.publicUrl || null;
   }
 }

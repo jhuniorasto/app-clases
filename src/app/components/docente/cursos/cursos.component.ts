@@ -48,7 +48,7 @@ export class CursosComponent {
     if (uid) {
       this.getCursosDeUsuario(uid);
     }
-    //this.cargarCursos();
+    this.cargarCursos();
     this.checkearRol();
   }
 
