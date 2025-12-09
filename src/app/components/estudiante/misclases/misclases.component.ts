@@ -84,6 +84,14 @@ export class MisclasesComponent {
           email: user.email || '',
           nombre: user.displayName || '',
           fotoUrl: user.photoURL || '',
+          rol: 'estudiante', // Asigna un valor válido del tipo UserRole
+          toFirestore: () => ({
+            uid: user.uid,
+            email: user.email || '',
+            nombre: user.displayName || '',
+            fotoUrl: user.photoURL || '',
+            rol: 'estudiante',
+          }),
         };
         this.verificarInscripcion();
         if (this.cursoId) {

@@ -18,7 +18,6 @@ import { Usuario } from '../models/usuario.model';
   providedIn: 'root',
 })
 export class UsuarioService {
-  
   private usuariosCollection: CollectionReference;
 
   constructor(private firestore: Firestore, private auth: Auth) {
@@ -69,22 +68,24 @@ export class UsuarioService {
   }
 
   // 🧑‍🏫 6. Obtener todos los profesores (para asignar cursos o responder comentarios)
- 
+
   async obtenerProfesores(): Promise<Usuario[]> {
     const profesoresRef = collection(this.firestore, 'profesores');
     const snapshot = await getDocs(profesoresRef);
 
     return snapshot.docs.map((doc) => {
       const data = doc.data();
-
-      return {
-        uid: doc.id,
-        nombre: data['nombre'] ?? '',
-        email: '', // no existe en los documentos actuales
-        rol: 'docente', // asumido
-        fotoUrl: data['imagenUrl'] ?? '', // usa imagenUrl de Firebase
-        fechaRegistro: undefined
-      };
+      return Usuario.fromFirestore(
+        {
+          uid: doc.id,
+          nombre: data['nombre'] ?? '',
+          email: '', // no existe en los documentos actuales
+          rol: 'docente', // asumido
+          fotoUrl: data['imagenUrl'] ?? '', // usa imagenUrl de Firebase
+          fechaRegistro: undefined,
+        },
+        doc.id
+      );
     });
   }
 

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
+    <!-- Fuente -->
+  </head>
+
+  <body>
+    <div class="container">
+      <h3 class="display-5 mt-5">
+        <Strong>Panel de Administración</Strong>
+      </h3>
+
+      <!-- Sección de Carga -->
+      <div *ngIf="cargando" class="alert alert-info">
+        <p>Cargando estadísticas...</p>
+      </div>
+
+      <!-- Sección de Error -->
+      <div *ngIf="error" class="alert alert-danger">
+        <p>{{ error }}</p>
+      </div>
+
+      <!-- Sección de Estadísticas -->
+      <div *ngIf="estadisticas && !cargando" class="row g-3">
+        <!-- Estudiantes -->
+        <div class="col-12 col-md-6 col-lg-3 fade-up">
+          <div class="dashboard-card">
+            <div class="icon-wrapper">
+              <i class="bi bi-people"></i>
+            </div>
+            <div class="card-title">Estudiantes</div>
+            <div class="card-value">{{ estadisticas.totalEstudiantes }}</div>
+            <div class="card-subtitle">Registrados en el sistema</div>
+          </div>
+        </div>
+
+        <!-- Docentes -->
+        <div class="col-12 col-md-6 col-lg-3 fade-up">
+          <div class="dashboard-card">
+            <div class="icon-wrapper">
+              <i class="bi bi-person-badge"></i>
+            </div>
+            <div class="card-title">Docentes</div>
+            <div class="card-value">{{ estadisticas.totalDocentes }}</div>
+            <div class="card-subtitle">Activos en la plataforma</div>
+          </div>
+        </div>
+
+        <!-- Cursos -->
+        <div class="col-12 col-md-6 col-lg-3 fade-up">
+          <div class="dashboard-card">
+            <div class="icon-wrapper">
+              <i class="bi bi-journal-text"></i>
+            </div>
+            <div class="card-title">Cursos</div>
+            <div class="card-value">{{ estadisticas.totalCursos }}</div>
+            <div class="card-subtitle">Disponibles</div>
+          </div>
+        </div>
+
+        <!-- Inscripciones -->
+        <div class="col-12 col-md-6 col-lg-3 fade-up">
+          <div class="dashboard-card">
+            <div class="icon-wrapper">
+              <i class="bi bi-card-checklist"></i>
+            </div>
+            <div class="card-title">Inscripciones</div>
+            <div class="card-value">{{ estadisticas.totalInscripciones }}</div>
+            <div class="card-subtitle">Realizadas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Acciones Rápidas -->
+      <div class="mt-5">
+        <h3 class="display-5">
+          <Strong>Acciones Rápidas</Strong>
+        </h3>
+
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <button
+              routerLink="/admin/usuarios"
+              class="btn btn-primary btn-block w-100"
+            >
+              + Gestionar Usuarios
+            </button>
+          </div>
+          <div class="col-md-6 mb-2">
+            <button
+              routerLink="/admin/inscripciones"
+              class="btn btn-success btn-block w-100"
+            >
+              + Gestionar Inscripciones
+            </button>
+          </div>
+          <div class="col-md-6 mb-2">
+            <button
+              routerLink="/admin/cursos"
+              class="btn btn-warning btn-block w-100"
+            >
+              + Gestionar Cursos
+            </button>
+          </div>
+          <div class="col-md-6 mb-2">
+            <button
+              routerLink="/admin/horarios"
+              class="btn btn-info btn-block w-100"
+            >
+              ⏰ Gestionar Horarios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style></style>
+  </body>
+</html>

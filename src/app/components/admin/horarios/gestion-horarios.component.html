@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
+    <!-- Fuente -->
+  </head>
+
+  <body>
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, minimum-scale=1"
+        />
+        <meta
+          name="description"
+          content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+        />
+        <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+        <!-- Estilos Mobirise y Bootstrap -->
+        <link
+          rel="stylesheet"
+          href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+        />
+        <!-- Fuente -->
+      </head>
+
+      <body>
+        <div class="container-fluid">
+          <h3 class="display-5">
+            <Strong>Gestión de Horarios</Strong>
+          </h3>
+
+          <!-- Selección de Curso -->
+          <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+              <h5>Seleccionar Curso</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <select
+                    class="form-control"
+                    [(ngModel)]="cursoSeleccionado"
+                    (change)="onCursoChange()"
+                  >
+                    <option value="">-- Selecciona un curso --</option>
+                    <option *ngFor="let curso of cursos" [value]="curso.id">
+                      {{ curso.titulo }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <button
+                    class="btn btn-success w-100"
+                    (click)="abrirFormularioNuevo()"
+                    *ngIf="cursoSeleccionado && !mostrarFormulario"
+                  >
+                    + Nuevo Horario
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulario -->
+          <div *ngIf="mostrarFormulario" class="card mb-4">
+            <div class="card-header bg-success text-white">
+              <h5>
+                {{ horarioEditando ? "Editar Horario" : "Crear Nuevo Horario" }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <form
+                [formGroup]="formularioHorario"
+                (ngSubmit)="guardarHorario()"
+              >
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Día *</label>
+                    <select class="form-control" formControlName="dia">
+                      <option value="">-- Selecciona un día --</option>
+                      <option *ngFor="let dia of dias" [value]="dia">
+                        {{ dia }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Hora Inicio *</label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      formControlName="horaInicio"
+                    />
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Hora Fin *</label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      formControlName="horaFin"
+                    />
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-success">
+                    {{ horarioEditando ? "Actualizar" : "Crear" }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="cerrarFormulario()"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Tabla de Horarios -->
+          <div class="card" *ngIf="cursoSeleccionado">
+            <div class="card-header bg-light">
+              <h5>
+                Horarios
+                <span class="badge badge-primary">{{ horarios.length }}</span>
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="cargando" class="alert alert-info">
+                <p>Cargando horarios...</p>
+              </div>
+
+              <div
+                *ngIf="!cargando && horarios.length === 0"
+                class="alert alert-warning"
+              >
+                <p>No hay horarios registrados para este curso</p>
+              </div>
+
+              <div
+                class="table-responsive"
+                *ngIf="!cargando && horarios.length > 0"
+              >
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Día</th>
+                      <th>Hora Inicio</th>
+                      <th>Hora Fin</th>
+                      <th>Duración</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let horario of horarios">
+                      <td>
+                        <strong>{{ horario.dia }}</strong>
+                      </td>
+                      <td>{{ horario.horaInicio }}</td>
+                      <td>{{ horario.horaFin }}</td>
+                      <td>
+                        <span class="badge bg-info">
+                          {{
+                            calcularDuracion(
+                              horario.horaInicio,
+                              horario.horaFin
+                            )
+                          }}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-warning"
+                          (click)="abrirFormularioEditar(horario)"
+                          title="Editar"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          class="btn btn-sm btn-danger"
+                          (click)="eliminarHorario(horario)"
+                          title="Eliminar"
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!cursoSeleccionado" class="alert alert-info mt-4">
+            <p>Selecciona un curso para ver y gestionar sus horarios</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  </body>
+</html>

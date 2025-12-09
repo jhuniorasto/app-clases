@@ -94,6 +94,14 @@ export class ClasesComponent {
           email: user.email || '',
           nombre: user.displayName || '',
           fotoUrl: user.photoURL || '',
+          rol: 'estudiante', // Valor por defecto si no tienes el rol en el objeto user
+          toFirestore: () => ({
+            uid: user.uid,
+            email: user.email || '',
+            nombre: user.displayName || '',
+            fotoUrl: user.photoURL || '',
+            rol: 'estudiante', // Valor por defecto si no tienes el rol en el objeto user
+          }),
         };
         this.verificarInscripcion();
       } else {

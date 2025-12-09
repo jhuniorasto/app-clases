@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
+    <!-- Fuente -->
+  </head>
+
+  <body>
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, minimum-scale=1"
+        />
+        <meta
+          name="description"
+          content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+        />
+        <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+        <!-- Estilos Mobirise y Bootstrap -->
+        <link
+          rel="stylesheet"
+          href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+        />
+        <!-- Fuente -->
+      </head>
+
+      <body>
+        <div class="container-fluid">
+          <h3 class="display-5">
+            <Strong>Gestión de Inscripciones</Strong>
+          </h3>
+
+          <div *ngIf="cargando" class="alert alert-info">Cargando...</div>
+
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5>Inscribir Estudiante</h5>
+              <div class="row">
+                <div class="col-md-5">
+                  <select class="form-select" [(ngModel)]="seleccionEstudiante">
+                    <option value="">-- Seleccione Estudiante --</option>
+                    <option *ngFor="let e of estudiantes" [value]="e.uid">
+                      {{ e.nombre }} ({{ e.email }})
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-5">
+                  <select class="form-select" [(ngModel)]="seleccionCurso">
+                    <option value="">-- Seleccione Curso --</option>
+                    <option *ngFor="let c of cursos" [value]="c.id">
+                      {{ c.titulo || c.nombre || c.id }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <button
+                    class="btn btn-primary w-85 h-45"
+                    (click)="inscribir()"
+                  >
+                    Inscribir
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5>Inscripciones actuales</h5>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Estudiante</th>
+                    <th>Curso</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ins of inscripciones">
+                    <td>{{ ins.estudiante?.nombre || ins.estudianteUid }}</td>
+                    <td>
+                      {{
+                        ins.curso?.titulo || ins.curso?.nombre || ins.cursoId
+                      }}
+                    </td>
+                    <td>
+                      {{
+                        ins.fechaInscripcion?.toDate
+                          ? (ins.fechaInscripcion.toDate() | date : "short")
+                          : (ins.fechaInscripcion | date : "short")
+                      }}
+                    </td>
+                    <td>
+                      <button
+                        class="btn btn-sm btn-danger"
+                        (click)="desinscribir(ins)"
+                      >
+                        Desinscribir
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="inscripciones.length === 0">
+                    <td colspan="4" class="text-center">
+                      No hay inscripciones
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  </body>
+</html>

@@ -4,14 +4,12 @@ import {
   AfterViewInit,
   ViewChild,
   ElementRef,
-  
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
-
 
 @Component({
   selector: 'app-login',
@@ -23,14 +21,38 @@ import Swal from 'sweetalert2';
 export class LoginComponent implements OnInit, AfterViewInit {
   public email: string = '';
   public password: string = '';
+  isEstudiante: boolean = false;
+  isAdmin: boolean = false;
+  isDocente: boolean = false;
 
   @ViewChild('typedText') typedTextRef!: ElementRef<HTMLSpanElement>;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   // Método para redirigir a la página de inicio
-  onRedirectToHome(): void {
-    this.router.navigate(['/home']);
+
+  async checkearRol(): Promise<void> {
+    const user = await this.authService.getUserData();
+
+    if (user) {
+      this.isEstudiante = user.rol === 'estudiante';
+      this.isAdmin = user.rol === 'admin';
+      this.isDocente = user.rol === 'docente';
+    } else {
+      this.isEstudiante = false;
+      this.isAdmin = false;
+      this.isDocente = false;
+    }
+  }
+  redirectByRole(rol: string): void {
+    const rutasPorRol: Record<string, string> = {
+      admin: '/admin',
+      docente: '/cursos',
+      estudiante: '/miscursos',
+    };
+
+    const ruta = rutasPorRol[rol] ?? '/';
+    this.router.navigate([ruta]);
   }
 
   // Método para redirigir a la página de registro
@@ -39,24 +61,36 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   // Método para iniciar sesión con Email y Contraseña
+  // Método para iniciar sesión con Email y Contraseña
   onLoginWithEmailAndPassword(): void {
-    if (!this.onValidateFields()) return; // Validar campos
-    if (!this.onValidateEmail()) return; // Validar email
-    if (!this.onValidatePassword()) return; // Validar contraseña
+    if (!this.onValidateFields()) return;
+    if (!this.onValidateEmail()) return;
+    if (!this.onValidatePassword()) return;
 
-    // Si las validaciones son correctas, se procede a iniciar sesión
-    // con Email y Contraseña
     this.authService
       .loginConEmailPassword(this.email, this.password)
-      .then(() => {
+      .then(async () => {
+        // 👉 Obtener los datos del usuario con rol
+        const userData = await this.authService.getUserData();
+
+        if (!userData || !userData.rol) {
+          console.error('No se pudo obtener el rol del usuario');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo obtener información del usuario.',
+          });
+          return;
+        }
+
         Swal.fire({
           icon: 'success',
           title: '¡Usuario verificado!',
           text: `Bienvenido`,
           confirmButtonText: 'Ir a Home',
         }).then(() => {
-          // Recién aquí se redirige al Home después de hacer clic en "Ir a Home"
-          this.onRedirectToHome();
+          // 👉 Redirigir según el rol
+          this.redirectByRole(userData.rol);
         });
       })
       .catch((error) => {
@@ -68,46 +102,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
         if (error.code === 'auth/invalid-credential') {
           Swal.fire({
             icon: 'error',
-            title: 'Error al registrar',
+            title: 'Error al iniciar sesión',
             text: 'Credenciales inválidas. Por favor, verifica tu correo electrónico o contraseña.',
           });
         }
-      });
-  }
-
-  // Método para iniciar sesión con Google
-onLoginWithGoogle(): void {
-  this.authService.loginConGoogle()
-    .then((usuario) => {
-      if (usuario) {
-        this.router.navigate(['/home']); // ✅ solo si hay usuario válido
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo iniciar sesión con Google.',
-        });
-      }
-    })
-    .catch((error) => {
-      console.error('Error al iniciar sesión con Google', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Hubo un problema al autenticar con Google.',
-      });
-    });
-}
-
-  // Método para iniciar sesión con Facebook
-  onLoginWithFacebook(): void {
-    this.authService
-      .loginConFacebook()
-      .then(() => {
-        this.onRedirectToHome();
-      })
-      .catch((error) => {
-        console.error('Error al iniciar sesión con Facebook', error);
       });
   }
 
@@ -132,7 +130,7 @@ onLoginWithGoogle(): void {
 
   // Validar la longitud de la contraseña
   onValidatePassword(): boolean {
-    if (this.password.length < 8) {
+    if (this.password.length < 5) {
       alert('La contraseña debe tener al menos 8 caracteres.');
       return false;
     }
