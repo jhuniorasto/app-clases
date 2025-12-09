@@ -3,20 +3,20 @@
     <div class="logo"></div>
     <h2>Bienvenido(a)</h2>
     <form>
-      <label>Email</label>
+      <label>Correo</label>
       <input
         [(ngModel)]="email"
         name="email"
         type="email"
-        placeholder="Ingresa tu email"
+        placeholder="Ingresa tu correo"
       />
 
-      <label>Password<a href="#">Olvidaste tu contraseña?</a></label>
+      <label>Clave<a href="#">Olvidaste tu clave?</a></label>
       <input
         [(ngModel)]="password"
         name="password"
         type="password"
-        placeholder="Ingresa tu contraseña"
+        placeholder="Ingresa tu clave"
       />
 
       <button
@@ -27,30 +27,6 @@
         Iniciar Sesión
       </button>
     </form>
-
-    <div class="divider">O</div>
-
-    <button class="btn social google-btn" (click)="onLoginWithGoogle()">
-      <img
-        src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-        alt="Google"
-        class="icon"
-      />
-      Continuar con Google
-    </button>
-
-    <button class="btn social github-btn" (click)="onLoginWithFacebook()">
-      <img
-        src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg"
-        alt="GitHub"
-        class="icon"
-      />
-      Continuar con Facebook
-    </button>
-
-    <div class="signup-link">
-      ¿No tienes una cuenta? <a (click)="onRedirectToSignUp()">Únete</a>
-    </div>
   </div>
 
   <div class="hero-box">

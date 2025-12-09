@@ -7,11 +7,6 @@
       name="viewport"
       content="width=device-width, initial-scale=1, minimum-scale=1"
     />
-    <link
-      rel="shortcut icon"
-      href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg"
-      type="image/x-icon"
-    />
     <meta
       name="description"
       content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
@@ -21,52 +16,16 @@
     <!-- Estilos Mobirise y Bootstrap -->
     <link
       rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css"
-    />
-    <link
-      rel="stylesheet"
       href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
     />
-
     <!-- Fuente -->
-    <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript
-      ><link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
-    /></noscript>
   </head>
 
   <body>
     <div class="container">
-      <h2 class="mbr-section-title display-2 mt-5">
-        <strong>Gestión de Cursos</strong>
-      </h2>
+      <h3 class="display-5 mt-5">
+        <Strong>Gestión de Cursos</Strong>
+      </h3>
 
       <div class="d-flex justify-content-end mb-4">
         <button class="btn btn-primary" (click)="abrirModal()">
@@ -91,7 +50,7 @@
             <div class="curso-ver">
               <button
                 class="btn btn-primary btn-sm"
-                [routerLink]="['/detalle-curso', curso.id]"
+                [routerLink]="['/cursos/detalle-curso', curso.id]"
               >
                 Ver curso
               </button>

@@ -16,6 +16,8 @@ import { User } from 'firebase/auth';
 export class NavbarComponent {
   usuario$: Observable<User | null>;
   isEstudiante: boolean = false;
+  isAdmin: boolean = false;
+  isDocente: boolean = false;
   constructor(private authService: AuthService, private router: Router) {
     this.usuario$ = this.authService.usuario$;
   }
@@ -29,8 +31,12 @@ export class NavbarComponent {
 
     if (user) {
       this.isEstudiante = user.rol === 'estudiante';
+      this.isAdmin = user.rol === 'admin';
+      this.isDocente = user.rol === 'docente';
     } else {
       this.isEstudiante = false;
+      this.isAdmin = false;
+      this.isDocente = false;
     }
   }
 
@@ -39,7 +45,7 @@ export class NavbarComponent {
   }
 
   onRedirectToProfesores(): void {
-    this.router.navigate(['/admin']);
+    this.router.navigate(['/docente']);
   }
 
   onRedirectToCursos(): void {
@@ -67,9 +73,13 @@ export class NavbarComponent {
     this.router.navigate(['/perfil']);
   }
 
+  onRedirectToAdmin(): void {
+    this.router.navigate(['/admin']);
+  }
+
   onLogout(): void {
     this.authService.logout().then(() => {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/signin']);
     });
   }
 }

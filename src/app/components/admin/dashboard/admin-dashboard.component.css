@@ -1,0 +1,83 @@
+/* =============================== */
+/*    DASHBOARD STATS — LIGHT UI   */
+/* =============================== */
+body {
+  padding-top: 80px; /* Altura del navbar fijo */
+  padding-bottom: 5%;
+}
+.dashboard-card {
+  border: none;
+  border-radius: 16px;
+  padding: 22px;
+  background: linear-gradient(145deg, #ffffff, #f3f4f6);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.1);
+}
+
+/* Icono circular */
+.icon-wrapper {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px auto;
+  transition: 0.3s ease;
+}
+
+.dashboard-card:hover .icon-wrapper {
+  background: #e0e7ff;
+}
+
+/* Iconos */
+.icon-wrapper i {
+  font-size: 1.6rem;
+  color: #4f46e5;
+}
+
+/* Título */
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+/* Valor principal */
+.card-value {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+/* Subtexto */
+.card-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+/* Animación suave */
+.fade-up {
+  animation: fadeUp 0.6s ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}

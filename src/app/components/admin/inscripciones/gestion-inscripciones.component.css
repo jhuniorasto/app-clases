@@ -1,0 +1,14 @@
+.container-fluid {
+  padding: 30px;
+  padding-top: 115px;
+  margin-top: 10px;
+}
+.card {
+  border-radius: 6px;
+}
+.form-select {
+  margin-bottom: 8px;
+}
+.w-100 {
+  width: 100%;
+}

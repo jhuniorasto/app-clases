@@ -7,11 +7,6 @@
       name="viewport"
       content="width=device-width, initial-scale=1, minimum-scale=1"
     />
-    <link
-      rel="shortcut icon"
-      href="https://r.mobirisesite.com/1458871/assets/images/photo-1521714161819-15534968fc5f.jpeg"
-      type="image/x-icon"
-    />
     <meta
       name="description"
       content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
@@ -21,53 +16,17 @@
     <!-- Estilos Mobirise y Bootstrap -->
     <link
       rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/web/assets/mobirise-icons2/mobirise2.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/bootstrap/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/parallax/jarallax.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/dropdown/css/style.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/socicon/css/styles.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/theme/css/style.css"
-    />
-    <link
-      rel="stylesheet"
       href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
     />
-
     <!-- Fuente -->
-    <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript
-      ><link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap"
-    /></noscript>
   </head>
 
   <body>
     <!-- Sección de gestion de profesores -->
     <div class="container">
-      <h2 class="mbr-section-title display-2 mt-5">
-        <strong>Gestión de Profesores</strong>
-      </h2>
+      <h3 class="display-5 mt-5">
+        <Strong>Gestión de Profesores</Strong>
+      </h3>
 
       <div class="d-flex justify-content-end mb-4">
         <button class="btn btn-primary" (click)="agregarProfesor()">
@@ -96,9 +55,19 @@
             <div
               class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3"
             >
-           <button class="btn btn-outline-primary btn-sm px-3" (click)="abrirModalEditar(profesor)">Modificar</button>
+              <button
+                class="btn btn-outline-primary btn-sm px-3"
+                (click)="abrirModalEditar(profesor)"
+              >
+                Modificar
+              </button>
 
-              <button class="btn btn-outline-danger btn-sm px-3" (click)="eliminarProfesor(profesor.id)">Eliminar</button>
+              <button
+                class="btn btn-outline-danger btn-sm px-3"
+                (click)="eliminarProfesor(profesor.id)"
+              >
+                Eliminar
+              </button>
             </div>
           </div>
         </div>
@@ -137,34 +106,39 @@
     </div>
 
     <!-- Modal para editar profesor -->
-<div class="modal-overlay" *ngIf="mostrarModalEditar">
-  <div class="modal-content">
-    <h4 class="modal-title">Editar Profesor</h4>
+    <div class="modal-overlay" *ngIf="mostrarModalEditar">
+      <div class="modal-content">
+        <h4 class="modal-title">Editar Profesor</h4>
 
-    <input
-      class="form-control mb-2"
-      [(ngModel)]="profesorEditado.nombre"
-      placeholder="Nombre"
-    />
-    <input
-      class="form-control mb-2"
-      type="number"
-      [(ngModel)]="profesorEditado.edad"
-      placeholder="Edad"
-    />
-    <input
-      class="form-control mb-3"
-      [(ngModel)]="profesorEditado.curso"
-      placeholder="Curso"
-    />
+        <input
+          class="form-control mb-2"
+          [(ngModel)]="profesorEditado.nombre"
+          placeholder="Nombre"
+        />
+        <input
+          class="form-control mb-2"
+          type="number"
+          [(ngModel)]="profesorEditado.edad"
+          placeholder="Edad"
+        />
+        <input
+          class="form-control mb-3"
+          [(ngModel)]="profesorEditado.curso"
+          placeholder="Curso"
+        />
 
-    <div class="modal-buttons d-flex justify-content-between">
-   <button class="btn btn-success px-4" (click)="confirmarEdicion()">Guardar cambios</button>
-<button class="btn btn-outline-secondary px-4" (click)="cerrarModalEditar()">Cancelar</button>
-
+        <div class="modal-buttons d-flex justify-content-between">
+          <button class="btn btn-success px-4" (click)="confirmarEdicion()">
+            Guardar cambios
+          </button>
+          <button
+            class="btn btn-outline-secondary px-4"
+            (click)="cerrarModalEditar()"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
   </body>
 </html>

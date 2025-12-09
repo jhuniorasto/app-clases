@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
+    <meta
+      name="description"
+      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+    />
+    <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+    <!-- Estilos Mobirise y Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+    />
+    <!-- Fuente -->
+  </head>
+
+  <body>
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, minimum-scale=1"
+        />
+        <meta
+          name="description"
+          content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
+        />
+        <title>EduSmart - Gestión de Cursos Virtuales</title>
+
+        <!-- Estilos Mobirise y Bootstrap -->
+        <link
+          rel="stylesheet"
+          href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
+        />
+        <!-- Fuente -->
+      </head>
+
+      <body>
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="display-5">
+              <Strong>Gestión de Cursos</Strong>
+            </h3>
+
+            <button class="btn btn-primary" (click)="abrirFormularioNuevo()">
+              + Nuevo Curso
+            </button>
+          </div>
+
+          <div *ngIf="cargando" class="alert alert-info">
+            Cargando cursos...
+          </div>
+
+          <div
+            *ngIf="!cargando && cursos.length === 0"
+            class="alert alert-warning"
+          >
+            No hay cursos
+          </div>
+
+          <div *ngIf="!cargando && cursos.length > 0" class="table-responsive">
+            <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Título</th>
+                  <th>Categoría</th>
+                  <th>Creado por</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let curso of cursos">
+                  <td>{{ curso.titulo }}</td>
+                  <td>{{ curso.categoria }}</td>
+                  <td>{{ curso.creadoPorUid }}</td>
+                  <td>{{ curso.fechaCreacion | date : "short" }}</td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-warning"
+                      (click)="abrirFormularioEditar(curso)"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      (click)="eliminarCurso(curso.id)"
+                    >
+                      🗑️
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="mostrarFormulario" class="card mt-4">
+            <div class="card-body">
+              <h5 class="card-title">
+                {{ cursoEditando ? "Editar Curso" : "Nuevo Curso" }}
+              </h5>
+              <form (ngSubmit)="guardarCurso()">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label>Título</label>
+                    <input
+                      class="form-control"
+                      [(ngModel)]="nuevoCurso.titulo"
+                      name="titulo"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label>Categoría</label>
+                    <input
+                      class="form-control"
+                      [(ngModel)]="nuevoCurso.categoria"
+                      name="categoria"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label>Descripción</label>
+                    <textarea
+                      class="form-control"
+                      [(ngModel)]="nuevoCurso.descripcion"
+                      name="descripcion"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label>Imagen URL</label>
+                    <input
+                      class="form-control"
+                      [(ngModel)]="nuevoCurso.imagenUrl"
+                      name="imagenUrl"
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label>Duración (hrs)</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      [(ngModel)]="nuevoCurso.duracion"
+                      name="duracion"
+                    />
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <button class="btn btn-success" type="submit">Guardar</button>
+                  <button
+                    class="btn btn-secondary"
+                    type="button"
+                    (click)="cerrarFormulario()"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  </body>
+</html>

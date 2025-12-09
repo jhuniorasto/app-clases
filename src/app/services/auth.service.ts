@@ -46,8 +46,14 @@ export class AuthService {
     onAuthStateChanged(this.auth, async (user) => {
       this.usuarioActual.next(user);
       if (user) {
-        const rol = await this.usuarioService.obtenerRolUsuario(user.uid);
-        this.rolUsuario.next(rol);
+        try {
+          const rol = await this.usuarioService.obtenerRolUsuario(user.uid);
+          console.log('✅ Rol cargado:', rol, 'para usuario:', user.email);
+          this.rolUsuario.next(rol);
+        } catch (error) {
+          console.error('❌ Error al obtener rol:', error);
+          this.rolUsuario.next(null);
+        }
       } else {
         this.rolUsuario.next(null);
       }
@@ -63,39 +69,20 @@ export class AuthService {
     return !querySnapshot.empty;
   }
 
-  // ✅ Registro de usuario (rol fijo: docente)
+  // ✅ Registro de usuario (DESHABILITADO - Solo admins pueden crear cuentas)
+  /**
+   * @deprecated Desde 09/12/2025, el registro público está deshabilitado.
+   * Solo los administradores pueden crear cuentas de usuario a través de AdminService.
+   * Este método rechazará cualquier intento de registro.
+   */
   async signUpEmailAndPassword(
     email: string,
     password: string,
     nombre: string
   ) {
-    try {
-      const existe = await this.correoYaExiste(email);
-      if (existe) {
-        throw new Error('El correo ya está registrado en la base de datos.');
-      }
-
-      const userCredential = await createUserWithEmailAndPassword(
-        this.auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
-      await this.usuarioService.crearUsuario({
-        uid: user.uid,
-        email: user.email || '',
-        nombre: nombre,
-        rol: 'docente',
-        fechaRegistro: new Date(),
-        fotoUrl: user.photoURL || '',
-      });
-
-      return userCredential;
-    } catch (error: any) {
-      console.error('Error al registrar usuario:', error);
-      throw error;
-    }
+    throw new Error(
+      '❌ El registro público ha sido deshabilitado. Solo los administradores pueden crear cuentas. Contacta con el administrador.'
+    );
   }
 
   // ✅ Login con correo y contraseña
@@ -117,6 +104,16 @@ export class AuthService {
         fechaRegistro: new Date(),
         rol: 'estudiante',
         fotoUrl: user.photoURL || '',
+        toFirestore() {
+          return {
+            uid: this.uid,
+            nombre: this.nombre,
+            email: this.email,
+            rol: this.rol,
+            fotoUrl: this.fotoUrl,
+            fechaRegistro: this.fechaRegistro,
+          };
+        },
       };
 
       await this.usuarioService.crearUsuario(usuario);
@@ -179,5 +176,22 @@ export class AuthService {
       console.error('Error al obtener usuario por UID:', error);
       return null;
     }
+  }
+
+  /**
+   * Devuelve el rol del usuario actual (o null si no existe)
+   */
+  async getRole(): Promise<string | null> {
+    const uid = await this.getUserId();
+    if (!uid) return null;
+    return await this.usuarioService.obtenerRolUsuario(uid);
+  }
+
+  /**
+   * Indica si el usuario actual es admin
+   */
+  async isAdmin(): Promise<boolean> {
+    const rol = await this.getRole();
+    return rol === 'admin';
   }
 }
