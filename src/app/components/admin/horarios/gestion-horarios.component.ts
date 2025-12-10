@@ -7,9 +7,9 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { AdminService } from '../../../services/admin.service';
-import { CursoService } from '../../../services/curso.service';
-import { Curso } from '../../../models/curso.model';
+import { AdminService } from '../../../core/services/admin.service';
+import { CursoService } from '../../../core/services/curso.service';
+import { Curso } from '../../../core/models/curso.model';
 import Swal from 'sweetalert2';
 
 interface Horario {

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { Curso } from '../../../models/curso.model';
-import { CursoService } from '../../../services/curso.service';
-import { ClaseService } from '../../../services/clase.service';
-import { ProgresoClaseService } from '../../../services/progreso-clase.service';
-import { AuthService } from '../../../services/auth.service';
-import { InscripcionService } from '../../../services/inscripcion.service';
+import { Curso } from '../../../core/models/curso.model';
+import { CursoService } from '../../../core/services/curso.service';
+import { ClaseService } from '../../../core/services/clase.service';
+import { ProgresoClaseService } from '../../../core/services/progreso-clase.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { InscripcionService } from '../../../core/services/inscripcion.service';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

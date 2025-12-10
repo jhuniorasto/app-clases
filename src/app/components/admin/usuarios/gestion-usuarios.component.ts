@@ -1,4 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -7,23 +12,64 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { AdminService } from '../../../services/admin.service';
-import { Usuario, UserRole } from '../../../models/usuario.model';
+import { AdminService } from '../../../core/services/admin.service';
+import { Usuario, UserRole } from '../../../core/models/usuario.model';
 import Swal from 'sweetalert2';
+import { BehaviorSubject, combineLatest, from, of } from 'rxjs';
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-gestion-usuarios',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './gestion-usuarios.component.html',
-  styleUrl: './gestion-usuarios.component.css',
+  styleUrls: ['./gestion-usuarios.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GestionUsuariosComponent implements OnInit {
-  usuarios: Usuario[] = [];
-  usuariosFiltrados: Usuario[] = [];
-  cargando: boolean = true;
-  rolFiltro: UserRole | 'todos' = 'todos';
-  terminoBusqueda: string = '';
+export class GestionUsuariosComponent implements OnInit, OnDestroy {
+  private reload$ = new BehaviorSubject<void>(undefined);
+  private rolFiltro$ = new BehaviorSubject<UserRole | 'todos'>('todos');
+  private terminoBusqueda$ = new BehaviorSubject<string>('');
+
+  usuarios$ = this.reload$.pipe(
+    tap(() => this.cargando$.next(true)),
+    switchMap(() =>
+      from(this.adminService.obtenerUsuarioPorRol()).pipe(
+        tap(() => this.cargando$.next(false)),
+        catchError((error) => {
+          console.error('Error al cargar usuarios:', error);
+          Swal.fire('Error', 'No se pudieron cargar los usuarios', 'error');
+          this.cargando$.next(false);
+          return of([] as Usuario[]);
+        })
+      )
+    ),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  usuariosFiltrados$ = combineLatest([
+    this.usuarios$,
+    this.rolFiltro$,
+    this.terminoBusqueda$,
+  ]).pipe(
+    map(([usuarios, rol, termino]) => {
+      let lista = usuarios;
+      if (rol !== 'todos') {
+        lista = lista.filter((u) => u.rol === rol);
+      }
+      if (termino.trim()) {
+        const t = termino.toLowerCase();
+        lista = lista.filter(
+          (u) =>
+            u.nombre.toLowerCase().includes(t) ||
+            u.email.toLowerCase().includes(t)
+        );
+      }
+      return lista;
+    })
+  );
+
+  cargando$ = new BehaviorSubject<boolean>(true);
   mostrarFormulario: boolean = false;
   usuarioEditando: Usuario | null = null;
 
@@ -33,73 +79,58 @@ export class GestionUsuariosComponent implements OnInit {
     this.formularioUsuario = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.minLength(6)]],
       rol: ['', Validators.required],
       especialidad: [''],
       numeroEstudiante: [''],
     });
+
+    this.configurarValidacionPassword(true);
   }
 
   async ngOnInit(): Promise<void> {
-    await this.cargarUsuarios();
+    this.reload$.next();
   }
 
-  async cargarUsuarios(): Promise<void> {
-    try {
-      this.cargando = true;
-      this.usuarios = await this.adminService.obtenerUsuarioPorRol();
-      this.aplicarFiltros();
-    } catch (error) {
-      console.error('Error al cargar usuarios:', error);
-      Swal.fire('Error', 'No se pudieron cargar los usuarios', 'error');
-    } finally {
-      this.cargando = false;
-    }
+  ngOnDestroy(): void {
+    this.cargando$.complete();
+    this.rolFiltro$.complete();
+    this.terminoBusqueda$.complete();
   }
 
-  aplicarFiltros(): void {
-    let usuarios = this.usuarios;
-
-    // Filtrar por rol
-    if (this.rolFiltro !== 'todos') {
-      usuarios = usuarios.filter((u) => u.rol === this.rolFiltro);
-    }
-
-    // Filtrar por búsqueda
-    if (this.terminoBusqueda.trim()) {
-      const termino = this.terminoBusqueda.toLowerCase();
-      usuarios = usuarios.filter(
-        (u) =>
-          u.nombre.toLowerCase().includes(termino) ||
-          u.email.toLowerCase().includes(termino)
-      );
-    }
-
-    this.usuariosFiltrados = usuarios;
+  onFiltroChange(value: UserRole | 'todos'): void {
+    this.rolFiltro$.next(value);
   }
 
-  onFiltroChange(): void {
-    this.aplicarFiltros();
+  onBusqueda(value: string): void {
+    this.terminoBusqueda$.next(value);
   }
 
-  onBusqueda(): void {
-    this.aplicarFiltros();
+  get rolFiltroValue(): UserRole | 'todos' {
+    return this.rolFiltro$.value;
+  }
+
+  get terminoBusquedaValue(): string {
+    return this.terminoBusqueda$.value;
   }
 
   abrirFormularioNuevo(): void {
     this.usuarioEditando = null;
     this.formularioUsuario.reset({ rol: '' });
+    this.configurarValidacionPassword(true);
     this.mostrarFormulario = true;
   }
 
   abrirFormularioEditar(usuario: Usuario): void {
     this.usuarioEditando = usuario;
+    this.configurarValidacionPassword(false);
     this.formularioUsuario.patchValue({
       nombre: usuario.nombre,
       email: usuario.email,
       rol: usuario.rol,
       especialidad: usuario.especialidad,
       numeroEstudiante: usuario.numeroEstudiante,
+      password: '',
     });
     this.mostrarFormulario = true;
   }
@@ -147,7 +178,7 @@ export class GestionUsuariosComponent implements OnInit {
       }
 
       this.cerrarFormulario();
-      await this.cargarUsuarios();
+      this.reload$.next();
     } catch (error: any) {
       console.error('Error al guardar usuario:', error);
       Swal.fire(
@@ -176,7 +207,7 @@ export class GestionUsuariosComponent implements OnInit {
           'Desactivado por admin'
         );
         Swal.fire('✅ Éxito', 'Usuario desactivado correctamente', 'success');
-        await this.cargarUsuarios();
+        this.reload$.next();
       } catch (error) {
         Swal.fire('Error', 'No se pudo desactivar el usuario', 'error');
       }
@@ -198,7 +229,7 @@ export class GestionUsuariosComponent implements OnInit {
       try {
         await this.adminService.eliminarUsuario(usuario.uid);
         Swal.fire('✅ Éxito', 'Usuario eliminado correctamente', 'success');
-        await this.cargarUsuarios();
+        this.reload$.next();
       } catch (error) {
         Swal.fire('Error', 'No se pudo eliminar el usuario', 'error');
       }
@@ -229,5 +260,21 @@ export class GestionUsuariosComponent implements OnInit {
       default:
         return '❓';
     }
+  }
+
+  trackByUid(_: number, usuario: Usuario): string {
+    return usuario.uid;
+  }
+
+  private configurarValidacionPassword(esRequerida: boolean): void {
+    const control = this.formularioUsuario.get('password');
+    if (!control) return;
+
+    if (esRequerida) {
+      control.setValidators([Validators.required, Validators.minLength(6)]);
+    } else {
+      control.clearValidators();
+    }
+    control.updateValueAndValidity();
   }
 }

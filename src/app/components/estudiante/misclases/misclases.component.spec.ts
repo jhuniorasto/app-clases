@@ -6,12 +6,12 @@ import {
   flushMicrotasks,
 } from '@angular/core/testing';
 import { MisclasesComponent } from './misclases.component';
-import { CursoService } from '../../../services/curso.service';
-import { ClaseService } from '../../../services/clase.service';
-import { InscripcionService } from '../../../services/inscripcion.service';
-import { AuthService } from '../../../services/auth.service';
-import { SupabasestorageService } from '../../../services/supabasestorage.service';
-import { ProgresoClaseService } from '../../../services/progreso-clase.service';
+import { CursoService } from '../../../core/services/curso.service';
+import { ClaseService } from '../../../core/services/clase.service';
+import { InscripcionService } from '../../../core/services/inscripcion.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { SupabasestorageService } from '../../../core/services/supabasestorage.service';
+import { ProgresoClaseService } from '../../../core/services/progreso-clase.service';
 import { ActivatedRoute } from '@angular/router';
 import { materialize, of } from 'rxjs';
 

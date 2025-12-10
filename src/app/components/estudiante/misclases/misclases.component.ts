@@ -1,18 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CursoService } from '../../../services/curso.service';
+import { CursoService } from '../../../core/services/curso.service';
 import { ActivatedRoute } from '@angular/router';
-import { Curso } from '../../../models/curso.model';
-import { Clase } from '../../../models/clase.model';
-import { Usuario } from '../../../models/usuario.model';
-import { Inscripcion } from '../../../models/inscripcion.model';
-import { ClaseService } from '../../../services/clase.service';
-import { InscripcionService } from '../../../services/inscripcion.service';
-import { AuthService } from '../../../services/auth.service';
+import { Curso } from '../../../core/models/curso.model';
+import { Clase } from '../../../core/models/clase.model';
+import { Usuario } from '../../../core/models/usuario.model';
+import { Inscripcion } from '../../../core/models/inscripcion.model';
+import { ClaseService } from '../../../core/services/clase.service';
+import { InscripcionService } from '../../../core/services/inscripcion.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { SupabasestorageService } from '../../../services/supabasestorage.service';
+import { SupabasestorageService } from '../../../core/services/supabasestorage.service';
 import { ComentariosComponent } from '../../comentarios/comentarios.component';
-import { ProgresoClaseService } from '../../../services/progreso-clase.service';
+import { ProgresoClaseService } from '../../../core/services/progreso-clase.service';
 import Swal from 'sweetalert2';
 type ClaseConCompletada = Clase & { completada?: boolean };
 @Component({

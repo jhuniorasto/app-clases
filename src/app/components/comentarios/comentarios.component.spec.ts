@@ -6,8 +6,8 @@ import {
 } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { ComentariosComponent } from './comentarios.component';
-import { ComentarioService } from '../../services/comentario.service';
-import { AuthService } from '../../services/auth.service';
+import { ComentarioService } from '../../core/services/comentario.service';
+import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 

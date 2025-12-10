@@ -5,9 +5,9 @@ import {
   tick,
 } from '@angular/core/testing';
 import { MyperfilComponent } from './myperfil.component';
-import { AuthService } from '../../services/auth.service';
-import { UsuarioService } from '../../services/usuario.service';
-import { Usuario } from '../../models/usuario.model';
+import { AuthService } from '../../core/services/auth.service';
+import { UsuarioService } from '../../core/services/usuario.service';
+import { Usuario } from '../../core/models/usuario.model';
 
 describe('MyperfilComponent', () => {
   let component: MyperfilComponent;

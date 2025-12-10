@@ -1,248 +1,213 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, minimum-scale=1"
-    />
-    <meta
-      name="description"
-      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
-    />
-    <title>EduSmart - Gestión de Cursos Virtuales</title>
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="display-6 mb-1">📋 Gestión de Inscripciones</h3>
+      <p class="text-muted mb-0">Asigna cursos y horarios a estudiantes</p>
+    </div>
+  </div>
 
-    <!-- Estilos Mobirise y Bootstrap -->
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
-    />
-    <!-- Fuente -->
-  </head>
+  <div *ngIf="cargando" class="alert alert-info">⏳ Cargando datos...</div>
 
-  <body>
-    <!DOCTYPE html>
-    <html lang="es">
-      <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, minimum-scale=1"
-        />
-        <meta
-          name="description"
-          content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
-        />
-        <title>EduSmart - Gestión de Cursos Virtuales</title>
+  <!-- Filtros -->
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <h5 class="card-title">🔍 Filtros</h5>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Curso</label>
+          <select
+            class="form-select"
+            [(ngModel)]="filtroCurso"
+            (change)="aplicarFiltros()"
+          >
+            <option value="">Todos</option>
+            <option *ngFor="let c of cursos" [value]="c.id">
+              {{ c.titulo || c.nombre || c.id }} ({{
+                contarEstudiantesPorCurso(c.id)
+              }})
+            </option>
+          </select>
+        </div>
 
-        <!-- Estilos Mobirise y Bootstrap -->
-        <link
-          rel="stylesheet"
-          href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
-        />
-        <!-- Fuente -->
-      </head>
+        <div class="col-md-3">
+          <label class="form-label">Estudiante</label>
+          <select
+            class="form-select"
+            [(ngModel)]="filtroEstudiante"
+            (change)="aplicarFiltros()"
+          >
+            <option value="">Todos</option>
+            <option *ngFor="let e of estudiantes" [value]="e.uid">
+              {{ e.nombre }} ({{ contarInscripcionesEstudiante(e.uid) }})
+            </option>
+          </select>
+        </div>
 
-      <body>
-        <div class="container-fluid">
-          <h3 class="display-5">
-            <strong>📋 Gestión de Inscripciones</strong>
-          </h3>
+        <div class="col-md-4">
+          <label class="form-label">Buscar estudiante</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="buscarEstudiante"
+            (input)="aplicarFiltros()"
+            placeholder="Nombre o email"
+          />
+        </div>
 
-          <div *ngIf="cargando" class="alert alert-info">
-            ⏳ Cargando datos...
-          </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button class="btn btn-primary w-100" (click)="aplicarFiltros()">
+            Aplicar
+          </button>
+          <button
+            class="btn btn-outline-secondary w-100"
+            (click)="limpiarFiltros()"
+          >
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-          <!-- Filtros -->
-          <div class="card">
-            <div class="card-body">
-              <h5>🔍 Filtros</h5>
-              <div class="row g-2 align-items-end">
-                <div class="col-md-3">
-                  <label class="form-label">Filtrar por curso</label>
-                  <select
-                    class="form-select"
-                    [(ngModel)]="filtroCurso"
-                    (change)="aplicarFiltros()"
-                  >
-                    <option value="">Todos los cursos</option>
-                    <option *ngFor="let c of cursos" [value]="c.id">
-                      {{ c.titulo || c.nombre || c.id }}
-                      - (<span class="badge">{{
-                        contarEstudiantesPorCurso(c.id)
-                      }}</span
-                      >)
-                    </option>
-                  </select>
-                </div>
+  <!-- Inscribir Nuevo -->
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <h5 class="card-title">➕ Inscribir estudiante</h5>
+      <div class="row g-3 align-items-end">
+        <div class="col-lg-4">
+          <label class="form-label">Estudiante</label>
+          <select class="form-select" [(ngModel)]="seleccionEstudiante">
+            <option value="">-- Seleccione estudiante --</option>
+            <option
+              *ngFor="let e of obtenerEstudiantesDisponibles()"
+              [value]="e.uid"
+            >
+              {{ e.nombre }} ({{ e.email }})
+            </option>
+          </select>
+        </div>
 
-                <div class="col-md-3">
-                  <label class="form-label">Filtrar por estudiante</label>
-                  <select
-                    class="form-select"
-                    [(ngModel)]="filtroEstudiante"
-                    (change)="aplicarFiltros()"
-                  >
-                    <option value="">Todos los estudiantes</option>
-                    <option *ngFor="let e of estudiantes" [value]="e.uid">
-                      {{ e.nombre }}
-                      - (<span class="badge">{{
-                        contarInscripcionesEstudiante(e.uid)
-                      }}</span
-                      >)
-                    </option>
-                  </select>
-                </div>
+        <div class="col-lg-4">
+          <label class="form-label">Curso</label>
+          <select
+            class="form-select"
+            [(ngModel)]="seleccionCurso"
+            (change)="cargarHorarios()"
+          >
+            <option value="">-- Seleccione curso --</option>
+            <option *ngFor="let c of cursos" [value]="c.id">
+              {{ c.titulo || c.nombre || c.id }} ({{
+                contarEstudiantesPorCurso(c.id)
+              }})
+            </option>
+          </select>
+        </div>
 
-                <div class="col-md-4">
-                  <label class="form-label"
-                    >Buscar estudiante (nombre o email)</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="buscarEstudiante"
-                    (keyup)="aplicarFiltros()"
-                    placeholder="Escribe nombre o email..."
-                  />
-                </div>
-
-                <div class="col-md-2">
-                  <button
-                    class="btn btn-primary w-100"
-                    (click)="aplicarFiltros()"
-                  >
-                    🔄 Aplicar
-                  </button>
-                  <button class="btn btn-link w-100" (click)="limpiarFiltros()">
-                    ✖ Limpiar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Inscribir Nuevo -->
-          <div class="card">
-            <div class="card-body">
-              <h5>➕ Inscribir Nuevo Estudiante</h5>
-              <div class="row g-2 align-items-center">
-                <div class="col-md-5">
-                  <label class="form-label">Estudiante</label>
-                  <select
-                    class="form-select"
-                    [(ngModel)]="seleccionEstudiante"
-                    (change)="obtenerEstudiantesDisponibles()"
-                  >
-                    <option value="">-- Seleccione Estudiante --</option>
-                    <option
-                      *ngFor="let e of obtenerEstudiantesDisponibles()"
-                      [value]="e.uid"
-                    >
-                      {{ e.nombre }} ({{ e.email }})
-                    </option>
-                  </select>
-                  <small class="text-muted" *ngIf="seleccionEstudiante">
-                    ✓ Estudiante disponible
-                  </small>
-                </div>
-
-                <div class="col-md-5">
-                  <label class="form-label">Curso</label>
-                  <select class="form-select" [(ngModel)]="seleccionCurso">
-                    <option value="">-- Seleccione Curso --</option>
-                    <option *ngFor="let c of cursos" [value]="c.id">
-                      {{ c.titulo || c.nombre || c.id }}
-                      - (<span class="badge">{{
-                        contarEstudiantesPorCurso(c.id)
-                      }}</span
-                      >)
-                    </option>
-                  </select>
-                  <small class="text-muted" *ngIf="seleccionCurso">
-                    ✓ Curso seleccionado
-                  </small>
-                </div>
-
-                <div class="col-md-2">
-                  <button
-                    class="btn btn-success w-100"
-                    (click)="inscribir()"
-                    [disabled]="!seleccionEstudiante || !seleccionCurso"
-                  >
-                    📝 Inscribir
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Lista de Inscripciones -->
-          <div class="card">
-            <div class="card-body">
-              <h5>
-                📊 Inscripciones Actuales
-                <span class="badge">{{ inscripciones.length }}</span>
-              </h5>
-
-              <div *ngIf="inscripciones.length === 0" class="alert alert-info">
-                No hay inscripciones que coincidan con los filtros aplicados.
-              </div>
-
-              <div class="table-responsive" *ngIf="inscripciones.length > 0">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>👤 Estudiante</th>
-                      <th>📚 Curso</th>
-                      <th>📅 Fecha de Inscripción</th>
-                      <th>⚙️ Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let ins of inscripciones">
-                      <td>
-                        <strong>{{
-                          ins.estudiante?.nombre || ins.estudianteUid
-                        }}</strong>
-                        <br />
-                        <small class="text-muted">{{
-                          ins.estudiante?.email
-                        }}</small>
-                      </td>
-                      <td>
-                        <strong>{{
-                          ins.curso?.titulo || ins.curso?.nombre || ins.cursoId
-                        }}</strong>
-                        <br />
-                        <small class="text-muted">ID: {{ ins.cursoId }}</small>
-                      </td>
-                      <td>
-                        {{
-                          ins.fechaInscripcion?.toDate
-                            ? (ins.fechaInscripcion.toDate() | date : "short")
-                            : (ins.fechaInscripcion | date : "short")
-                        }}
-                      </td>
-                      <td>
-                        <button
-                          class="btn btn-sm btn-danger"
-                          (click)="desinscribir(ins)"
-                          title="Desinscribir estudiante del curso"
-                        >
-                          🗑️ Desinscribir
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        <div class="col-lg-3">
+          <label class="form-label">Horario</label>
+          <select
+            class="form-select"
+            [(ngModel)]="seleccionHorario"
+            [disabled]="
+              cargandoHorarios || !seleccionCurso || horariosCurso.length === 0
+            "
+          >
+            <option value="" disabled>-- Seleccione horario --</option>
+            <ng-container *ngIf="horariosCurso.length > 0; else sinHorarios">
+              <option *ngFor="let h of horariosCurso" [value]="h.id">
+                {{ h.dia }} · {{ h.horaInicio }} - {{ h.horaFin }}
+              </option>
+            </ng-container>
+          </select>
+          <ng-template #sinHorarios>
+            <option value="" disabled>No hay horarios</option>
+          </ng-template>
+          <div class="form-text" *ngIf="cargandoHorarios">
+            Cargando horarios...
           </div>
         </div>
-      </body>
-    </html>
-  </body>
-</html>
+
+        <div class="col-lg-1 d-grid">
+          <button
+            class="btn btn-success"
+            (click)="inscribir()"
+            [disabled]="
+              !seleccionEstudiante || !seleccionCurso || !seleccionHorario
+            "
+          >
+            📝 Inscribir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Inscripciones -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">
+        📊 Inscripciones
+        <span class="badge bg-primary">{{ inscripciones.length }}</span>
+      </h5>
+
+      <div *ngIf="inscripciones.length === 0" class="alert alert-info mb-0">
+        No hay inscripciones con los filtros actuales.
+      </div>
+
+      <div class="table-responsive" *ngIf="inscripciones.length > 0">
+        <table class="table align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Estudiante</th>
+              <th>Curso</th>
+              <th>Horario</th>
+              <th>Fecha</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ins of inscripciones">
+              <td>
+                <div class="fw-semibold">
+                  {{ ins.estudiante?.nombre || ins.estudianteUid }}
+                </div>
+                <small class="text-muted">{{ ins.estudiante?.email }}</small>
+              </td>
+              <td>
+                <div class="fw-semibold">
+                  {{ ins.curso?.titulo || ins.curso?.nombre || ins.cursoId }}
+                </div>
+                <small class="text-muted">ID: {{ ins.cursoId }}</small>
+              </td>
+              <td>
+                <div *ngIf="ins.horario; else sinHorario">
+                  {{ ins.horario?.dia }} · {{ ins.horario?.horaInicio }} -
+                  {{ ins.horario?.horaFin }}
+                </div>
+                <ng-template #sinHorario>
+                  <span class="badge bg-secondary">Sin horario</span>
+                </ng-template>
+              </td>
+              <td>
+                {{
+                  ins.fechaInscripcion?.toDate
+                    ? (ins.fechaInscripcion.toDate() | date : "short")
+                    : (ins.fechaInscripcion | date : "short")
+                }}
+              </td>
+              <td class="text-end">
+                <button
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="desinscribir(ins)"
+                  title="Desinscribir estudiante del curso"
+                >
+                  🗑️ Desinscribir
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,29 +1,44 @@
-import { AdminComponent } from './components/docente/profesores/admin.component';
+/**
+ * Rutas de la aplicación organizadas por features
+ * Usa lazy loading y guards modernos con canMatch
+ */
+
 import { Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard';
+import { AuthGuard, RoleGuard } from './core/guards';
 import { LoginComponent } from './components/auth/signin/login.component';
 import { LayoutComponent } from './components/layout/layout.component';
-import { RoleGuard } from './guards/has-role.guard';
-// Todas las rutas están protegidas con lazy loading + canLoad si es necesario
-export const routes: Routes = [
-  // Rutas públicas
-  { path: 'signin', component: LoginComponent },
-  { path: '', redirectTo: 'signin', pathMatch: 'full' },
+import { NotFoundComponent } from './shared/components/not-found.component';
+import { ForbiddenComponent } from './shared/components/forbidden.component';
 
-  // Rutas con layout general
+export const routes: Routes = [
+  // ========== Rutas públicas ==========
+  {
+    path: 'signin',
+    component: LoginComponent,
+    title: 'Iniciar sesión',
+  },
+  {
+    path: 'forbidden',
+    component: ForbiddenComponent,
+    title: 'Acceso denegado',
+  },
+  {
+    path: '',
+    redirectTo: 'signin',
+    pathMatch: 'full',
+  },
+
+  // ========== Rutas protegidas con layout ==========
   {
     path: '',
     component: LayoutComponent,
+    canActivate: [AuthGuard],
     children: [
-      /* {
-        path: 'home',
-        loadComponent: () =>
-          import('./components/home/home.component').then(
-            (m) => m.HomeComponent
-          ),
-      }, */
+      // ===== Feature: Admin =====
       {
         path: 'admin',
+        canMatch: [AuthGuard, RoleGuard],
+        data: { roles: ['admin'] },
         children: [
           {
             path: '',
@@ -31,8 +46,7 @@ export const routes: Routes = [
               import(
                 './components/admin/dashboard/admin-dashboard.component'
               ).then((m) => m.AdminDashboardComponent),
-            canActivate: [AuthGuard, RoleGuard],
-            data: { roles: ['admin'] },
+            title: 'Panel de administración',
           },
           {
             path: 'usuarios',
@@ -40,8 +54,7 @@ export const routes: Routes = [
               import(
                 './components/admin/usuarios/gestion-usuarios.component'
               ).then((m) => m.GestionUsuariosComponent),
-            canActivate: [AuthGuard, RoleGuard],
-            data: { roles: ['admin'] },
+            title: 'Gestión de usuarios',
           },
           {
             path: 'inscripciones',
@@ -49,8 +62,7 @@ export const routes: Routes = [
               import(
                 './components/admin/inscripciones/gestion-inscripciones.component'
               ).then((m) => m.GestionInscripcionesComponent),
-            canActivate: [AuthGuard, RoleGuard],
-            data: { roles: ['admin'] },
+            title: 'Gestión de inscripciones',
           },
           {
             path: 'horarios',
@@ -58,8 +70,7 @@ export const routes: Routes = [
               import(
                 './components/admin/horarios/gestion-horarios.component'
               ).then((m) => m.GestionHorariosComponent),
-            canActivate: [AuthGuard, RoleGuard],
-            data: { roles: ['admin'] },
+            title: 'Gestión de horarios',
           },
           {
             path: 'cursos',
@@ -67,23 +78,28 @@ export const routes: Routes = [
               import('./components/admin/cursos/gestion-cursos.component').then(
                 (m) => m.GestionCursosComponent
               ),
-            canActivate: [AuthGuard, RoleGuard],
-            data: { roles: ['admin'] },
+            title: 'Gestión de cursos',
           },
         ],
       },
+
+      // ===== Feature: Docente =====
       {
         path: 'docente',
         loadComponent: () =>
           import('./components/docente/profesores/admin.component').then(
             (m) => m.AdminComponent
           ),
-        canActivate: [AuthGuard, RoleGuard],
-        canLoad: [AuthGuard, RoleGuard],
+        canMatch: [AuthGuard, RoleGuard],
         data: { roles: ['docente', 'admin', 'estudiante'] },
+        title: 'Docentes',
       },
+
+      // ===== Feature: Cursos (compartido) =====
       {
         path: 'cursos',
+        canMatch: [AuthGuard, RoleGuard],
+        data: { roles: ['docente', 'admin', 'estudiante'] },
         children: [
           {
             path: '',
@@ -91,9 +107,7 @@ export const routes: Routes = [
               import('./components/docente/cursos/cursos.component').then(
                 (m) => m.CursosComponent
               ),
-            canActivate: [AuthGuard, RoleGuard],
-            canLoad: [AuthGuard, RoleGuard],
-            data: { roles: ['docente', 'admin', 'estudiante'] },
+            title: 'Cursos',
           },
           {
             path: 'detalle-clases/:id',
@@ -101,9 +115,9 @@ export const routes: Routes = [
               import(
                 './components/estudiante/misclases/misclases.component'
               ).then((m) => m.MisclasesComponent),
-            canActivate: [AuthGuard, RoleGuard],
-            canLoad: [AuthGuard, RoleGuard],
+            canMatch: [AuthGuard, RoleGuard],
             data: { roles: ['estudiante', 'admin'] },
+            title: 'Mis clases',
           },
           {
             path: 'detalle-curso/:id',
@@ -111,32 +125,33 @@ export const routes: Routes = [
               import('./components/docente/clases/clases.component').then(
                 (m) => m.ClasesComponent
               ),
-            canActivate: [AuthGuard, RoleGuard],
-            canLoad: [AuthGuard, RoleGuard],
-            data: { roles: ['docente', 'estudiante', 'admin'] },
+            title: 'Detalle del curso',
           },
         ],
       },
+
+      // ===== Feature: Perfil (compartido) =====
       {
         path: 'perfil',
         loadComponent: () =>
           import('./components/myperfil/myperfil.component').then(
             (m) => m.MyperfilComponent
           ),
-        canActivate: [AuthGuard, RoleGuard],
-        canLoad: [AuthGuard, RoleGuard],
-        data: { roles: ['estudiante', 'docente', 'admin'] }, // ambos roles pueden acceder
+        canMatch: [AuthGuard, RoleGuard],
+        data: { roles: ['estudiante', 'docente', 'admin'] },
+        title: 'Mi perfil',
       },
+
+      // ===== Feature: Estudiante =====
       {
         path: 'miscursos',
         loadComponent: () =>
           import('./components/estudiante/miscursos/miscursos.component').then(
             (m) => m.MiscursosComponent
           ),
-        canActivate: [AuthGuard, RoleGuard],
-        canLoad: [AuthGuard, RoleGuard],
-
+        canMatch: [AuthGuard, RoleGuard],
         data: { roles: ['estudiante'] },
+        title: 'Mis cursos',
       },
       {
         path: 'misdocentes',
@@ -144,11 +159,17 @@ export const routes: Routes = [
           import(
             './components/estudiante/misdocentes/misdocentes.component'
           ).then((m) => m.MisdocentesComponent),
-        canActivate: [AuthGuard, RoleGuard],
-        canLoad: [AuthGuard, RoleGuard],
-
+        canMatch: [AuthGuard, RoleGuard],
         data: { roles: ['estudiante'] },
+        title: 'Mis docentes',
       },
     ],
+  },
+
+  // ========== Ruta 404 (debe ir al final) ==========
+  {
+    path: '**',
+    component: NotFoundComponent,
+    title: 'Página no encontrada',
   },
 ];

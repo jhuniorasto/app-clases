@@ -1,23 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Curso } from '../../../models/curso.model';
-import { CursoService } from '../../../services/curso.service';
+import { Curso } from '../../../core/models/curso.model';
+import { CursoService } from '../../../core/services/curso.service';
 import { Timestamp } from '@angular/fire/firestore';
 import Swal from 'sweetalert2';
+import { catchError, map, shareReplay } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-gestion-cursos',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './gestion-cursos.component.html',
-  styleUrl: './gestion-cursos.component.css',
+  styleUrls: ['./gestion-cursos.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GestionCursosComponent implements OnInit {
-  cursos: Curso[] = [];
-  cargando = true;
+export class GestionCursosComponent {
   mostrarFormulario = false;
   cursoEditando: Curso | null = null;
+
+  cursos$: Observable<Curso[]>;
 
   nuevoCurso: Partial<Curso> = {
     titulo: '',
@@ -30,31 +33,8 @@ export class GestionCursosComponent implements OnInit {
     progresoEstudiante: 0,
   };
 
-  constructor(private cursoService: CursoService) {}
-
-  ngOnInit(): void {
-    this.cargarCursos();
-  }
-
-  cargarCursos(): void {
-    this.cursoService.obtenerCursos().subscribe(
-      (cursos) => {
-        this.cursos = cursos.map((curso) => ({
-          ...curso,
-          fechaCreacion:
-            curso.fechaCreacion instanceof Timestamp
-              ? curso.fechaCreacion.toDate()
-              : curso.fechaCreacion,
-        }));
-
-        this.cargando = false;
-      },
-      (error) => {
-        console.error('Error al cargar cursos:', error);
-        Swal.fire('Error', 'No se pudieron cargar los cursos', 'error');
-        this.cargando = false;
-      }
-    );
+  constructor(private cursoService: CursoService) {
+    this.cursos$ = this.cargarCursos();
   }
 
   abrirFormularioNuevo(): void {
@@ -124,7 +104,6 @@ export class GestionCursosComponent implements OnInit {
         Swal.fire('✅ Éxito', 'Curso creado correctamente', 'success');
       }
       this.cerrarFormulario();
-      this.cargarCursos();
     } catch (error: any) {
       console.error('Error guardando curso:', error);
       Swal.fire(
@@ -150,7 +129,6 @@ export class GestionCursosComponent implements OnInit {
       try {
         await this.cursoService.eliminarCurso(id);
         Swal.fire('✅ Éxito', 'Curso eliminado correctamente', 'success');
-        this.cargarCursos();
       } catch (error: any) {
         console.error('Error eliminando curso:', error);
         Swal.fire(
@@ -160,5 +138,29 @@ export class GestionCursosComponent implements OnInit {
         );
       }
     }
+  }
+
+  trackById(index: number, curso: Curso): string {
+    return curso.id;
+  }
+
+  private cargarCursos(): Observable<Curso[]> {
+    return this.cursoService.obtenerCursos().pipe(
+      map((cursos) =>
+        cursos.map((curso) => ({
+          ...curso,
+          fechaCreacion:
+            curso.fechaCreacion instanceof Timestamp
+              ? curso.fechaCreacion.toDate()
+              : curso.fechaCreacion,
+        }))
+      ),
+      catchError((error) => {
+        console.error('Error al cargar cursos:', error);
+        Swal.fire('Error', 'No se pudieron cargar los cursos', 'error');
+        return of([] as Curso[]);
+      }),
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
   }
 }

@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService } from '../../../services/usuario.service'; // ajusta la ruta si es necesario
-import { Usuario } from '../../../models/usuario.model'; // ajusta la ruta si es necesario
+import { UsuarioService } from '../../../core/services/usuario.service'; // ajusta la ruta si es necesario
+import { Usuario } from '../../../core/models/usuario.model'; // ajusta la ruta si es necesario
 import Swal from 'sweetalert2';
 
 @Component({

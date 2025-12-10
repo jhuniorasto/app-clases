@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminService } from '../../../services/admin.service';
+import { AdminService } from '../../../core/services/admin.service';
 import Swal from 'sweetalert2';
+import { Horario } from '../../../core/models/horario.model';
 
 @Component({
   selector: 'app-gestion-inscripciones',
@@ -17,8 +18,12 @@ export class GestionInscripcionesComponent implements OnInit {
   inscripciones: any[] = [];
   inscripcionesOriginales: any[] = [];
 
+  horariosCurso: Horario[] = [];
+  cargandoHorarios = false;
+
   seleccionEstudiante: string = '';
   seleccionCurso: string = '';
+  seleccionHorario: string = '';
 
   // filtros
   filtroEstudiante: string = '';
@@ -41,6 +46,9 @@ export class GestionInscripcionesComponent implements OnInit {
       this.inscripcionesOriginales =
         await this.adminService.obtenerInscripciones();
       this.inscripciones = [...this.inscripcionesOriginales];
+      if (this.seleccionCurso) {
+        await this.cargarHorarios();
+      }
     } catch (error) {
       console.error('Error cargando datos de inscripciones', error);
     } finally {
@@ -120,6 +128,11 @@ export class GestionInscripcionesComponent implements OnInit {
       return false;
     }
 
+    if (!this.seleccionHorario) {
+      Swal.fire('Error', 'Seleccione un horario para el curso.', 'warning');
+      return false;
+    }
+
     // validar en el servidor si ya existe
     try {
       const existe = await this.adminService.verificarInscripcionExistente(
@@ -156,12 +169,15 @@ export class GestionInscripcionesComponent implements OnInit {
     try {
       await this.adminService.inscribirEstudianteEnCurso(
         this.seleccionEstudiante,
-        this.seleccionCurso
+        this.seleccionCurso,
+        this.seleccionHorario
       );
       Swal.fire('Listo', 'Estudiante inscrito correctamente.', 'success');
       await this.cargarDatos();
       this.seleccionEstudiante = '';
       this.seleccionCurso = '';
+      this.seleccionHorario = '';
+      this.horariosCurso = [];
     } catch (error) {
       console.error('Error al inscribir estudiante', error);
       Swal.fire('Error', 'No se pudo inscribir al estudiante.', 'error');
@@ -180,7 +196,8 @@ export class GestionInscripcionesComponent implements OnInit {
       try {
         await this.adminService.desinscribirEstudianteDelCurso(
           inscripcion.estudianteUid,
-          inscripcion.cursoId
+          inscripcion.cursoId,
+          inscripcion.scheduleId
         );
         Swal.fire('Listo', 'Estudiante desinscrito.', 'success');
         await this.cargarDatos();
@@ -188,6 +205,32 @@ export class GestionInscripcionesComponent implements OnInit {
         console.error('Error al desinscribir', error);
         Swal.fire('Error', 'No se pudo desinscribir.', 'error');
       }
+    }
+  }
+
+  async cargarHorarios(): Promise<void> {
+    if (!this.seleccionCurso) {
+      this.horariosCurso = [];
+      return;
+    }
+
+    try {
+      this.cargandoHorarios = true;
+      this.horariosCurso = await this.adminService.obtenerHorariosDeCurso(
+        this.seleccionCurso
+      );
+      if (!this.horariosCurso.find((h) => h.id === this.seleccionHorario)) {
+        this.seleccionHorario = '';
+      }
+    } catch (error) {
+      console.error('Error al cargar horarios', error);
+      Swal.fire(
+        'Error',
+        'No se pudieron cargar los horarios del curso.',
+        'error'
+      );
+    } finally {
+      this.cargandoHorarios = false;
     }
   }
 }

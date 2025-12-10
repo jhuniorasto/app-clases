@@ -49,248 +49,79 @@
         <div class="container-fluid">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="display-5">
-              <strong>👥 Gestión de Usuarios</strong>
+              <strong>📚 Gestión de Usuarios</strong>
             </h3>
-            <button
-              class="btn btn-primary"
-              (click)="abrirFormularioNuevo()"
-              *ngIf="!mostrarFormulario"
-            >
-              ➕ Nuevo Usuario
+
+            <button class="btn btn-primary" (click)="abrirFormularioNuevo()">
+              <i class="bi bi-plus-circle me-1"></i> Nuevo Usuario
             </button>
           </div>
 
-          <!-- Formulario -->
-          <div *ngIf="mostrarFormulario" class="card">
-            <div class="card-header">
-              <h5>
-                {{
-                  usuarioEditando
-                    ? "✏️ Editar Usuario"
-                    : "➕ Crear Nuevo Usuario"
-                }}
-              </h5>
-            </div>
+          <div class="card shadow-sm">
             <div class="card-body">
-              <form
-                [formGroup]="formularioUsuario"
-                (ngSubmit)="guardarUsuario()"
-              >
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Nombre *</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="nombre"
-                      placeholder="Nombre completo"
-                    />
-                    <small
-                      class="text-danger"
-                      *ngIf="
-                        formularioUsuario.get('nombre')?.invalid &&
-                        formularioUsuario.get('nombre')?.touched
-                      "
-                    >
-                      El nombre es requerido (mínimo 3 caracteres)
-                    </small>
-                  </div>
-
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Email *</label>
-                    <input
-                      type="email"
-                      class="form-control"
-                      formControlName="email"
-                      placeholder="correo@ejemplo.com"
-                    />
-                    <small
-                      class="text-danger"
-                      *ngIf="
-                        formularioUsuario.get('email')?.invalid &&
-                        formularioUsuario.get('email')?.touched
-                      "
-                    >
-                      Email válido requerido
-                    </small>
-                  </div>
-
-                  <div class="col-md-6 mb-3" *ngIf="!usuarioEditando">
-                    <label class="form-label">Contraseña *</label>
-                    <input
-                      type="password"
-                      class="form-control"
-                      formControlName="password"
-                      placeholder="Contraseña (mínimo 6 caracteres)"
-                    />
-                    <small
-                      class="text-danger"
-                      *ngIf="
-                        formularioUsuario.get('password')?.invalid &&
-                        formularioUsuario.get('password')?.touched
-                      "
-                    >
-                      Contraseña requerida (mínimo 6 caracteres)
-                    </small>
-                  </div>
-
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Rol *</label>
-                    <select class="form-select" formControlName="rol">
-                      <option value="">-- Selecciona un rol --</option>
-                      <option value="estudiante">👤 Estudiante</option>
-                      <option value="docente">👨‍🏫 Docente</option>
-                    </select>
-                  </div>
-
-                  <div
-                    class="col-md-6 mb-3"
-                    *ngIf="formularioUsuario.get('rol')?.value === 'docente'"
-                  >
-                    <label class="form-label">Especialidad</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="especialidad"
-                      placeholder="Ej: Matemáticas, Física, etc."
-                    />
-                    <small class="text-muted"
-                      >Campo opcional para docentes</small
-                    >
-                  </div>
-
-                  <div
-                    class="col-md-6 mb-3"
-                    *ngIf="formularioUsuario.get('rol')?.value === 'estudiante'"
-                  >
-                    <label class="form-label">Número de Estudiante</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="numeroEstudiante"
-                      placeholder="Ej: EST-001"
-                    />
-                    <small class="text-muted"
-                      >Campo opcional para estudiantes</small
-                    >
-                  </div>
-                </div>
-
-                <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-success">
-                    {{ usuarioEditando ? "🔄 Actualizar" : "✅ Crear" }}
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    (click)="cerrarFormulario()"
-                  >
-                    ❌ Cancelar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- Filtros -->
-          <div class="card" *ngIf="!mostrarFormulario">
-            <div class="card-body">
-              <h5>🔍 Filtros</h5>
-              <div class="row g-2 align-items-end">
-                <div class="col-md-3">
-                  <label class="form-label">Filtrar por Rol</label>
+              <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                  <label class="form-label">Rol</label>
                   <select
                     class="form-select"
-                    [(ngModel)]="rolFiltro"
-                    (change)="onFiltroChange()"
+                    [ngModel]="rolFiltroValue"
+                    (ngModelChange)="onFiltroChange($event)"
                   >
-                    <option value="todos">Todos los roles</option>
-                    <option value="estudiante">👤 Estudiante</option>
-                    <option value="docente">👨‍🏫 Docente</option>
+                    <option value="todos">Todos</option>
+                    <option value="admin">Administradores</option>
+                    <option value="docente">Docentes</option>
+                    <option value="estudiante">Estudiantes</option>
                   </select>
                 </div>
-
-                <div class="col-md-7">
-                  <label class="form-label"
-                    >Buscar usuario (nombre o email)</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="terminoBusqueda"
-                    (keyup)="onBusqueda()"
-                    placeholder="Escribe nombre o email..."
-                  />
+                <div class="col-md-4">
+                  <label class="form-label">Buscar</label>
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Nombre o email"
+                      [ngModel]="terminoBusquedaValue"
+                      (ngModelChange)="onBusqueda($event)"
+                    />
+                  </div>
                 </div>
-
-                <div class="col-md-2">
-                  <button class="btn btn-primary w-100" (click)="onBusqueda()">
-                    🔄 Aplicar
-                  </button>
+                <div class="col-md-4 d-flex align-items-end">
+                  <div class="alert alert-info w-100 mb-0">
+                    <i class="bi bi-people me-2"></i>
+                    Usuarios encontrados:
+                    {{ (usuariosFiltrados$ | async)?.length || 0 }}
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tabla de Usuarios -->
-          <div class="card">
-            <div class="card-header">
-              <h5>
-                📋 Usuarios
-                <span class="badge">{{ usuariosFiltrados.length }}</span>
-              </h5>
-            </div>
-            <div class="card-body">
-              <div *ngIf="cargando" class="alert alert-info">
-                ⏳ Cargando usuarios...
-              </div>
-
-              <div
-                *ngIf="!cargando && usuariosFiltrados.length === 0"
-                class="alert alert-warning"
-              >
-                ⚠️ No hay usuarios que coincidan con los criterios de búsqueda.
               </div>
 
               <div
                 class="table-responsive"
-                *ngIf="!cargando && usuariosFiltrados.length > 0"
+                *ngIf="!(cargando$ | async); else loading"
               >
-                <table class="table table-striped">
-                  <thead>
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
                     <tr>
-                      <th>👤 Nombre</th>
-                      <th>📧 Email</th>
-                      <th>🏷️ Rol</th>
-                      <th>📝 Especialidad/Número</th>
-                      <th>🔗 Estado</th>
-                      <th>⚙️ Acciones</th>
+                      <th>Nombre</th>
+                      <th>Email</th>
+                      <th>Rol</th>
+                      <th>Estado</th>
+                      <th class="text-end">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let usuario of usuariosFiltrados">
+                    <tr
+                      *ngFor="
+                        let usuario of usuariosFiltrados$ | async;
+                        trackBy: trackByUid
+                      "
+                    >
                       <td>
-                        <strong>{{ usuario.nombre }}</strong>
+                        <div class="fw-semibold">{{ usuario.nombre }}</div>
+                        <small class="text-muted">{{ usuario.uid }}</small>
                       </td>
+                      <td>{{ usuario.email }}</td>
                       <td>
-                        {{ usuario.email }}
-                      </td>
-                      <td>
-                        <span
-                          class="badge"
-                          [ngClass]="'bg-' + getRolColor(usuario.rol)"
-                        >
-                          {{ getRolIcon(usuario.rol) }} {{ usuario.rol }}
-                        </span>
-                      </td>
-                      <td>
-                        <small class="text-muted">
-                          {{
-                            usuario.especialidad ||
-                              usuario.numeroEstudiante ||
-                              "-"
-                          }}
-                        </small>
+                        <span class="badge bg-primary">{{ usuario.rol }}</span>
                       </td>
                       <td>
                         <span
@@ -299,39 +130,131 @@
                             usuario.estado?.activo ? 'bg-success' : 'bg-danger'
                           "
                         >
-                          {{
-                            usuario.estado?.activo ? "✅ Activo" : "🔒 Inactivo"
-                          }}
+                          {{ usuario.estado?.activo ? "Activo" : "Inactivo" }}
                         </span>
                       </td>
-                      <td>
-                        <button
-                          class="btn btn-sm btn-warning"
-                          (click)="abrirFormularioEditar(usuario)"
-                          title="Editar usuario"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          class="btn btn-sm btn-danger"
-                          (click)="desactivarUsuario(usuario)"
-                          *ngIf="usuario.estado?.activo"
-                          title="Desactivar usuario"
-                        >
-                          🔒
-                        </button>
-                        <button
-                          class="btn btn-sm btn-danger"
-                          (click)="eliminarUsuario(usuario)"
-                          title="Eliminar usuario permanentemente"
-                        >
-                          🗑️
-                        </button>
+                      <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                          <button
+                            class="btn btn-outline-primary"
+                            (click)="abrirFormularioEditar(usuario)"
+                          >
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                          <button
+                            class="btn btn-outline-warning"
+                            (click)="desactivarUsuario(usuario)"
+                            [disabled]="!usuario.estado?.activo"
+                          >
+                            <i class="bi bi-dash-circle"></i>
+                          </button>
+                          <button
+                            class="btn btn-outline-danger"
+                            (click)="eliminarUsuario(usuario)"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
                 </table>
+
+                <div
+                  class="text-center py-4 text-muted"
+                  *ngIf="(usuariosFiltrados$ | async)?.length === 0"
+                >
+                  <i class="bi bi-emoji-neutral fs-1 d-block mb-2"></i>
+                  No hay usuarios que coincidan con los filtros
+                </div>
               </div>
+
+              <ng-template #loading>
+                <div class="text-center py-4">
+                  <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                  <p class="mt-2">Cargando usuarios...</p>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <div
+            class="offcanvas offcanvas-end"
+            [class.show]="mostrarFormulario"
+            [style.visibility]="mostrarFormulario ? 'visible' : 'hidden'"
+          >
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title">
+                {{ usuarioEditando ? "Editar Usuario" : "Nuevo Usuario" }}
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                (click)="cerrarFormulario()"
+              ></button>
+            </div>
+            <div class="offcanvas-body">
+              <form
+                [formGroup]="formularioUsuario"
+                (ngSubmit)="guardarUsuario()"
+              >
+                <div class="mb-3">
+                  <label class="form-label">Nombre</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="nombre"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    formControlName="email"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Rol</label>
+                  <select class="form-select" formControlName="rol">
+                    <option value="admin">Administrador</option>
+                    <option value="docente">Docente</option>
+                    <option value="estudiante">Estudiante</option>
+                  </select>
+                </div>
+
+                <div class="mb-3 form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="activo"
+                    formControlName="activo"
+                  />
+                  <label class="form-check-label" for="activo">Activo</label>
+                </div>
+
+                <div class="d-grid gap-2">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="formularioUsuario.invalid"
+                  >
+                    <i class="bi bi-save me-1"></i>
+                    {{ usuarioEditando ? "Actualizar" : "Crear" }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="cerrarFormulario()"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

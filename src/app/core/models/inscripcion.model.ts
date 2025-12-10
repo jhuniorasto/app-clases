@@ -4,6 +4,7 @@ export class Inscripcion {
     public id: string,
     public cursoId: string,
     public estudianteUid: string,
+    public scheduleId: string,
     public fechaInscripcion: Date
   ) {}
 
@@ -12,6 +13,7 @@ export class Inscripcion {
       id,
       data.cursoId,
       data.estudianteUid,
+      data.scheduleId || '',
       new Date(data.fechaInscripcion)
     );
   }

@@ -1,38 +1,41 @@
 import { Injectable } from '@angular/core';
-import {
-  Firestore,
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-} from '@angular/fire/firestore';
-import { Curso } from '../models/curso.model'; // Ajusta si tienes otra ruta
+import { Firestore, query, where } from '@angular/fire/firestore';
+import { Curso } from '../models/curso.model';
 import { collectionData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import {
+  getCollectionRef,
+  createDocument,
+  getDocumentById,
+  updateDocument,
+  deleteDocument,
+  serializeDates,
+  handleFirestoreError,
+} from '../data/firestore.utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CursoService {
+  private readonly COLLECTION_PATH = 'cursos';
   private cursosCollection;
 
   constructor(private firestore: Firestore) {
-    this.cursosCollection = collection(this.firestore, 'cursos');
+    this.cursosCollection = getCollectionRef(
+      this.firestore,
+      this.COLLECTION_PATH
+    );
   }
 
   // ✅ Crear curso
   async crearCurso(curso: Omit<Curso, 'id'>): Promise<string> {
-    const docRef = await addDoc(this.cursosCollection, {
-      ...curso,
-      fechaCreacion: curso.fechaCreacion.toISOString(), // guardamos en formato string
-    });
-    return docRef.id;
+    try {
+      const serialized = serializeDates(curso, ['fechaCreacion']);
+      return await createDocument(this.cursosCollection, serialized);
+    } catch (error) {
+      handleFirestoreError(error, 'crear curso');
+    }
   }
 
   // ✅ Obtener todos los cursos
@@ -52,10 +55,16 @@ export class CursoService {
 
   // ✅ Obtener un curso por ID
   async obtenerCursoPorId(id: string): Promise<Curso | null> {
-    const cursoRef = doc(this.firestore, `cursos/${id}`);
-    const snap = await getDoc(cursoRef);
-    if (!snap.exists()) return null;
-    return Curso.fromFirestore(snap.data(), snap.id);
+    try {
+      return await getDocumentById(
+        this.firestore,
+        this.COLLECTION_PATH,
+        id,
+        (data, id) => Curso.fromFirestore(data, id)
+      );
+    } catch (error) {
+      handleFirestoreError(error, 'obtener curso por ID');
+    }
   }
 
   // ✅ Actualizar curso
@@ -63,15 +72,19 @@ export class CursoService {
     id: string,
     datos: Partial<Omit<Curso, 'id' | 'creadoPorUid'>>
   ): Promise<void> {
-    const cursoRef = doc(this.firestore, `cursos/${id}`);
-    await updateDoc(cursoRef, {
-      ...datos,
-    });
+    try {
+      await updateDocument(this.firestore, this.COLLECTION_PATH, id, datos);
+    } catch (error) {
+      handleFirestoreError(error, 'actualizar curso');
+    }
   }
 
   // ✅ Eliminar curso
   async eliminarCurso(id: string): Promise<void> {
-    const cursoRef = doc(this.firestore, `cursos/${id}`);
-    await deleteDoc(cursoRef);
+    try {
+      await deleteDocument(this.firestore, this.COLLECTION_PATH, id);
+    } catch (error) {
+      handleFirestoreError(error, 'eliminar curso');
+    }
   }
 }

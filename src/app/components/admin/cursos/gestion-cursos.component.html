@@ -116,9 +116,9 @@
                       placeholder="Descripción detallada del curso..."
                       rows="4"
                     ></textarea>
-                    <small class="text-muted"
-                      >Proporciona una descripción clara del contenido</small
-                    >
+                    <small class="text-muted">
+                      Proporciona una descripción clara del contenido
+                    </small>
                   </div>
 
                   <div class="col-md-6 mb-3">
@@ -173,87 +173,88 @@
             </div>
           </div>
 
-          <!-- Cargando -->
-          <div *ngIf="cargando" class="alert alert-info">
-            ⏳ Cargando cursos...
-          </div>
-
-          <!-- Sin cursos -->
-          <div
-            *ngIf="!cargando && cursos.length === 0"
-            class="alert alert-warning"
-          >
-            ⚠️ No hay cursos creados. ¡Crea uno para comenzar!
-          </div>
-
-          <!-- Tabla de Cursos -->
-          <div *ngIf="!cargando && cursos.length > 0" class="card">
-            <div class="card-header">
-              <h5>
-                📋 Cursos Disponibles
-                <span class="badge">{{ cursos.length }}</span>
-              </h5>
+          <!-- Listado de cursos -->
+          <ng-container *ngIf="cursos$ | async as cursos; else loading">
+            <div *ngIf="cursos.length === 0" class="alert alert-warning">
+              ⚠️ No hay cursos creados. ¡Crea uno para comenzar!
             </div>
-            <div class="table-responsive">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>📚 Título</th>
-                    <th>🏷️ Categoría</th>
-                    <th>⏱️ Duración (hrs)</th>
-                    <th>📅 Fecha de Creación</th>
-                    <th>📝 Descripción</th>
-                    <th>⚙️ Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let curso of cursos">
-                    <td>
-                      <strong>{{ curso.titulo }}</strong>
-                    </td>
-                    <td>
-                      <span class="badge">
-                        {{ curso.categoria }}
-                      </span>
-                    </td>
-                    <td>
-                      <span class="badge bg-success"
-                        >{{ curso.duracion || 0 }} hrs</span
-                      >
-                    </td>
-                    <td>
-                      {{
-                        curso.fechaCreacion
-                          ? (curso.fechaCreacion | date : "short")
-                          : (curso.fechaCreacion | date : "short")
-                      }}
-                    </td>
-                    <td>
-                      <small class="text-muted">
-                        {{ curso.descripcion.substring(0, 50) || "-" }}...
-                      </small>
-                    </td>
-                    <td>
-                      <button
-                        class="btn btn-sm btn-warning"
-                        (click)="abrirFormularioEditar(curso)"
-                        title="Editar curso"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        class="btn btn-sm btn-danger"
-                        (click)="eliminarCurso(curso.id)"
-                        title="Eliminar curso"
-                      >
-                        🗑️
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+
+            <div *ngIf="cursos.length > 0" class="card">
+              <div class="card-header">
+                <h5>
+                  📋 Cursos Disponibles
+                  <span class="badge">{{ cursos.length }}</span>
+                </h5>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>📚 Título</th>
+                      <th>🏷️ Categoría</th>
+                      <th>⏱️ Duración (hrs)</th>
+                      <th>📅 Fecha de Creación</th>
+                      <th>📝 Descripción</th>
+                      <th>⚙️ Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let curso of cursos; trackBy: trackById">
+                      <td>
+                        <strong>{{ curso.titulo }}</strong>
+                      </td>
+                      <td>
+                        <span class="badge">
+                          {{ curso.categoria }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge bg-success"
+                          >{{ curso.duracion || 0 }} hrs</span
+                        >
+                      </td>
+                      <td>
+                        {{
+                          curso.fechaCreacion
+                            ? (curso.fechaCreacion | date : "short")
+                            : "-"
+                        }}
+                      </td>
+                      <td>
+                        <small class="text-muted">
+                          {{
+                            curso.descripcion
+                              ? curso.descripcion.slice(0, 50) + "..."
+                              : "-"
+                          }}
+                        </small>
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-warning"
+                          (click)="abrirFormularioEditar(curso)"
+                          title="Editar curso"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          class="btn btn-sm btn-danger"
+                          (click)="eliminarCurso(curso.id)"
+                          title="Eliminar curso"
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          </ng-container>
+
+          <ng-template #loading>
+            <div class="alert alert-info">⏳ Cargando cursos...</div>
+          </ng-template>
         </div>
       </body>
     </html>

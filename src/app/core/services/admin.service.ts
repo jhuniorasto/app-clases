@@ -1,41 +1,56 @@
 import { Injectable } from '@angular/core';
 import {
   Firestore,
-  collection,
-  query,
   where,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  getDoc,
   writeBatch,
-  collectionData,
+  doc,
+  CollectionReference,
 } from '@angular/fire/firestore';
-import {
-  Auth,
-  createUserWithEmailAndPassword,
-  deleteUser,
-  User,
-} from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
 import { Usuario, UserRole, UsuarioEstado } from '../models/usuario.model';
 import { UsuarioService } from './usuario.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Horario } from '../models/horario.model';
+import {
+  getCollectionRef,
+  queryDocuments,
+  createDocument,
+  updateDocument,
+  deleteDocument,
+  handleFirestoreError,
+  getAllDocuments,
+  serializeDates,
+  getDocumentById,
+} from '../data/firestore.utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
-  private usuariosCollection: ReturnType<typeof collection>;
+  private usuariosCollection: CollectionReference;
+  private inscripcionesCollection: CollectionReference;
+  private cursosCollection: CollectionReference;
+  private horariosCollection: CollectionReference;
+
+  private readonly USERS_PATH = 'usuarios';
+  private readonly INSCRIPCIONES_PATH = 'inscripciones';
+  private readonly CURSOS_PATH = 'cursos';
+  private readonly HORARIOS_PATH = 'horarios';
 
   constructor(
     private firestore: Firestore,
     private auth: Auth,
     private usuarioService: UsuarioService
   ) {
-    this.usuariosCollection = collection(this.firestore, 'usuarios');
+    this.usuariosCollection = getCollectionRef(this.firestore, this.USERS_PATH);
+    this.inscripcionesCollection = getCollectionRef(
+      this.firestore,
+      this.INSCRIPCIONES_PATH
+    );
+    this.cursosCollection = getCollectionRef(this.firestore, this.CURSOS_PATH);
+    this.horariosCollection = getCollectionRef(
+      this.firestore,
+      this.HORARIOS_PATH
+    );
   }
 
   // ============================================================
@@ -48,18 +63,14 @@ export class AdminService {
    */
   async obtenerUsuarioPorRol(rol?: UserRole): Promise<Usuario[]> {
     try {
-      let q: ReturnType<typeof collection> | ReturnType<typeof query> =
-        this.usuariosCollection;
-      if (rol) {
-        q = query(this.usuariosCollection, where('rol', '==', rol));
-      }
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map((doc) =>
-        Usuario.fromFirestore(doc.data(), doc.id)
+      const constraints = rol ? [where('rol', '==', rol)] : [];
+      return await queryDocuments(
+        this.usuariosCollection,
+        constraints,
+        (data, id) => Usuario.fromFirestore(data, id)
       );
     } catch (error) {
-      console.error('Error al obtener usuarios por rol:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener usuarios por rol');
     }
   }
 
@@ -125,11 +136,9 @@ export class AdminService {
    */
   async actualizarUsuario(uid: string, datos: Partial<Usuario>): Promise<void> {
     try {
-      const userRef = doc(this.firestore, `usuarios/${uid}`);
-      await updateDoc(userRef, datos);
+      await updateDocument(this.firestore, this.USERS_PATH, uid, datos);
     } catch (error) {
-      console.error('Error al actualizar usuario:', error);
-      throw error;
+      handleFirestoreError(error, 'actualizar usuario');
     }
   }
 
@@ -139,16 +148,14 @@ export class AdminService {
    */
   async desactivarUsuario(uid: string, razon?: string): Promise<void> {
     try {
-      const userRef = doc(this.firestore, `usuarios/${uid}`);
       const estado: UsuarioEstado = {
         activo: false,
         razonDesactivacion: razon,
         fechaDesactivacion: new Date(),
       };
-      await updateDoc(userRef, { estado });
+      await updateDocument(this.firestore, this.USERS_PATH, uid, { estado });
     } catch (error) {
-      console.error('Error al desactivar usuario:', error);
-      throw error;
+      handleFirestoreError(error, 'desactivar usuario');
     }
   }
 
@@ -158,12 +165,10 @@ export class AdminService {
    */
   async reactivarUsuario(uid: string): Promise<void> {
     try {
-      const userRef = doc(this.firestore, `usuarios/${uid}`);
       const estado: UsuarioEstado = { activo: true };
-      await updateDoc(userRef, { estado });
+      await updateDocument(this.firestore, this.USERS_PATH, uid, { estado });
     } catch (error) {
-      console.error('Error al reactivar usuario:', error);
-      throw error;
+      handleFirestoreError(error, 'reactivar usuario');
     }
   }
 
@@ -175,17 +180,23 @@ export class AdminService {
     try {
       const batch = writeBatch(this.firestore);
 
-      // Eliminar documento de Firestore
-      const userRef = doc(this.firestore, `usuarios/${uid}`);
+      // Eliminar documento de usuario
+      const userRef = doc(this.firestore, `${this.USERS_PATH}/${uid}`);
       batch.delete(userRef);
 
       // Eliminar inscripciones asociadas
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      const q = query(inscripcionesRef, where('estudianteUid', '==', uid));
-      const inscripciones = await getDocs(q);
+      const inscripciones = await queryDocuments(
+        this.inscripcionesCollection,
+        [where('estudianteUid', '==', uid)],
+        (data, id) => ({ id })
+      );
 
-      inscripciones.docs.forEach((doc) => {
-        batch.delete(doc.ref);
+      inscripciones.forEach((inscripcion) => {
+        const ref = doc(
+          this.firestore,
+          `${this.INSCRIPCIONES_PATH}/${inscripcion.id}`
+        );
+        batch.delete(ref);
       });
 
       // Ejecutar batch
@@ -193,8 +204,7 @@ export class AdminService {
 
       // Nota: La eliminación en Firebase Auth debe hacerse por separado si es necesario
     } catch (error) {
-      console.error('Error al eliminar usuario:', error);
-      throw error;
+      handleFirestoreError(error, 'eliminar usuario');
     }
   }
 
@@ -228,11 +238,11 @@ export class AdminService {
     docenteUid: string
   ): Promise<void> {
     try {
-      const cursoRef = doc(this.firestore, `cursos/${cursoId}`);
-      await updateDoc(cursoRef, { creadoPorUid: docenteUid });
+      await updateDocument(this.firestore, this.CURSOS_PATH, cursoId, {
+        creadoPorUid: docenteUid,
+      });
     } catch (error) {
-      console.error('Error al asignar docente al curso:', error);
-      throw error;
+      handleFirestoreError(error, 'asignar docente al curso');
     }
   }
 
@@ -241,13 +251,13 @@ export class AdminService {
    */
   async obtenerCursosSinDocente(): Promise<any[]> {
     try {
-      const cursosRef = collection(this.firestore, 'cursos');
-      const q = query(cursosRef, where('creadoPorUid', '==', ''));
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      return await queryDocuments(
+        this.cursosCollection,
+        [where('creadoPorUid', '==', '')],
+        (data, id) => ({ id, ...data })
+      );
     } catch (error) {
-      console.error('Error al obtener cursos sin docente:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener cursos sin docente');
     }
   }
 
@@ -261,18 +271,22 @@ export class AdminService {
    */
   async inscribirEstudianteEnCurso(
     estudianteUid: string,
-    cursoId: string
+    cursoId: string,
+    scheduleId: string
   ): Promise<void> {
     try {
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      await addDoc(inscripcionesRef, {
-        estudianteUid,
-        cursoId,
-        fechaInscripcion: new Date(),
-      });
+      const data = serializeDates(
+        {
+          estudianteUid,
+          cursoId,
+          scheduleId,
+          fechaInscripcion: new Date(),
+        },
+        ['fechaInscripcion']
+      );
+      await createDocument(this.inscripcionesCollection, data);
     } catch (error) {
-      console.error('Error al inscribir estudiante en curso:', error);
-      throw error;
+      handleFirestoreError(error, 'inscribir estudiante en curso');
     }
   }
 
@@ -282,20 +296,32 @@ export class AdminService {
    */
   async desinscribirEstudianteDelCurso(
     estudianteUid: string,
-    cursoId: string
+    cursoId: string,
+    scheduleId?: string
   ): Promise<void> {
     try {
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      const q = query(
-        inscripcionesRef,
+      const constraints = [
         where('estudianteUid', '==', estudianteUid),
-        where('cursoId', '==', cursoId)
+        where('cursoId', '==', cursoId),
+      ];
+      if (scheduleId) {
+        constraints.push(where('scheduleId', '==', scheduleId));
+      }
+
+      const inscripciones = await queryDocuments(
+        this.inscripcionesCollection,
+        constraints,
+        (data, id) => ({ id, ...data })
       );
-      const snapshot = await getDocs(q);
-      snapshot.docs.forEach((doc) => deleteDoc(doc.ref));
+      for (const inscripcion of inscripciones) {
+        await deleteDocument(
+          this.firestore,
+          this.INSCRIPCIONES_PATH,
+          inscripcion.id
+        );
+      }
     } catch (error) {
-      console.error('Error al desinscribir estudiante del curso:', error);
-      throw error;
+      handleFirestoreError(error, 'desinscribir estudiante del curso');
     }
   }
 
@@ -308,17 +334,17 @@ export class AdminService {
     cursoId: string
   ): Promise<boolean> {
     try {
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      const q = query(
-        inscripcionesRef,
-        where('estudianteUid', '==', estudianteUid),
-        where('cursoId', '==', cursoId)
+      const results = await queryDocuments(
+        this.inscripcionesCollection,
+        [
+          where('estudianteUid', '==', estudianteUid),
+          where('cursoId', '==', cursoId),
+        ],
+        (data, id) => ({ id, ...data })
       );
-      const snapshot = await getDocs(q);
-      return !snapshot.empty;
+      return results.length > 0;
     } catch (error) {
-      console.error('Error verificando inscripción existente:', error);
-      throw error;
+      handleFirestoreError(error, 'verificar inscripción existente');
     }
   }
 
@@ -331,35 +357,43 @@ export class AdminService {
       estudianteUid: string;
       cursoId: string;
       fechaInscripcion: any;
+      scheduleId?: string;
       estudiante?: Usuario | null;
+      horario?: Horario | null;
     }>
   > {
     try {
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      const q = query(inscripcionesRef, where('cursoId', '==', cursoId));
-      const snapshot = await getDocs(q);
+      const inscripciones = await queryDocuments(
+        this.inscripcionesCollection,
+        [where('cursoId', '==', cursoId)],
+        (data, id) => ({ id, ...data })
+      );
 
       const resultados = await Promise.all(
-        snapshot.docs.map(async (docSnap) => {
-          const data = docSnap.data();
+        inscripciones.map(async (inscripcion) => {
           const estudiante = await this.usuarioService.obtenerUsuarioPorUid(
-            data['estudianteUid']
+            inscripcion.estudianteUid
           );
-
+          let horario: Horario | null = null;
+          if (inscripcion.scheduleId) {
+            horario = (await getDocumentById(
+              this.firestore,
+              this.HORARIOS_PATH,
+              inscripcion.scheduleId,
+              (data, id) => ({ id, ...data })
+            )) as Horario | null;
+          }
           return {
-            id: docSnap.id,
-            estudianteUid: data['estudianteUid'],
-            cursoId: data['cursoId'],
-            fechaInscripcion: data['fechaInscripcion'],
+            ...inscripcion,
             estudiante,
+            horario,
           };
         })
       );
 
       return resultados;
     } catch (error) {
-      console.error('Error al obtener inscripciones por curso:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener inscripciones por curso');
     }
   }
 
@@ -372,45 +406,56 @@ export class AdminService {
       estudianteUid: string;
       cursoId: string;
       fechaInscripcion: any;
+      scheduleId?: string;
       curso?: { id: string; [key: string]: any } | null;
+      horario?: Horario | null;
     }>
   > {
     try {
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      const q = query(
-        inscripcionesRef,
-        where('estudianteUid', '==', estudianteUid)
+      const inscripciones = await queryDocuments(
+        this.inscripcionesCollection,
+        [where('estudianteUid', '==', estudianteUid)],
+        (data, id) => ({ id, ...data })
       );
-      const snapshot = await getDocs(q);
 
       const resultados = await Promise.all(
-        snapshot.docs.map(async (docSnap) => {
-          const data = docSnap.data();
-          const cursoRef = doc(this.firestore, `cursos/${data['cursoId']}`);
+        inscripciones.map(async (inscripcion) => {
           let cursoData: any = null;
-
           try {
-            const cursoSnap = await getDoc(cursoRef);
-            if (cursoSnap.exists())
-              cursoData = { id: cursoSnap.id, ...cursoSnap.data() };
+            cursoData = await getDocumentById(
+              this.firestore,
+              this.CURSOS_PATH,
+              inscripcion.cursoId,
+              (data, id) => ({ id, ...data })
+            );
           } catch (e) {
-            console.warn('No se pudo obtener datos del curso', data['cursoId']);
+            console.warn(
+              'No se pudo obtener datos del curso',
+              inscripcion.cursoId
+            );
+          }
+
+          let horario: Horario | null = null;
+          if (inscripcion.scheduleId) {
+            horario = (await getDocumentById(
+              this.firestore,
+              this.HORARIOS_PATH,
+              inscripcion.scheduleId,
+              (data, id) => ({ id, ...data })
+            )) as Horario | null;
           }
 
           return {
-            id: docSnap.id,
-            estudianteUid: data['estudianteUid'],
-            cursoId: data['cursoId'],
-            fechaInscripcion: data['fechaInscripcion'],
+            ...inscripcion,
             curso: cursoData,
+            horario,
           };
         })
       );
 
       return resultados;
     } catch (error) {
-      console.error('Error al obtener inscripciones por estudiante:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener inscripciones por estudiante');
     }
   }
 
@@ -419,20 +464,20 @@ export class AdminService {
    */
   async obtenerEstudiantesDelCurso(cursoId: string): Promise<Usuario[]> {
     try {
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      const q = query(inscripcionesRef, where('cursoId', '==', cursoId));
-      const snapshot = await getDocs(q);
+      const inscripciones = await queryDocuments(
+        this.inscripcionesCollection,
+        [where('cursoId', '==', cursoId)],
+        (data, id) => ({ id, ...data })
+      );
 
-      const usuariosPromesas = snapshot.docs.map((doc) => {
-        const estudianteUid = doc.data()['estudianteUid'];
-        return this.usuarioService.obtenerUsuarioPorUid(estudianteUid);
-      });
+      const usuariosPromesas = inscripciones.map((inscripcion) =>
+        this.usuarioService.obtenerUsuarioPorUid(inscripcion.estudianteUid)
+      );
 
       const usuarios = await Promise.all(usuariosPromesas);
       return usuarios.filter((u) => u !== null) as Usuario[];
     } catch (error) {
-      console.error('Error al obtener estudiantes del curso:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener estudiantes del curso');
     }
   }
 
@@ -441,12 +486,12 @@ export class AdminService {
    */
   async obtenerCursos(): Promise<Array<{ id: string; [key: string]: any }>> {
     try {
-      const cursosRef = collection(this.firestore, 'cursos');
-      const snapshot = await getDocs(cursosRef);
-      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      return await getAllDocuments(this.cursosCollection, (data, id) => ({
+        id,
+        ...data,
+      }));
     } catch (error) {
-      console.error('Error al obtener cursos:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener cursos');
     }
   }
 
@@ -459,51 +504,61 @@ export class AdminService {
       estudianteUid: string;
       cursoId: string;
       fechaInscripcion: any;
+      scheduleId?: string;
       estudiante?: Usuario | null;
       curso?: { id: string; [key: string]: any } | null;
+      horario?: Horario | null;
     }>
   > {
     try {
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      const snapshot = await getDocs(inscripcionesRef);
+      const inscripciones = await getAllDocuments(
+        this.inscripcionesCollection,
+        (data, id) => ({ id, ...data })
+      );
 
       const resultados = await Promise.all(
-        snapshot.docs.map(async (docSnap) => {
-          const data = docSnap.data();
-          const estudianteUid = data['estudianteUid'];
-          const cursoId = data['cursoId'];
-
-          // Obtener estudiante
+        inscripciones.map(async (inscripcion) => {
           const estudiante = await this.usuarioService.obtenerUsuarioPorUid(
-            estudianteUid
+            inscripcion.estudianteUid
           );
-
-          // Obtener curso
-          const cursoRef = doc(this.firestore, `cursos/${cursoId}`);
           let cursoData: any = null;
           try {
-            const cursoSnap = await getDoc(cursoRef);
-            if (cursoSnap.exists())
-              cursoData = { id: cursoSnap.id, ...cursoSnap.data() };
+            cursoData = await getDocumentById(
+              this.firestore,
+              this.CURSOS_PATH,
+              inscripcion.cursoId,
+              (data, id) => ({ id, ...data })
+            );
           } catch (e) {
-            console.warn('No se pudo obtener datos del curso', cursoId, e);
+            console.warn(
+              'No se pudo obtener datos del curso',
+              inscripcion.cursoId,
+              e
+            );
+          }
+
+          let horario: Horario | null = null;
+          if (inscripcion.scheduleId) {
+            horario = (await getDocumentById(
+              this.firestore,
+              this.HORARIOS_PATH,
+              inscripcion.scheduleId,
+              (data, id) => ({ id, ...data })
+            )) as Horario | null;
           }
 
           return {
-            id: docSnap.id,
-            estudianteUid,
-            cursoId,
-            fechaInscripcion: data['fechaInscripcion'],
+            ...inscripcion,
             estudiante,
             curso: cursoData,
+            horario,
           };
         })
       );
 
       return resultados;
     } catch (error) {
-      console.error('Error al obtener inscripciones:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener inscripciones');
     }
   }
 
@@ -523,15 +578,13 @@ export class AdminService {
     docenteUid?: string;
   }): Promise<string> {
     try {
-      const horariosRef = collection(this.firestore, 'horarios');
-      const docRef = await addDoc(horariosRef, {
-        ...horario,
-        fechaCreacion: new Date(),
-      });
-      return docRef.id;
+      const payload = serializeDates(
+        { ...horario, fechaCreacion: new Date() },
+        ['fechaCreacion']
+      );
+      return await createDocument(this.horariosCollection, payload);
     } catch (error) {
-      console.error('Error al crear horario:', error);
-      throw error;
+      handleFirestoreError(error, 'crear horario');
     }
   }
 
@@ -539,15 +592,15 @@ export class AdminService {
    * Obtiene horarios de un curso
    * RF 07
    */
-  async obtenerHorariosDeCurso(cursoId: string): Promise<any[]> {
+  async obtenerHorariosDeCurso(cursoId: string): Promise<Horario[]> {
     try {
-      const horariosRef = collection(this.firestore, 'horarios');
-      const q = query(horariosRef, where('cursoId', '==', cursoId));
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      return await queryDocuments(
+        this.horariosCollection,
+        [where('cursoId', '==', cursoId)],
+        (data, id) => ({ id, ...data })
+      );
     } catch (error) {
-      console.error('Error al obtener horarios del curso:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener horarios del curso');
     }
   }
 
@@ -560,11 +613,14 @@ export class AdminService {
     datos: Partial<any>
   ): Promise<void> {
     try {
-      const horarioRef = doc(this.firestore, `horarios/${horarioId}`);
-      await updateDoc(horarioRef, datos);
+      await updateDocument(
+        this.firestore,
+        this.HORARIOS_PATH,
+        horarioId,
+        datos
+      );
     } catch (error) {
-      console.error('Error al actualizar horario:', error);
-      throw error;
+      handleFirestoreError(error, 'actualizar horario');
     }
   }
 
@@ -574,11 +630,9 @@ export class AdminService {
    */
   async eliminarHorario(horarioId: string): Promise<void> {
     try {
-      const horarioRef = doc(this.firestore, `horarios/${horarioId}`);
-      await deleteDoc(horarioRef);
+      await deleteDocument(this.firestore, this.HORARIOS_PATH, horarioId);
     } catch (error) {
-      console.error('Error al eliminar horario:', error);
-      throw error;
+      handleFirestoreError(error, 'eliminar horario');
     }
   }
 
@@ -598,20 +652,20 @@ export class AdminService {
     try {
       const estudiantes = await this.obtenerEstudiantes();
       const docentes = await this.obtenerDocentes();
-      const cursosRef = collection(this.firestore, 'cursos');
-      const cursos = await getDocs(cursosRef);
-      const inscripcionesRef = collection(this.firestore, 'inscripciones');
-      const inscripciones = await getDocs(inscripcionesRef);
+      const cursos = await getAllDocuments(this.cursosCollection, (d) => d);
+      const inscripciones = await getAllDocuments(
+        this.inscripcionesCollection,
+        (d) => d
+      );
 
       return {
         totalEstudiantes: estudiantes.length,
         totalDocentes: docentes.length,
-        totalCursos: cursos.size,
-        totalInscripciones: inscripciones.size,
+        totalCursos: cursos.length,
+        totalInscripciones: inscripciones.length,
       };
     } catch (error) {
-      console.error('Error al obtener estadísticas:', error);
-      throw error;
+      handleFirestoreError(error, 'obtener estadísticas');
     }
   }
 }

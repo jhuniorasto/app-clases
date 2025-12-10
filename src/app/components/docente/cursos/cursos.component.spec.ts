@@ -5,10 +5,10 @@ import {
   tick,
 } from '@angular/core/testing';
 import { CursosComponent } from './cursos.component';
-import { CursoService } from '../../../services/curso.service';
-import { ClaseService } from '../../../services/clase.service';
-import { ProgresoClaseService } from '../../../services/progreso-clase.service';
-import { AuthService } from '../../../services/auth.service';
+import { CursoService } from '../../../core/services/curso.service';
+import { ClaseService } from '../../../core/services/clase.service';
+import { ProgresoClaseService } from '../../../core/services/progreso-clase.service';
+import { AuthService } from '../../../core/services/auth.service';
 import Swal from 'sweetalert2';
 import { of, throwError } from 'rxjs';
 import { Clase } from '../../../models/clase.model';
