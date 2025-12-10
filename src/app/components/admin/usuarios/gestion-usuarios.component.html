@@ -49,22 +49,26 @@
         <div class="container-fluid">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="display-5">
-              <Strong>Gestión de Usuarios</Strong>
+              <strong>👥 Gestión de Usuarios</strong>
             </h3>
             <button
               class="btn btn-primary"
               (click)="abrirFormularioNuevo()"
               *ngIf="!mostrarFormulario"
             >
-              + Nuevo Usuario
+              ➕ Nuevo Usuario
             </button>
           </div>
 
           <!-- Formulario -->
-          <div *ngIf="mostrarFormulario" class="card mb-4">
-            <div class="card-header bg-primary text-white">
+          <div *ngIf="mostrarFormulario" class="card">
+            <div class="card-header">
               <h5>
-                {{ usuarioEditando ? "Editar Usuario" : "Crear Nuevo Usuario" }}
+                {{
+                  usuarioEditando
+                    ? "✏️ Editar Usuario"
+                    : "➕ Crear Nuevo Usuario"
+                }}
               </h5>
             </div>
             <div class="card-body">
@@ -132,9 +136,10 @@
 
                   <div class="col-md-6 mb-3">
                     <label class="form-label">Rol *</label>
-                    <select class="form-control" formControlName="rol">
-                      <option value="estudiante">Estudiante</option>
-                      <option value="docente">Docente</option>
+                    <select class="form-select" formControlName="rol">
+                      <option value="">-- Selecciona un rol --</option>
+                      <option value="estudiante">👤 Estudiante</option>
+                      <option value="docente">👨‍🏫 Docente</option>
                     </select>
                   </div>
 
@@ -147,8 +152,11 @@
                       type="text"
                       class="form-control"
                       formControlName="especialidad"
-                      placeholder="Ej: Matemáticas"
+                      placeholder="Ej: Matemáticas, Física, etc."
                     />
+                    <small class="text-muted"
+                      >Campo opcional para docentes</small
+                    >
                   </div>
 
                   <div
@@ -162,19 +170,22 @@
                       formControlName="numeroEstudiante"
                       placeholder="Ej: EST-001"
                     />
+                    <small class="text-muted"
+                      >Campo opcional para estudiantes</small
+                    >
                   </div>
                 </div>
 
                 <div class="d-flex gap-2">
                   <button type="submit" class="btn btn-success">
-                    {{ usuarioEditando ? "Actualizar" : "Crear" }}
+                    {{ usuarioEditando ? "🔄 Actualizar" : "✅ Crear" }}
                   </button>
                   <button
                     type="button"
                     class="btn btn-secondary"
                     (click)="cerrarFormulario()"
                   >
-                    Cancelar
+                    ❌ Cancelar
                   </button>
                 </div>
               </form>
@@ -182,30 +193,40 @@
           </div>
 
           <!-- Filtros -->
-          <div class="card mb-4">
+          <div class="card" *ngIf="!mostrarFormulario">
             <div class="card-body">
-              <div class="row">
-                <div class="col-md-4 mb-3">
+              <h5>🔍 Filtros</h5>
+              <div class="row g-2 align-items-end">
+                <div class="col-md-3">
                   <label class="form-label">Filtrar por Rol</label>
                   <select
-                    class="form-control"
+                    class="form-select"
                     [(ngModel)]="rolFiltro"
                     (change)="onFiltroChange()"
                   >
-                    <option value="todos">Todos</option>
-                    <option value="estudiante">Estudiante</option>
-                    <option value="docente">Docente</option>
+                    <option value="todos">Todos los roles</option>
+                    <option value="estudiante">👤 Estudiante</option>
+                    <option value="docente">👨‍🏫 Docente</option>
                   </select>
                 </div>
-                <div class="col-md-8 mb-3">
-                  <label class="form-label">Buscar</label>
+
+                <div class="col-md-7">
+                  <label class="form-label"
+                    >Buscar usuario (nombre o email)</label
+                  >
                   <input
                     type="text"
                     class="form-control"
                     [(ngModel)]="terminoBusqueda"
                     (keyup)="onBusqueda()"
-                    placeholder="Buscar por nombre o email..."
+                    placeholder="Escribe nombre o email..."
                   />
+                </div>
+
+                <div class="col-md-2">
+                  <button class="btn btn-primary w-100" (click)="onBusqueda()">
+                    🔄 Aplicar
+                  </button>
                 </div>
               </div>
             </div>
@@ -213,45 +234,47 @@
 
           <!-- Tabla de Usuarios -->
           <div class="card">
-            <div class="card-header bg-light">
+            <div class="card-header">
               <h5>
-                Usuarios
-                <span class="badge badge-primary">{{
-                  usuariosFiltrados.length
-                }}</span>
+                📋 Usuarios
+                <span class="badge">{{ usuariosFiltrados.length }}</span>
               </h5>
             </div>
             <div class="card-body">
               <div *ngIf="cargando" class="alert alert-info">
-                <p>Cargando usuarios...</p>
+                ⏳ Cargando usuarios...
               </div>
 
               <div
                 *ngIf="!cargando && usuariosFiltrados.length === 0"
                 class="alert alert-warning"
               >
-                <p>No hay usuarios para mostrar</p>
+                ⚠️ No hay usuarios que coincidan con los criterios de búsqueda.
               </div>
 
               <div
                 class="table-responsive"
                 *ngIf="!cargando && usuariosFiltrados.length > 0"
               >
-                <table class="table table-striped table-hover">
-                  <thead class="table-dark">
+                <table class="table table-striped">
+                  <thead>
                     <tr>
-                      <th>Nombre</th>
-                      <th>Email</th>
-                      <th>Rol</th>
-                      <th>Especialidad/Número</th>
-                      <th>Estado</th>
-                      <th>Acciones</th>
+                      <th>👤 Nombre</th>
+                      <th>📧 Email</th>
+                      <th>🏷️ Rol</th>
+                      <th>📝 Especialidad/Número</th>
+                      <th>🔗 Estado</th>
+                      <th>⚙️ Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let usuario of usuariosFiltrados">
-                      <td>{{ usuario.nombre }}</td>
-                      <td>{{ usuario.email }}</td>
+                      <td>
+                        <strong>{{ usuario.nombre }}</strong>
+                      </td>
+                      <td>
+                        {{ usuario.email }}
+                      </td>
                       <td>
                         <span
                           class="badge"
@@ -261,11 +284,13 @@
                         </span>
                       </td>
                       <td>
-                        {{
-                          usuario.especialidad ||
-                            usuario.numeroEstudiante ||
-                            "-"
-                        }}
+                        <small class="text-muted">
+                          {{
+                            usuario.especialidad ||
+                              usuario.numeroEstudiante ||
+                              "-"
+                          }}
+                        </small>
                       </td>
                       <td>
                         <span
@@ -274,14 +299,16 @@
                             usuario.estado?.activo ? 'bg-success' : 'bg-danger'
                           "
                         >
-                          {{ usuario.estado?.activo ? "Activo" : "Inactivo" }}
+                          {{
+                            usuario.estado?.activo ? "✅ Activo" : "🔒 Inactivo"
+                          }}
                         </span>
                       </td>
                       <td>
                         <button
                           class="btn btn-sm btn-warning"
                           (click)="abrirFormularioEditar(usuario)"
-                          title="Editar"
+                          title="Editar usuario"
                         >
                           ✏️
                         </button>
@@ -289,14 +316,14 @@
                           class="btn btn-sm btn-danger"
                           (click)="desactivarUsuario(usuario)"
                           *ngIf="usuario.estado?.activo"
-                          title="Desactivar"
+                          title="Desactivar usuario"
                         >
                           🔒
                         </button>
                         <button
-                          class="btn btn-sm btn-dark"
+                          class="btn btn-sm btn-danger"
                           (click)="eliminarUsuario(usuario)"
-                          title="Eliminar"
+                          title="Eliminar usuario permanentemente"
                         >
                           🗑️
                         </button>

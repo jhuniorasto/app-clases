@@ -47,127 +47,211 @@
 
       <body>
         <div class="container-fluid">
-          <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="display-5">
-              <Strong>Gestión de Cursos</Strong>
+              <strong>📚 Gestión de Cursos</strong>
             </h3>
-
-            <button class="btn btn-primary" (click)="abrirFormularioNuevo()">
-              + Nuevo Curso
+            <button
+              class="btn btn-primary"
+              (click)="abrirFormularioNuevo()"
+              *ngIf="!mostrarFormulario"
+            >
+              ➕ Nuevo Curso
             </button>
           </div>
 
-          <div *ngIf="cargando" class="alert alert-info">
-            Cargando cursos...
-          </div>
-
-          <div
-            *ngIf="!cargando && cursos.length === 0"
-            class="alert alert-warning"
-          >
-            No hay cursos
-          </div>
-
-          <div *ngIf="!cargando && cursos.length > 0" class="table-responsive">
-            <table class="table table-striped">
-              <thead class="table-dark">
-                <tr>
-                  <th>Título</th>
-                  <th>Categoría</th>
-                  <th>Creado por</th>
-                  <th>Fecha</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let curso of cursos">
-                  <td>{{ curso.titulo }}</td>
-                  <td>{{ curso.categoria }}</td>
-                  <td>{{ curso.creadoPorUid }}</td>
-                  <td>{{ curso.fechaCreacion | date : "short" }}</td>
-                  <td>
-                    <button
-                      class="btn btn-sm btn-warning"
-                      (click)="abrirFormularioEditar(curso)"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      class="btn btn-sm btn-danger"
-                      (click)="eliminarCurso(curso.id)"
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div *ngIf="mostrarFormulario" class="card mt-4">
-            <div class="card-body">
-              <h5 class="card-title">
-                {{ cursoEditando ? "Editar Curso" : "Nuevo Curso" }}
+          <!-- Formulario -->
+          <div *ngIf="mostrarFormulario" class="card">
+            <div class="card-header">
+              <h5>
+                {{ cursoEditando ? "✏️ Editar Curso" : "➕ Crear Nuevo Curso" }}
               </h5>
+            </div>
+            <div class="card-body">
               <form (ngSubmit)="guardarCurso()">
                 <div class="row">
                   <div class="col-md-6 mb-3">
-                    <label>Título</label>
+                    <label class="form-label">Título del Curso *</label>
                     <input
+                      type="text"
                       class="form-control"
                       [(ngModel)]="nuevoCurso.titulo"
                       name="titulo"
+                      placeholder="Ej: Matemáticas Avanzada"
                       required
                     />
+                    <small class="text-muted">Nombre del curso</small>
                   </div>
+
                   <div class="col-md-6 mb-3">
-                    <label>Categoría</label>
-                    <input
-                      class="form-control"
+                    <label class="form-label">Categoría *</label>
+                    <select
+                      class="form-select"
                       [(ngModel)]="nuevoCurso.categoria"
                       name="categoria"
                       required
-                    />
+                    >
+                      <option value="">-- Selecciona una categoría --</option>
+                      <option value="Matemáticas">Matemáticas</option>
+                      <option value="Ciencias">Ciencias</option>
+                      <option value="Lenguaje">Lenguaje</option>
+                      <option value="Historia">Historia</option>
+                      <option value="Idiomas">Idiomas</option>
+                      <option value="Tecnología">Tecnología</option>
+                      <option value="Arte">Arte</option>
+                      <option value="Educación Física">Educación Física</option>
+                      <option value="Otro">Otro</option>
+                    </select>
+                    <small class="text-muted"
+                      >Selecciona la categoría del curso</small
+                    >
                   </div>
+
                   <div class="col-md-12 mb-3">
-                    <label>Descripción</label>
+                    <label class="form-label">Descripción</label>
                     <textarea
                       class="form-control"
                       [(ngModel)]="nuevoCurso.descripcion"
                       name="descripcion"
-                      rows="3"
+                      placeholder="Descripción detallada del curso..."
+                      rows="4"
                     ></textarea>
+                    <small class="text-muted"
+                      >Proporciona una descripción clara del contenido</small
+                    >
                   </div>
+
                   <div class="col-md-6 mb-3">
-                    <label>Imagen URL</label>
+                    <label class="form-label">URL de Imagen</label>
                     <input
+                      type="url"
                       class="form-control"
                       [(ngModel)]="nuevoCurso.imagenUrl"
                       name="imagenUrl"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                    />
+                    <small class="text-muted"
+                      >Enlace a la imagen del curso</small
+                    >
+                    <img
+                      *ngIf="nuevoCurso.imagenUrl"
+                      [src]="nuevoCurso.imagenUrl"
+                      alt="Preview"
+                      class="img-preview mt-2"
+                      onerror="this.style.display='none'"
                     />
                   </div>
+
                   <div class="col-md-6 mb-3">
-                    <label>Duración (hrs)</label>
+                    <label class="form-label">Duración (horas) *</label>
                     <input
                       type="number"
                       class="form-control"
                       [(ngModel)]="nuevoCurso.duracion"
                       name="duracion"
+                      placeholder="Ej: 40"
+                      min="1"
+                      required
                     />
+                    <small class="text-muted">Horas totales del curso</small>
                   </div>
                 </div>
 
                 <div class="d-flex gap-2">
-                  <button class="btn btn-success" type="submit">Guardar</button>
+                  <button type="submit" class="btn btn-success">
+                    {{ cursoEditando ? "🔄 Actualizar" : "✅ Crear" }}
+                  </button>
                   <button
-                    class="btn btn-secondary"
                     type="button"
+                    class="btn btn-secondary"
                     (click)="cerrarFormulario()"
                   >
-                    Cancelar
+                    ❌ Cancelar
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+
+          <!-- Cargando -->
+          <div *ngIf="cargando" class="alert alert-info">
+            ⏳ Cargando cursos...
+          </div>
+
+          <!-- Sin cursos -->
+          <div
+            *ngIf="!cargando && cursos.length === 0"
+            class="alert alert-warning"
+          >
+            ⚠️ No hay cursos creados. ¡Crea uno para comenzar!
+          </div>
+
+          <!-- Tabla de Cursos -->
+          <div *ngIf="!cargando && cursos.length > 0" class="card">
+            <div class="card-header">
+              <h5>
+                📋 Cursos Disponibles
+                <span class="badge">{{ cursos.length }}</span>
+              </h5>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>📚 Título</th>
+                    <th>🏷️ Categoría</th>
+                    <th>⏱️ Duración (hrs)</th>
+                    <th>📅 Fecha de Creación</th>
+                    <th>📝 Descripción</th>
+                    <th>⚙️ Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let curso of cursos">
+                    <td>
+                      <strong>{{ curso.titulo }}</strong>
+                    </td>
+                    <td>
+                      <span class="badge">
+                        {{ curso.categoria }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge bg-success"
+                        >{{ curso.duracion || 0 }} hrs</span
+                      >
+                    </td>
+                    <td>
+                      {{
+                        curso.fechaCreacion
+                          ? (curso.fechaCreacion | date : "short")
+                          : (curso.fechaCreacion | date : "short")
+                      }}
+                    </td>
+                    <td>
+                      <small class="text-muted">
+                        {{ curso.descripcion.substring(0, 50) || "-" }}...
+                      </small>
+                    </td>
+                    <td>
+                      <button
+                        class="btn btn-sm btn-warning"
+                        (click)="abrirFormularioEditar(curso)"
+                        title="Editar curso"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger"
+                        (click)="eliminarCurso(curso.id)"
+                        title="Eliminar curso"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

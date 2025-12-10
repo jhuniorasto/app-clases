@@ -34,7 +34,7 @@ export class GestionUsuariosComponent implements OnInit {
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      rol: ['estudiante', Validators.required],
+      rol: ['', Validators.required],
       especialidad: [''],
       numeroEstudiante: [''],
     });
@@ -67,10 +67,11 @@ export class GestionUsuariosComponent implements OnInit {
 
     // Filtrar por búsqueda
     if (this.terminoBusqueda.trim()) {
+      const termino = this.terminoBusqueda.toLowerCase();
       usuarios = usuarios.filter(
         (u) =>
-          u.nombre.toLowerCase().includes(this.terminoBusqueda.toLowerCase()) ||
-          u.email.toLowerCase().includes(this.terminoBusqueda.toLowerCase())
+          u.nombre.toLowerCase().includes(termino) ||
+          u.email.toLowerCase().includes(termino)
       );
     }
 
@@ -87,7 +88,7 @@ export class GestionUsuariosComponent implements OnInit {
 
   abrirFormularioNuevo(): void {
     this.usuarioEditando = null;
-    this.formularioUsuario.reset({ rol: 'estudiante' });
+    this.formularioUsuario.reset({ rol: '' });
     this.mostrarFormulario = true;
   }
 
@@ -131,7 +132,7 @@ export class GestionUsuariosComponent implements OnInit {
           especialidad: datos.especialidad,
           numeroEstudiante: datos.numeroEstudiante,
         });
-        Swal.fire('Éxito', 'Usuario actualizado correctamente', 'success');
+        Swal.fire('✅ Éxito', 'Usuario actualizado correctamente', 'success');
       } else {
         // Crear nuevo usuario
         await this.adminService.crearCuentaUsuario({
@@ -142,7 +143,7 @@ export class GestionUsuariosComponent implements OnInit {
           especialidad: datos.especialidad,
           numeroEstudiante: datos.numeroEstudiante,
         });
-        Swal.fire('Éxito', 'Usuario creado correctamente', 'success');
+        Swal.fire('✅ Éxito', 'Usuario creado correctamente', 'success');
       }
 
       this.cerrarFormulario();
@@ -159,12 +160,13 @@ export class GestionUsuariosComponent implements OnInit {
 
   async desactivarUsuario(usuario: Usuario): Promise<void> {
     const resultado = await Swal.fire({
-      title: '¿Desactivar usuario?',
+      title: '⚠️ ¿Desactivar usuario?',
       text: `¿Estás seguro de que deseas desactivar a ${usuario.nombre}?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, desactivar',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: '✅ Sí, desactivar',
+      cancelButtonText: '❌ Cancelar',
+      confirmButtonColor: '#f5576c',
     });
 
     if (resultado.isConfirmed) {
@@ -173,7 +175,7 @@ export class GestionUsuariosComponent implements OnInit {
           usuario.uid,
           'Desactivado por admin'
         );
-        Swal.fire('Éxito', 'Usuario desactivado', 'success');
+        Swal.fire('✅ Éxito', 'Usuario desactivado correctamente', 'success');
         await this.cargarUsuarios();
       } catch (error) {
         Swal.fire('Error', 'No se pudo desactivar el usuario', 'error');
@@ -183,19 +185,19 @@ export class GestionUsuariosComponent implements OnInit {
 
   async eliminarUsuario(usuario: Usuario): Promise<void> {
     const resultado = await Swal.fire({
-      title: '¿Eliminar usuario?',
+      title: '🗑️ ¿Eliminar usuario?',
       text: `¿Estás seguro de que deseas eliminar a ${usuario.nombre}? Esta acción no se puede deshacer.`,
       icon: 'error',
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#d33',
+      confirmButtonText: '✅ Sí, eliminar',
+      cancelButtonText: '❌ Cancelar',
+      confirmButtonColor: '#f5576c',
     });
 
     if (resultado.isConfirmed) {
       try {
         await this.adminService.eliminarUsuario(usuario.uid);
-        Swal.fire('Éxito', 'Usuario eliminado', 'success');
+        Swal.fire('✅ Éxito', 'Usuario eliminado correctamente', 'success');
         await this.cargarUsuarios();
       } catch (error) {
         Swal.fire('Error', 'No se pudo eliminar el usuario', 'error');

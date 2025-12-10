@@ -300,6 +300,121 @@ export class AdminService {
   }
 
   /**
+   * Verifica si un estudiante ya está inscrito en un curso
+   * @returns true si ya existe la inscripción
+   */
+  async verificarInscripcionExistente(
+    estudianteUid: string,
+    cursoId: string
+  ): Promise<boolean> {
+    try {
+      const inscripcionesRef = collection(this.firestore, 'inscripciones');
+      const q = query(
+        inscripcionesRef,
+        where('estudianteUid', '==', estudianteUid),
+        where('cursoId', '==', cursoId)
+      );
+      const snapshot = await getDocs(q);
+      return !snapshot.empty;
+    } catch (error) {
+      console.error('Error verificando inscripción existente:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene inscripciones filtradas por curso
+   */
+  async obtenerInscripcionesPorCurso(cursoId: string): Promise<
+    Array<{
+      id: string;
+      estudianteUid: string;
+      cursoId: string;
+      fechaInscripcion: any;
+      estudiante?: Usuario | null;
+    }>
+  > {
+    try {
+      const inscripcionesRef = collection(this.firestore, 'inscripciones');
+      const q = query(inscripcionesRef, where('cursoId', '==', cursoId));
+      const snapshot = await getDocs(q);
+
+      const resultados = await Promise.all(
+        snapshot.docs.map(async (docSnap) => {
+          const data = docSnap.data();
+          const estudiante = await this.usuarioService.obtenerUsuarioPorUid(
+            data['estudianteUid']
+          );
+
+          return {
+            id: docSnap.id,
+            estudianteUid: data['estudianteUid'],
+            cursoId: data['cursoId'],
+            fechaInscripcion: data['fechaInscripcion'],
+            estudiante,
+          };
+        })
+      );
+
+      return resultados;
+    } catch (error) {
+      console.error('Error al obtener inscripciones por curso:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene inscripciones filtradas por estudiante
+   */
+  async obtenerInscripcionesPorEstudiante(estudianteUid: string): Promise<
+    Array<{
+      id: string;
+      estudianteUid: string;
+      cursoId: string;
+      fechaInscripcion: any;
+      curso?: { id: string; [key: string]: any } | null;
+    }>
+  > {
+    try {
+      const inscripcionesRef = collection(this.firestore, 'inscripciones');
+      const q = query(
+        inscripcionesRef,
+        where('estudianteUid', '==', estudianteUid)
+      );
+      const snapshot = await getDocs(q);
+
+      const resultados = await Promise.all(
+        snapshot.docs.map(async (docSnap) => {
+          const data = docSnap.data();
+          const cursoRef = doc(this.firestore, `cursos/${data['cursoId']}`);
+          let cursoData: any = null;
+
+          try {
+            const cursoSnap = await getDoc(cursoRef);
+            if (cursoSnap.exists())
+              cursoData = { id: cursoSnap.id, ...cursoSnap.data() };
+          } catch (e) {
+            console.warn('No se pudo obtener datos del curso', data['cursoId']);
+          }
+
+          return {
+            id: docSnap.id,
+            estudianteUid: data['estudianteUid'],
+            cursoId: data['cursoId'],
+            fechaInscripcion: data['fechaInscripcion'],
+            curso: cursoData,
+          };
+        })
+      );
+
+      return resultados;
+    } catch (error) {
+      console.error('Error al obtener inscripciones por estudiante:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Obtiene todos los estudiantes inscritos en un curso
    */
   async obtenerEstudiantesDelCurso(cursoId: string): Promise<Usuario[]> {
