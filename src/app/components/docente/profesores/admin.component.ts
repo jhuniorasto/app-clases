@@ -17,10 +17,11 @@ import Swal from 'sweetalert2';
   selector: 'app-admin',
   imports: [CommonModule, FormsModule],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.css',
+  styleUrls: ['./admin.component.css'],
 })
 export class AdminComponent {
   profesores: any[] = [];
+  filteredProfesores: any[] = [];
   mostrarModalEditar = false;
   profesorEditado: any = { id: '', nombre: '', edad: null, curso: '' };
 
@@ -48,6 +49,8 @@ export class AdminComponent {
       id: doc.id,
       ...doc.data(),
     }));
+    // Inicializar lista filtrada
+    this.filteredProfesores = [...this.profesores];
   }
 
   // Mostrar el modal
@@ -167,6 +170,19 @@ export class AdminComponent {
   abrirModalEditar(profesor: any) {
     this.profesorEditado = { ...profesor };
     this.mostrarModalEditar = true;
+  }
+
+  onBuscar(term: string | null | undefined) {
+    const q = (term || '').toString().toLowerCase().trim();
+    if (!q) {
+      this.filteredProfesores = [...this.profesores];
+      return;
+    }
+    this.filteredProfesores = this.profesores.filter((p) => {
+      const nombre = (p.nombre || '').toString().toLowerCase();
+      const curso = (p.curso || '').toString().toLowerCase();
+      return nombre.includes(q) || curso.includes(q);
+    });
   }
 
   cerrarModalEditar() {

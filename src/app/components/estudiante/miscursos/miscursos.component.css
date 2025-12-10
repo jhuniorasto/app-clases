@@ -1,114 +1,15 @@
-body {
-  padding-top: 80px; /* Altura del navbar fijo */
-  padding-bottom: 5%;
-}
+.grid-cursos{display:grid;gap:20px;grid-template-columns:1fr}
 
-.social-list {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+@media(min-width:720px){
+  .grid-cursos{grid-template-columns:repeat(2,1fr)}
+}.curso-card{background:#fff;border-radius:12px;padding:0;overflow:hidden;box-shadow:0 6px 18px rgba(40,40,60,0.06);transition:transform .18s ease;display:flex;flex-direction:column}
+.curso-card:hover{transform:translateY(-6px)}
+.curso-imagen{height:150px;overflow:hidden}
+.curso-imagen img{width:100%;height:100%;object-fit:cover}
+.curso-body{padding:14px 16px;flex:1}
+.curso-titulo{font-weight:700;margin:0 0 6px;color:#222}
+.curso-descripcion{font-size:.95rem;color:#666;margin:0 0 10px}
+.curso-docente{font-size:.9rem;color:#444}
 
-.header-menu {
-  list-style: none;
-  padding-left: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-.header-menu li {
-  margin: 5px 0;
-}
-
-.curso-card {
-  border-radius: 15px;
-  background: radial-gradient(
-    circle,
-    rgba(238, 174, 202, 1) 0%,
-    rgba(148, 187, 233, 1) 100%
-  );
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #f0f0f0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
-  cursor: pointer;
-  color: inherit;
-  text-decoration: none;
-}
-
-.curso-card:hover {
-  transform: translateY(-5px);
-}
-
-.curso-imagen img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-top: 12px;
-}
-
-.curso-titulo {
-  font-family: "Poppins";
-  font-weight: 600;
-  font-size: 2rem;
-}
-
-.curso-docente {
-  margin-top: 10px;
-  font-size: 1.5rem;
-}
-
-.curso-progreso {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-}
-
-.curso-acciones {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-}
-
-svg {
-  transform: rotate(-90deg);
-}
-
-circle.bg {
-  fill: none;
-  stroke: #eee;
-  stroke-width: 4;
-}
-
-circle.progress {
-  fill: none;
-  stroke: #8e44ad;
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-dasharray: 100, 100;
-  transition: stroke-dasharray 0.3s ease;
-}
-
-text.porcentaje {
-  fill: #000;
-  font-size: 10px;
-  transform: rotate(90deg);
-}
-
-.curso-progreso .bg {
-  fill: none;
-  stroke: #e0e0e0; /* gris claro */
-  stroke-width: 4;
-}
-
-.curso-progreso .progress {
-  fill: none;
-  stroke: #a259e6; /* morado */
-  stroke-width: 4;
-  stroke-linecap: round;
-  transition: stroke-dasharray 0.5s, stroke-dashoffset 0.5s;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-}
+.curso-actions{display:flex;gap:8px;align-items:center}
+.btn{border-radius:8px}

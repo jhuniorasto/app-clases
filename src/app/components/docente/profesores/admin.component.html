@@ -1,144 +1,58 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, minimum-scale=1"
-    />
-    <meta
-      name="description"
-      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
-    />
-    <title>EduSmart - Gestión de Cursos Virtuales</title>
+<!-- Gestión de Profesores (component template) -->
+<div class="profesores-root container"> 
+  <div class="d-flex align-items-center justify-content-between mt-5 mb-3">
+    <h3 class="display-5 mb-0"><strong>Gestión de Profesores</strong></h3>
+    <div class="d-flex gap-2 align-items-center">
+        <input #search type="search" class="form-control form-control-sm search-input" placeholder="Buscar profesor..." (input)="onBuscar(search.value)" />
+      <button class="btn btn-primary btn-sm" (click)="agregarProfesor()">Agregar Profesor</button>
+    </div>
+  </div>
 
-    <!-- Estilos Mobirise y Bootstrap -->
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
-    />
-    <!-- Fuente -->
-  </head>
-
-  <body>
-    <!-- Sección de gestion de profesores -->
-    <div class="container">
-      <h3 class="display-5 mt-5">
-        <Strong>Gestión de Profesores</Strong>
-      </h3>
-
-      <div class="d-flex justify-content-end mb-4">
-        <button class="btn btn-primary" (click)="agregarProfesor()">
-          Agregar Profesor
-        </button>
+  <div class="profesores-grid">
+      <div class="profesor-card" *ngFor="let profesor of filteredProfesores">
+      <div class="profesor-top">
+        <img [src]="profesor.imagenUrl || 'https://via.placeholder.com/150'" alt="avatar" class="avatar" />
       </div>
-
-      <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
-        <div class="col" *ngFor="let profesor of profesores">
-          <div class="card h-100 shadow border-0">
-            <div class="text-center mt-4">
-              <img
-                [src]="profesor.imagenUrl || 'https://via.placeholder.com/150'"
-                class="rounded-circle"
-                alt="Foto del profesor"
-                style="width: 120px; height: 120px; object-fit: cover"
-              />
-            </div>
-            <div class="card-body text-center">
-              <h5 class="card-title mb-3">{{ profesor.nombre }}</h5>
-              <p class="card-text">
-                <strong>Edad:</strong> {{ profesor.edad }}<br />
-                <strong>Curso:</strong> {{ profesor.curso }}
-              </p>
-            </div>
-            <div
-              class="card-footer bg-transparent border-0 d-flex justify-content-center gap-2 mb-3"
-            >
-              <button
-                class="btn btn-outline-primary btn-sm px-3"
-                (click)="abrirModalEditar(profesor)"
-              >
-                Modificar
-              </button>
-
-              <button
-                class="btn btn-outline-danger btn-sm px-3"
-                (click)="eliminarProfesor(profesor.id)"
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
+      <div class="profesor-body">
+        <h5 class="profesor-nombre">{{ profesor.nombre }}</h5>
+        <div class="profesor-meta small text-muted">Edad: {{ profesor.edad }} • Curso: {{ profesor.curso }}</div>
+      </div>
+      <div class="profesor-actions">
+        <button class="btn btn-sm btn-outline-primary" (click)="abrirModalEditar(profesor)">Modificar</button>
+        <button class="btn btn-sm btn-outline-danger" (click)="eliminarProfesor(profesor.id)">Eliminar</button>
       </div>
     </div>
+  </div>
 
-    <!-- Modal agregar profesor -->
-    <div class="modal-overlay" *ngIf="mostrarModal">
-      <div class="modal-content">
-        <h4 class="modal-title">Agregar Profesor</h4>
+  <!-- Modal agregar profesor -->
+  <div class="modal-overlay" *ngIf="mostrarModal">
+    <div class="modal-content">
+      <h4 class="modal-title">Agregar Profesor</h4>
 
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="profesorForm.nombre"
-          placeholder="Nombre del profesor"
-        />
-        <input
-          class="form-control mb-2"
-          type="number"
-          [(ngModel)]="profesorForm.edad"
-          placeholder="Edad"
-        />
-        <input
-          class="form-control mb-3"
-          [(ngModel)]="profesorForm.curso"
-          placeholder="Curso que imparte"
-        />
+      <input class="form-control mb-2" [(ngModel)]="profesorForm.nombre" placeholder="Nombre del profesor" />
+      <input class="form-control mb-2" type="number" [(ngModel)]="profesorForm.edad" placeholder="Edad" />
+      <input class="form-control mb-3" [(ngModel)]="profesorForm.curso" placeholder="Curso que imparte" />
 
-        <div class="modal-buttons">
-          <button class="btn guardar" (click)="confirmarAgregarProfesor()">
-            Guardar
-          </button>
-          <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
-        </div>
+      <div class="modal-buttons text-end">
+        <button class="btn btn-primary btn-sm" (click)="confirmarAgregarProfesor()">Guardar</button>
+        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cerrarModal()">Cancelar</button>
       </div>
     </div>
+  </div>
 
-    <!-- Modal para editar profesor -->
-    <div class="modal-overlay" *ngIf="mostrarModalEditar">
-      <div class="modal-content">
-        <h4 class="modal-title">Editar Profesor</h4>
+  <!-- Modal editar profesor -->
+  <div class="modal-overlay" *ngIf="mostrarModalEditar">
+    <div class="modal-content">
+      <h4 class="modal-title">Editar Profesor</h4>
 
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="profesorEditado.nombre"
-          placeholder="Nombre"
-        />
-        <input
-          class="form-control mb-2"
-          type="number"
-          [(ngModel)]="profesorEditado.edad"
-          placeholder="Edad"
-        />
-        <input
-          class="form-control mb-3"
-          [(ngModel)]="profesorEditado.curso"
-          placeholder="Curso"
-        />
+      <input class="form-control mb-2" [(ngModel)]="profesorEditado.nombre" placeholder="Nombre" />
+      <input class="form-control mb-2" type="number" [(ngModel)]="profesorEditado.edad" placeholder="Edad" />
+      <input class="form-control mb-3" [(ngModel)]="profesorEditado.curso" placeholder="Curso" />
 
-        <div class="modal-buttons d-flex justify-content-between">
-          <button class="btn btn-success px-4" (click)="confirmarEdicion()">
-            Guardar cambios
-          </button>
-          <button
-            class="btn btn-outline-secondary px-4"
-            (click)="cerrarModalEditar()"
-          >
-            Cancelar
-          </button>
-        </div>
+      <div class="modal-buttons text-end">
+        <button class="btn btn-success btn-sm" (click)="confirmarEdicion()">Guardar cambios</button>
+        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cerrarModalEditar()">Cancelar</button>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+</div>

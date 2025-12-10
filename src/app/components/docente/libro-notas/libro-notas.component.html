@@ -1,0 +1,59 @@
+<div class="container mt-4">
+  <h2>Libro de notas - Curso: {{ cursoId }}</h2>
+
+  <div *ngIf="cargando">Cargando datos...</div>
+
+  <div *ngIf="!cargando && clases.length === 0">No hay clases para este curso.</div>
+
+  <div *ngIf="!cargando && estudiantes.length > 0">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Estudiante</th>
+          <th *ngFor="let clase of clases">{{ clase.titulo }}</th>
+          <th>Promedio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let est of estudiantes">
+          <td>{{ est.usuario?.nombre || est.estudianteUid }}</td>
+          <td *ngFor="let clase of clases">
+            <div *ngIf="!est.editando[clase.id]">
+              <span *ngIf="est.notasPorClase[clase.id]">{{ est.notasPorClase[clase.id]?.valor }}</span>
+              <span *ngIf="!est.notasPorClase[clase.id]">-</span>
+              <button class="btn btn-sm btn-link" (click)="openModalFor(est, clase.id)">Editar</button>
+            </div>
+            <div *ngIf="est.editando[clase.id]">
+              <input type="number" class="form-control form-control-sm d-inline-block" style="width:80px" [(ngModel)]="est.valorTemporal[clase.id]" />
+              <button class="btn btn-sm btn-primary ms-1" (click)="guardarNota(est, clase.id)">Guardar</button>
+              <button class="btn btn-sm btn-secondary ms-1" (click)="cancelarEdicion(est, clase.id)">Cancelar</button>
+            </div>
+          </td>
+          <td>{{ est.promedio | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Modal de edición de nota -->
+  <div class="modal-overlay" *ngIf="modalVisible">
+    <div class="modal-dialog card p-3">
+      <h5>Editar nota</h5>
+      <p><strong>Estudiante:</strong> {{ modalEstudiante?.usuario?.nombre || modalEstudiante?.estudianteUid }}</p>
+      <p><strong>Clase:</strong> {{ getClaseTitulo(modalClaseId) }}</p>
+      <form #notaFormRef="ngForm" (ngSubmit)="saveFromModal()">
+        <div class="mb-2">
+          <label class="form-label">Calificación</label>
+          <input name="modalValor" type="number" min="0" max="100" required class="form-control" [(ngModel)]="modalValor" #modalValorControl="ngModel" />
+          <div *ngIf="modalValorControl.invalid && (modalValorControl.dirty || modalValorControl.touched)" class="text-danger small">
+            <div *ngIf="modalValorControl.errors?.['required']">La calificación es obligatoria.</div>
+            <div *ngIf="modalValorControl.errors?.['min'] || modalValorControl.errors?.['max']">Valor entre 0 y 100.</div>
+          </div>
+        </div>
+        <div class="text-end">
+          <button class="btn btn-primary btn-sm" [disabled]="notaFormRef.invalid">Guardar</button>
+          <button type="button" class="btn btn-secondary btn-sm ms-2" (click)="closeModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

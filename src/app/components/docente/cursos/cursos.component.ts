@@ -8,11 +8,13 @@ import { CursoService } from '../../../services/curso.service';
 import { ClaseService } from '../../../services/clase.service';
 import { ProgresoClaseService } from '../../../services/progreso-clase.service';
 import { AuthService } from '../../../services/auth.service';
+import { UsuarioService } from '../../../services/usuario.service';
 import { RouterModule } from '@angular/router';
+import { TypeaheadComponent } from '../../../shared/typeahead/typeahead.component';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 @Component({
   selector: 'app-cursos',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TypeaheadComponent],
   standalone: true,
   templateUrl: './cursos.component.html',
   styleUrls: ['./cursos.component.css'],
@@ -22,6 +24,11 @@ export class CursosComponent {
   cursoSeleccionado: Curso | null = null;
   mostrarModal = false;
   isEstudiante: boolean = false;
+
+  profesores: any[] = [];
+  docenteQuery: string = '';
+  filteredProfesores: any[] = [];
+  selectedProfesorNombre: string | null = null;
 
   imagenPorDefecto: string =
     'https://cdn-icons-png.flaticon.com/512/4539/4539220.png';
@@ -41,6 +48,8 @@ export class CursosComponent {
     private claseService: ClaseService,
     private progresoClaseService: ProgresoClaseService,
     private authService: AuthService
+    ,
+    private usuarioService: UsuarioService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -50,6 +59,38 @@ export class CursosComponent {
     }
     this.cargarCursos();
     this.checkearRol();
+    this.cargarProfesores();
+  }
+
+  async cargarProfesores(): Promise<void> {
+    try {
+      this.profesores = await this.usuarioService.obtenerProfesores();
+    } catch (err) {
+      console.error('Error al cargar profesores:', err);
+      this.profesores = [];
+    }
+  }
+
+  getDocenteNombre(uid: string | undefined | null): string {
+    if (!uid) return 'Desconocido';
+    const prof = this.profesores.find((p) => p.uid === uid);
+    return prof ? prof.nombre || prof.email || uid : uid;
+  }
+
+  filterProfesores(): void {
+    const q = (this.docenteQuery || '').toLowerCase();
+    if (!q) {
+      this.filteredProfesores = [];
+      return;
+    }
+    this.filteredProfesores = this.profesores.filter((p) => (p.nombre || '').toLowerCase().includes(q));
+  }
+
+  selectProfesor(prof: any): void {
+    this.nuevoCurso.creadoPorUid = prof.uid;
+    this.docenteQuery = prof.nombre;
+    this.selectedProfesorNombre = prof.nombre;
+    this.filteredProfesores = [];
   }
 
   async checkearRol(): Promise<void> {
@@ -119,6 +160,15 @@ export class CursosComponent {
   seleccionarCurso(curso: Curso): void {
     this.cursoSeleccionado = curso;
     this.nuevoCurso = { ...curso };
+    // intentar mostrar el nombre del docente seleccionado
+    const prof = this.profesores.find((p) => p.uid === curso.creadoPorUid);
+    if (prof) {
+      this.docenteQuery = prof.nombre;
+      this.selectedProfesorNombre = prof.nombre;
+    } else {
+      this.docenteQuery = '';
+      this.selectedProfesorNombre = null;
+    }
     this.abrirModal(); // Abre el modal con los datos del curso
   }
 

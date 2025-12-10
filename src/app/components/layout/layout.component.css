@@ -1,0 +1,20 @@
+/* Compensar navbar fijo (56px de alto mínimo en desktop, menos en mobile) */
+:host {
+  display: block;
+  /* Ajusta este valor si tu navbar es más alto. */
+  --navbar-height: 92px;
+}
+
+main {
+  margin-top: var(--navbar-height);
+  padding: 24px;
+  min-height: calc(100vh - var(--navbar-height));
+  background: #f8f9fa;
+}
+
+/* Mobile: navbar más compacta */
+@media (max-width: 767px) {
+  main {
+    margin-top: 64px;
+  }
+}

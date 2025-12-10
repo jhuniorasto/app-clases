@@ -9,10 +9,11 @@ import { FooterComponent } from '../home/footer/footer.component';
   imports: [RouterOutlet, NavbarComponent, FooterComponent],
   template: `
     <app-navbar></app-navbar>
-    <main class="">
+    <main>
       <router-outlet></router-outlet>
     </main>
     <app-footer></app-footer>
   `,
+  styleUrls: ['./layout.component.css'],
 })
 export class LayoutComponent {}

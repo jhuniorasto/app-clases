@@ -115,6 +115,16 @@ export const routes: Routes = [
             canLoad: [AuthGuard, RoleGuard],
             data: { roles: ['docente', 'estudiante', 'admin'] },
           },
+          {
+            path: 'libro-notas/:id',
+            loadComponent: () =>
+              import('./components/docente/libro-notas/libro-notas.component').then(
+                (m) => m.LibroNotasComponent
+              ),
+            canActivate: [AuthGuard, RoleGuard],
+            canLoad: [AuthGuard, RoleGuard],
+            data: { roles: ['docente', 'admin'] },
+          },
         ],
       },
       {

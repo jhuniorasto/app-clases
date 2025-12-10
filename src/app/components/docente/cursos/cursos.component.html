@@ -1,122 +1,69 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, minimum-scale=1"
-    />
-    <meta
-      name="description"
-      content="Desarrolla una moderna aplicación web en Angular standalone, conectada a Firebase, para gestionar cursos virtuales."
-    />
-    <title>EduSmart - Gestión de Cursos Virtuales</title>
+<div class="container">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h3 class="display-5"><strong>Gestión de Cursos</strong></h3>
+    <div>
+      <button class="btn btn-primary" (click)="abrirModal()">Agregar Curso</button>
+    </div>
+  </div>
 
-    <!-- Estilos Mobirise y Bootstrap -->
-    <link
-      rel="stylesheet"
-      href="https://r.mobirisesite.com/1458871/assets/css/mbr-additional.css"
-    />
-    <!-- Fuente -->
-  </head>
+  <div class="grid-cursos">
+    <div *ngFor="let curso of cursos">
+      <div class="curso-card">
+        <div class="curso-imagen">
+          <img [src]="curso.imagenUrl || imagenPorDefecto" alt="Curso" />
+        </div>
+        <div class="curso-body">
+          <div>
+            <h4 class="curso-titulo">{{ curso.titulo }}</h4>
+            <p class="curso-descripcion">{{ curso.descripcion }}</p>
+          </div>
 
-  <body>
-    <div class="container">
-      <h3 class="display-5 mt-5">
-        <Strong>Gestión de Cursos</Strong>
-      </h3>
-
-      <div class="d-flex justify-content-end mb-4">
-        <button class="btn btn-primary" (click)="abrirModal()">
-          Agregar Curso
-        </button>
-      </div>
-
-      <div class="row row-cols-1 row-cols-md-2 g-4">
-        <div class="col" *ngFor="let curso of cursos">
-          <div class="curso-card p-3 d-block">
-            <div class="curso-imagen">
-              <img [src]="curso.imagenUrl || imagenPorDefecto" alt="Curso" />
-            </div>
-            <div class="curso-info mt-3">
-              <h6 class="curso-titulo mb-1">
-                {{ curso.titulo }} - {{ curso.descripcion }}
-              </h6>
-              <p class="curso-docente text-muted">
-                Docente: {{ curso.creadoPorUid }}
-              </p>
-            </div>
-            <div class="curso-ver">
-              <button
-                class="btn btn-primary btn-sm"
-                [routerLink]="['/cursos/detalle-curso', curso.id]"
-              >
-                Ver curso
-              </button>
-            </div>
-            <!-- Iconos de editar y eliminar solo para admin/profesor -->
-            <div class="curso-acciones text-end" *ngIf="!isEstudiante">
-              <button
-                class="btn btn-link p-0 me-2"
-                title="Editar"
-                (click)="seleccionarCurso(curso)"
-              >
-                <i class="bi bi-pencil-square fs-5 text-primary"></i>
-              </button>
-              <button
-                class="btn btn-link p-0"
-                (click)="eliminarCurso(curso.id)"
-                title="Eliminar"
-              >
-                <i class="bi bi-trash fs-5 text-danger"></i>
-              </button>
+            <div class="curso-meta">
+            <div class="curso-docente">{{ getDocenteNombre(curso.creadoPorUid) }}</div>
+            <div class="curso-actions">
+              <button class="btn btn-primary" [routerLink]="['/cursos/detalle-curso', curso.id]">Ver</button>
+              <button class="btn btn-outline-secondary" *ngIf="!isEstudiante" [routerLink]="['/cursos/libro-notas', curso.id]">Libro</button>
+              <button class="btn" *ngIf="!isEstudiante" (click)="seleccionarCurso(curso)"><i class="bi bi-pencil"></i></button>
+              <button class="btn" *ngIf="!isEstudiante" (click)="eliminarCurso(curso.id)"><i class="bi bi-trash text-danger"></i></button>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Modal para agregar/modificar curso -->
-    <div class="modal-overlay" *ngIf="mostrarModal">
-      <div class="modal-content">
-        <h4 class="modal-title">
-          {{ cursoSeleccionado ? "Modificar Curso" : "Agregar Curso" }}
-        </h4>
+  <!-- Modal para agregar/modificar curso -->
+  <div class="modal-overlay" *ngIf="mostrarModal">
+    <div class="modal-content">
+      <h4 class="modal-title">{{ cursoSeleccionado ? 'Modificar Curso' : 'Agregar Curso' }}</h4>
 
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="nuevoCurso.titulo"
-          placeholder="Título del curso"
-        />
-        <textarea
-          class="form-control mb-2"
-          [(ngModel)]="nuevoCurso.descripcion"
-          placeholder="Descripción del curso"
-        ></textarea>
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="nuevoCurso.categoria"
-          placeholder="Categoría"
-        />
-        <input
-          class="form-control mb-2"
-          [(ngModel)]="nuevoCurso.imagenUrl"
-          placeholder="URL de la imagen"
-        />
-        <input
-          class="form-control mb-3"
-          [(ngModel)]="nuevoCurso.creadoPorUid"
-          placeholder="UID del creador"
-        />
+      <form (ngSubmit)="confirmarAgregarCurso()">
+        <div class="form-field">
+          <input class="form-control" [(ngModel)]="nuevoCurso.titulo" name="titulo" placeholder="Título del curso" />
+        </div>
+
+        <div class="form-field">
+          <input class="form-control" [(ngModel)]="nuevoCurso.categoria" name="categoria" placeholder="Categoría" />
+        </div>
+
+        <div class="form-field">
+          <textarea class="form-control" [(ngModel)]="nuevoCurso.descripcion" name="descripcion" placeholder="Descripción del curso"></textarea>
+        </div>
+
+        <div class="form-field">
+          <input class="form-control" [(ngModel)]="nuevoCurso.imagenUrl" name="imagenUrl" placeholder="URL de la imagen" />
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Docente (buscar por nombre)</label>
+          <app-typeahead [items]="profesores" displayField="nombre" valueField="uid" placeholder="Escribe para buscar..." (select)="selectProfesor($event)"></app-typeahead>
+        </div>
 
         <div class="modal-buttons">
-          <button class="btn guardar" (click)="confirmarAgregarCurso()">
-            Guardar
-          </button>
-          <button class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
+          <button type="button" class="btn cancelar" (click)="cerrarModal()" style="display:inline-block !important; visibility:visible !important; background:var(--accent) !important; color:#000000 !important; padding:.65rem 1.2rem; border-radius:8px; border:none;">Cancelar</button>
+          <button type="submit" class="btn guardar" style="display:inline-block !important; visibility:visible !important; background:var(--accent) !important; color:#000000 !important; padding:.65rem 1.2rem; border-radius:8px; border:none;">Guardar</button>
         </div>
-      </div>
+      </form>
     </div>
-  </body>
-</html>
+  </div>
+</div>

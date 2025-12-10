@@ -150,7 +150,7 @@
                   {{ curso.titulo }} - {{ curso.descripcion }}
                 </h6>
                 <p class="curso-docente text-muted">
-                  Docente: {{ curso.creadoPorUid }}
+                  Docente: {{ getDocenteNombre(curso.creadoPorUid) }}
                 </p>
               </div>
             </a>

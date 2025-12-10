@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { UsuarioService } from '../../../services/usuario.service';
 
 @Component({
   selector: 'app-miscursos',
@@ -39,6 +40,8 @@ export class MiscursosComponent {
     private progresoClaseService: ProgresoClaseService,
     private authService: AuthService,
     private inscripcionService: InscripcionService
+    ,
+    private usuarioService: UsuarioService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -76,6 +79,8 @@ export class MiscursosComponent {
       this.cursos = cursos.filter(
         (curso) => !cursosInscritosIds.includes(curso.id)
       );
+      // Pre-cargar nombres de docentes para mejorar presentación
+      await this.preloadDocentesForCursos(this.cursos);
       // Calcula el progreso solo para los cursos no inscritos (opcional)
     });
   }
@@ -105,6 +110,29 @@ export class MiscursosComponent {
     );
     this.cursosInscritos = cursos.filter((c) => !!c); // Filtra nulos
     this.calcularProgresosCursosInscritos();
+    await this.preloadDocentesForCursos(this.cursosInscritos);
+  }
+
+  docentesCache: { [uid: string]: string } = {};
+
+  private async preloadDocentesForCursos(cursos: Curso[]) {
+    if (!cursos || cursos.length === 0) return;
+    const uids = Array.from(new Set(cursos.map((c) => c.creadoPorUid).filter(Boolean)));
+    for (const uid of uids) {
+      if (!this.docentesCache[uid]) {
+        try {
+          const u = await this.usuarioService.obtenerUsuarioPorUid(uid);
+          this.docentesCache[uid] = u ? u.nombre || u.email || uid : uid;
+        } catch (err) {
+          this.docentesCache[uid] = uid;
+        }
+      }
+    }
+  }
+
+  getDocenteNombre(uid: string | undefined | null): string {
+    if (!uid) return 'Desconocido';
+    return this.docentesCache[uid] || uid;
   }
 
   async calcularProgresosCursosInscritos() {

@@ -13,6 +13,7 @@ import {
   CollectionReference,
 } from '@angular/fire/firestore';
 import { Clase } from '../models/clase.model'; // Ajusta según tu estructura
+import { MaterialClase } from '../models/material-clase.model';
 import { collectionData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -22,9 +23,11 @@ import { map } from 'rxjs/operators';
 })
 export class ClaseService {
   private clasesCollection: CollectionReference;
+  private materialesCollection: CollectionReference;
 
   constructor(private firestore: Firestore) {
     this.clasesCollection = collection(this.firestore, 'clases');
+    this.materialesCollection = collection(this.firestore, 'materiales-clase');
   }
 
   // ✅ Crear una nueva clase
@@ -67,5 +70,31 @@ export class ClaseService {
   async eliminarClase(id: string): Promise<void> {
     const claseRef = doc(this.firestore, `clases/${id}`);
     await deleteDoc(claseRef);
+  }
+
+  // ---------- Materiales de clase (RF09) ----------
+  typeMaterialInput: any;
+  async crearMaterial(material: { claseId: string; titulo: string; descripcion?: string; tipo?: string; url?: string; creadoPor?: string; }): Promise<string> {
+    const docRef = await addDoc(this.materialesCollection, {
+      ...material,
+      fechaCreacion: new Date().toISOString(),
+    });
+    return docRef.id;
+  }
+
+  async obtenerMaterialesPorClase(claseId: string): Promise<MaterialClase[]> {
+    const q = query(this.materialesCollection, where('claseId', '==', claseId));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((docSnap) => MaterialClase.fromFirestore(docSnap.data(), docSnap.id));
+  }
+
+  async actualizarMaterial(id: string, datos: Partial<Omit<MaterialClase, 'id' | 'claseId'>>): Promise<void> {
+    const ref = doc(this.firestore, `materiales-clase/${id}`);
+    await updateDoc(ref, datos as any);
+  }
+
+  async eliminarMaterial(id: string): Promise<void> {
+    const ref = doc(this.firestore, `materiales-clase/${id}`);
+    await deleteDoc(ref);
   }
 }
